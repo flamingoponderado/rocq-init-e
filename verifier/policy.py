@@ -18,6 +18,9 @@ FORBIDDEN=frozenset({'Notation','Infix','Reserved','Declare','Redirect',
 class Rejected(ValueError): pass
 
 def read_claim(path):
+ return parse_claim(Path(path).read_text())
+
+def parse_claim(text):
  def unique_pairs(pairs):
   result={}
   for k,v in pairs:
@@ -25,7 +28,7 @@ def read_claim(path):
    result[k]=v
   return result
  try:
-  value=json.loads(Path(path).read_text(),object_pairs_hook=unique_pairs,
+  value=json.loads(text,object_pairs_hook=unique_pairs,
    parse_constant=lambda _: (_ for _ in ()).throw(Rejected('nonfinite JSON number')))
  except (ValueError,UnicodeError) as e: raise Rejected('invalid claim: '+str(e)) from e
  if not isinstance(value,dict) or set(value)!={'K'}: raise Rejected('claim must contain only K')
@@ -58,13 +61,31 @@ def tokens(source):
  if depth:raise Rejected('unterminated comment')
 
 def check_source(path):
- source=Path(path).read_text()
+ return check_source_text(Path(path).read_text())
+
+def check_source_text(source):
  identifiers=list(tokens(source))
  bad=set(identifiers)&FORBIDDEN
- # A Load command cannot be hidden behind a wrapper; reject standalone Load
- # at a vernacular boundary while allowing qualified instruction constructors.
- stripped=re.sub(r'\(\*.*?\*\)', '', source, flags=re.S)
- if re.search(r'(?:\A|\.\s+)(?:Time\s+|Fail\s+|Timeout\s+[0-9]+\s+)*(?:Load|Add\s+LoadPath|Remove\s+LoadPath)\b',stripped):
+ # Reject filesystem commands at any position, including vernacular wrappers.
+ # Qualified instruction constructors such as ReducedTypes.Load remain valid.
+ clean=[];i=0;depth=0
+ while i<len(source):
+  if source.startswith('(*',i):depth+=1;i+=2;clean.append(' ');continue
+  if depth and source.startswith('*)',i):depth-=1;i+=2;continue
+  if depth:i+=1;continue
+  if source[i]=='"':
+   i+=1;clean.append(' ')
+   while i<len(source):
+    if source[i]=='"':
+     if i+1<len(source) and source[i+1]=='"':i+=2;continue
+     i+=1;break
+    i+=1
+   continue
+  clean.append(source[i]);i+=1
+ cleaned=''.join(clean)
+ if (any(not re.search(r'[A-Za-z_][A-Za-z_0-9\x27]*\.$',cleaned[:m.start()])
+         for m in re.finditer(r'(?<![\w\x27])Load\b',cleaned))
+     or re.search(r'\b(?:Add|Remove)\s+(?:Rec\s+)?(?:LoadPath|ML\s+Path)\b',cleaned)):
   bad.add('load-path command')
  if bad:raise Rejected('unsupported submission command: '+', '.join(sorted(bad)))
  return source
@@ -73,12 +94,18 @@ def check_kernel_context(output):
  marker='CONTEXT SUMMARY\n==============='
  if output.count(marker)!=1:raise Rejected('missing or ambiguous kernel context')
  text=output.split(marker,1)[1]
- if '* Theory: Set is predicative' not in text:raise Rejected('unexpected Set theory')
- if '* Theory: Rewrite rules are not allowed' not in text:raise Rejected('rewrite rules enabled')
+ headers=[re.sub(r': <none>$', ':', h) for h in re.findall(r'^\* (.*)$',text,re.M)]
+ expected={'Theory: Set is predicative','Theory: Rewrite rules are not allowed',
+  'Axioms:',*(name+':' for name in UNSAFE_SECTIONS),
+  'Inductives relying on indices not mattering:'}
+ if set(headers)!=expected or len(headers)!=len(expected):
+  raise Rejected('unexpected or duplicate kernel sections')
+ if text.splitlines().count('* Theory: Set is predicative')!=1:raise Rejected('unexpected Set theory')
+ if text.splitlines().count('* Theory: Rewrite rules are not allowed')!=1:raise Rejected('rewrite rules enabled')
  def section(name):
-  m=re.search(r'^\* '+re.escape(name)+r':([^*]*)(?=^\*|\Z)',text,re.M|re.S)
-  if not m:raise Rejected('missing kernel section '+name)
-  return m[1].strip()
+  matches=list(re.finditer(r'^\* '+re.escape(name)+r':([^*]*)(?=^\*|\Z)',text,re.M|re.S))
+  if len(matches)!=1:raise Rejected('missing kernel section '+name)
+  return matches[0][1].strip()
  values=section('Axioms')
  found=set(values.split()) if values!='<none>' else set()
  if not found<=AXIOMS:raise Rejected('unapproved axioms: '+', '.join(sorted(found-AXIOMS)))
