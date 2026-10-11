@@ -169,3 +169,25 @@ certificate fails kernel policy. Results are recorded in
 `verifier-hardened-regressions.json`. Static configuration facts retain
 encoder correctness as an explicit obligation. Guest AST compilation is
 still live, and no positive baseline verifier result or main push is claimed.
+
+## Compiler application premises now proved
+
+`BackendConfigFacts.baseline_backend_configuration` proves the full concrete
+`backend_config_ok` predicate. `MachineConfigFacts` proves register
+initialization and reduces machine configuration correctness to the remaining
+encoder theorem. `SourceAllocation.source_globals_allocatable` proves global
+allocation for every input; no input-size assumption is introduced.
+`BaselineLayout` proves the fixed heap/stack arithmetic.
+
+`CompilerStepBridge` transfers successful supported steps, preserving the
+original distinct canonical values on failed THE. `EncoderSupport` passed
+independent full kernel replay with exactly the existing five foundation
+axioms, was reviewed and integrated as `465bb33`, and passed coherent Dune
+compilation. `ReducedEncoderStep.reduced_one_step` transfers abstract
+instruction correctness and the memory-frame property to the reduced target.
+Complete arbitrary-interference paths and per-assembly-case encoder
+correctness remain required; the worker is auditing its path proof branch.
+
+Concrete guest compilation, native installation/bootstrap, the actual stack
+certificate, source declaration-order behavior transport, final reference
+fidelity review and positive full verifier acceptance remain outstanding.
