@@ -1,0 +1,23 @@
+{
+  "verifier_source_commit": "6fcb55a",
+  "unit_tests_passed": 18,
+  "real_cli_cases": {
+    "wrong-statement": {
+      "rejected": true,
+      "gate": "comparison.log"
+    },
+    "wrong-rom": {
+      "rejected": true,
+      "gate": "comparison.log"
+    },
+    "wrong-score": {
+      "rejected": true,
+      "gate": "comparison.log"
+    },
+    "extra-axiom": {
+      "rejected": true,
+      "gate": "kernel.log"
+    }
+  },
+  "scope": "Negative integration only; positive baseline acceptance outstanding."
+}

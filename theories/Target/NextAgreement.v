@@ -3,7 +3,7 @@ From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.examples.l3_machine_code.riscv.model Require riscv.
 From Galette.HOL.examples.l3_machine_code.riscv.step Require riscv_step.
-From InitE.Target Require Import ReducedTypes ReducedStep StateEmbedding StateAgreement FetchAgreement MemoryAgreement Step InstructionEmbedding RunAgreement.
+From InitE.Target Require Import ReducedTypes ReducedStep StateEmbedding StateAgreement FetchAgreement MemoryAgreement Step InstructionEmbedding RunAgreement StoreAgreement.
 Theorem update_pc_embedding s pc :
  option_map embedriscv_state (ReducedStep.update_pc pc s) =
  riscv_step.update_pc pc (embedriscv_state s).
@@ -58,4 +58,14 @@ Proof.
  apply run_embedding_from_stores.
  - rewrite fetch_preserves_validity; exact H.
  - intros st; apply Hstore; rewrite fetch_preserves_validity; exact H.
+Qed.
+
+Theorem reduced_next_embedding s : Configuration.riscvOk s = true ->
+ option_map embedriscv_state (ReducedStep.NextRISCV s) = Step.NextRISCV (embedriscv_state s).
+Proof.
+ intros H; apply reduced_next_from_store_simulation; [exact H|].
+ intros fetched st Hf; destruct st;
+ repeat match goal with x : (_ * _)%type |- _ => destruct x end;
+ cbn [ReducedStep.Run embedStore riscv.Run fst snd];
+ [apply simulate_SB|apply simulate_SD|apply simulate_SH|apply simulate_SW]; exact Hf.
 Qed.

@@ -150,3 +150,22 @@ It snapshots participant inputs and sealed trusted libraries into private
 replay directories, rejects unsafe source commands and parses kernel context
 sections strictly. The current operator seal needs regeneration after the
 final coherent build; full baseline acceptance remains outstanding.
+
+## Completed reduced step composition
+
+Worker stores were reviewed and integrated as `83e1c33`; their independent
+kernel replay used only the existing five foundation axioms. A coherent full
+Dune build then passed with all four store simulations, memory writes,
+`NextAgreement.reduced_next_embedding`, static machine initialization and
+register permutation inverse facts. Reduced step agreement is now proved on
+original valid states against the restricted full model. Transfer to the
+unrestricted compiler target still needs support facts for encoded paths and
+the complete encoder correctness proof. Reference-definition fidelity review
+remains outstanding; this result is not a concrete baseline certificate.
+
+All four real hardened CLI negative cases passed: wrong statement, wrong ROM
+and wrong score fail trusted module comparison, and an axiom-backed exact
+certificate fails kernel policy. Results are recorded in
+`verifier-hardened-regressions.json`. Static configuration facts retain
+encoder correctness as an explicit obligation. Guest AST compilation is
+still live, and no positive baseline verifier result or main push is claimed.
