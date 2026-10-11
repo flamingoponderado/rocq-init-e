@@ -27,6 +27,28 @@ class PolicyTests(unittest.TestCase):
     p.write_text(text)
     with self.assertRaises(Rejected):check_source(p)
    p.write_text('(* Notation (* nested *) *) Definition x := ReducedTypes.Load.');check_source(p)
+ def test_wrapped_load_and_nested_comments(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   p=Path(tmp)/'Solution.v'
+   for text in ['Fail (* outer (* inner *) tail *) Load "x".',
+                'Time Timeout 2 Load "x".', 'Fail Add Rec LoadPath "x".',
+                'Remove LoadPath "x".', 'Add ML Path "x".',
+                'Definition x := 0.Load "x".']:
+    p.write_text(text)
+    with self.subTest(text=text),self.assertRaises(Rejected):check_source(p)
+   p.write_text('(* Load "x". (* nested *) *) Definition x := "Load". Definition y := ReducedTypes.Load.')
+   check_source(p)
+ def test_ambiguous_kernel_context(self):
+  log=(ROOT/'docs/challenge-kernel-check.log').read_text()
+  for extra in ['* Axioms: Candidate.bad',
+                '* Constants/Inductives relying on type-in-type: Candidate.bad',
+                '* Theory: Set is impredicative', '* Unknown audit section: <none>']:
+   with self.subTest(extra=extra),self.assertRaises(Rejected):
+    check_kernel_context(log+'\n'+extra+'\n')
+  with self.assertRaises(Rejected):check_kernel_context(log+log)
+  # A closed proof with no assumptions is still admissible.
+  start=log.index('* Axioms:');end=log.index('* Constants/',start)
+  self.assertEqual(check_kernel_context(log[:start]+'* Axioms: <none>\n\n'+log[end:]),[])
  def test_rom_bounds(self):
   with self.assertRaises(Rejected):literal_module(b'','infinity')
   text=literal_module(bytes([0,255,19]),'finite 12')

@@ -7,7 +7,7 @@ A package directory contains `rom.bin`, `claim.json`, `Solution.v` and optional
 Rocq helper sources. Binary/compiled helpers and symlinks are rejected.
 `claim.json` contains exactly `{"K":"infinity"}` or a nonnegative JSON integer
 in `K`. The ROM admission bound is 1..128 MiB; this is the original code bound,
-not a new restriction on challenge inputs.
+not a new restriction on challenge inputs. Claims are limited to 1 MiB of JSON.
 
 The verifier generates immutable `SubmissionLiterals.Values` from the bytes
 and claim. `Solution.v` can import it and must export:
@@ -50,6 +50,35 @@ also invalidates that run.
 
 ```sh
 python3 verifier/verify.py /path/to/package --output .artifacts/replay-new
+```
+
+The verifier reads inputs through regular-file descriptors without following
+symlinks in any path component, and checks for concurrent writes. It validates
+the copied sources again before invoking Rocq. ROM bytes and the claim are
+read once for literal generation. All stages run in a private directory under
+`/tmp`; only hash-checked `.vo` snapshots are mounted as challenge libraries.
+The main checkout `_build` is never mounted or written by a stage. Logs and
+artifacts are copied to the requested output after the sandbox exits, including
+on stage failure. Use an operator-owned output parent directory.
+
+The seal is an operator trust anchor, not a signature supplied by a participant.
+Keep the checkout, seal, verifier installation, `/usr`, system libraries and
+the entire Rocq toolchain prefix inaccessible to participant writes throughout
+a run. The seal hashes the Rocq launcher, not every runtime executable, plugin
+or standard-library dependency; it cannot authenticate an attacker-controlled
+toolchain. Replacing trusted files requires operator review, kernel checking
+and resealing. Private snapshots prevent later challenge-library changes from
+changing what a verification stage loads.
+
+Kernel summaries must contain exactly one of each expected audit section.
+Unknown or repeated sections, contradictory theory flags and extra axioms
+fail closed. A proof using a subset of the five foundation axioms, including
+no axioms, remains admissible.
+
+Run the fast security regressions with:
+
+```sh
+python3 -m unittest discover -s verifier -v
 ```
 
 Outputs include stage logs, protected generated literals and the final kernel
