@@ -121,6 +121,13 @@ bitmap count and static stack result is running; it is separate from the
 earlier text-based assembly proposal and is not yet a compilation proof.
 
 The verifier currently has literal/kernel-policy checks and six security
-regressions. The real sandboxed CLI, immutable manifest, successful baseline
-package and end-to-end acceptance gate are still outstanding. A minimal
+regressions. The real sandboxed CLI and immutable source/artifact sealing are implemented.
+Wrong statements, mismatched ROM, mismatched score and axiom-backed
+certificates were rejected by their intended gates. Successful baseline
+acceptance and final adversarial integration review remain outstanding. A minimal
 Bubblewrap namespace/isolation capability check passed on this server.
+
+`StateAgreement.v` now proves GPR, PC, memory and validity agreement with the
+Galette model and equivalence of the assembly-state relation. Instruction
+execution/encoder correctness transfer and the concrete baseline proof are
+still required.
