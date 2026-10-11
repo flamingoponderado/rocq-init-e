@@ -2,6 +2,7 @@
 From Galette Require Import Base.
 From Stdlib Require Import Lia.
 From Galette.HOL.src.finite_maps Require Import sptree.
+From Galette.HOL.src.pred_set.src Require Import pred_set.
 From Galette.cakeml.misc Require Import misc.
 From Galette.cakeml.compiler.backend Require Import stack_names.
 From Galette.cakeml.compiler.backend.riscv Require riscv_config.
@@ -40,3 +41,16 @@ Proof.
  - assert (n=0 \/ n=1 \/ n=2 \/ n=3 \/ n=4 \/ n=5 \/ n=6 \/ n=7 \/ n=8 \/ n=9 \/ n=10 \/ n=11 \/ n=12 \/ n=13 \/ n=14 \/ n=15 \/ n=16 \/ n=17 \/ n=18 \/ n=19 \/ n=20 \/ n=21 \/ n=22 \/ n=23 \/ n=24 \/ n=25 \/ n=26 \/ n=27 \/ n=28 \/ n=29 \/ n=30) by lia.
    destruct H0 as [E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|[E|E]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]; subst n; vm_compute; reflexivity.
 Qed.
+
+Theorem riscv_names_bijective : BIJ (find_name riscv_config.riscv_names) UNIV UNIV.
+Proof.
+ unfold BIJ,INJ,SURJ,pred_set.IN,UNIV; split; split.
+ - auto.
+ - intros x y _ E; pose proof (f_equal riscv_name_inverse E) as H.
+   rewrite !name_left_inverse in H; exact H.
+ - auto.
+ - intros x _; exists (riscv_name_inverse x); split; [exact I|apply name_right_inverse].
+Qed.
+
+Theorem riscv_names_admissible : names_ok riscv_config.riscv_names 32 [0;2;3;4;31] = true.
+Proof. vm_compute; reflexivity. Qed.
