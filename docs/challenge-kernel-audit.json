@@ -1,0 +1,15 @@
+{
+  "command": "rocq check -bytecode-compiler yes -silent -o -Q _build/default/galette-theories Galette -Q _build/default/theories InitE InitE.InitE.Challenge",
+  "exit": 0,
+  "scope": "Fixed original challenge and dependencies; not baseline certificate acceptance",
+  "axioms": [
+    "Stdlib.Logic.ClassicalEpsilon.constructive_indefinite_description",
+    "Stdlib.Logic.ProofIrrelevance.proof_irrelevance",
+    "Stdlib.Logic.FunctionalExtensionality.functional_extensionality_dep",
+    "Stdlib.Logic.PropExtensionality.propositional_extensionality",
+    "Stdlib.Logic.Classical_Prop.classic"
+  ],
+  "unsafe_fixpoints": false,
+  "assumed_positivity": false,
+  "type_in_type": false
+}

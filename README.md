@@ -29,6 +29,8 @@ Toolchain: Rocq 9.3.0, OCaml 5.2.1, Dune 3.24.2.
 git submodule update --init
 python3 scripts/import_guest.py --check
 python3 scripts/import_decoder.py --check
+python3 scripts/import_reduced_types.py --check
+python3 scripts/import_reduced_decoder.py --check
 dune build -j 3
 ```
 
@@ -43,7 +45,10 @@ Galette's extracted compiler can be built separately in `vendor/galette`.
 - Finite/infinite score, memory constants, and total declared-gas reader.
 - Input framing, startup words, shared-memory handlers, all accelerator calls.
 - Fixed Pancake source state and behavior, trace replay and output matching.
-- Literal original RV64IM decoder and its outer instruction step equation.
+- Original reduced RV64IM carriers, physical memory, all instruction cases,
+  and the complete literal interpreter step.
+- Original submission admission, zeroed machine state, and fixed certificate
+  statement; infinity still requires finite matching termination.
 - Kernel checked accelerator known-answer and decoder-boundary regressions.
 
 These modules do not yet constitute a complete challenge certificate.
