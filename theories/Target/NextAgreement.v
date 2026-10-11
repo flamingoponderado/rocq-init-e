@@ -3,7 +3,7 @@ From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.examples.l3_machine_code.riscv.model Require riscv.
 From Galette.HOL.examples.l3_machine_code.riscv.step Require riscv_step.
-From InitE.Target Require Import ReducedTypes ReducedStep StateEmbedding StateAgreement FetchAgreement MemoryAgreement Step.
+From InitE.Target Require Import ReducedTypes ReducedStep StateEmbedding StateAgreement FetchAgreement MemoryAgreement Step InstructionEmbedding RunAgreement.
 Theorem update_pc_embedding s pc :
  option_map embedriscv_state (ReducedStep.update_pc pc s) =
  riscv_step.update_pc pc (embedriscv_state s).
@@ -39,4 +39,23 @@ Proof.
    + rewrite <- (write_next_fetch_embedding _ None); apply update_pc_embedding.
    + reflexivity.
  - apply update_pc_embedding.
+Qed.
+
+Theorem decode_any_embedding raw :
+ embedInstruction (ReducedStep.DecodeAny raw) = Step.DecodeAny (embedrawInstType raw).
+Proof. destruct raw; [reflexivity|apply reduced_decoder_embedding]. Qed.
+Theorem reduced_next_from_store_simulation s :
+ Configuration.riscvOk s = true ->
+ (forall fetched st, Configuration.riscvOk fetched = true ->
+ embedriscv_state (ReducedStep.Run (ReducedTypes.Store st) fetched) =
+ riscv.Run (riscv.Store (embedStore st)) (embedriscv_state fetched)) ->
+ option_map embedriscv_state (ReducedStep.NextRISCV s) = Step.NextRISCV (embedriscv_state s).
+Proof.
+ intros H Hstore.
+ apply next_embedding_from_run; [apply validity_physical_mode; exact H|].
+ cbn beta iota zeta.
+ rewrite <- decode_any_embedding.
+ apply run_embedding_from_stores.
+ - rewrite fetch_preserves_validity; exact H.
+ - intros st; apply Hstore; rewrite fetch_preserves_validity; exact H.
 Qed.

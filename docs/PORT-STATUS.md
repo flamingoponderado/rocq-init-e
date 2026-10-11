@@ -131,3 +131,22 @@ Bubblewrap namespace/isolation capability check passed on this server.
 Galette model and equivalence of the assembly-state relation. Instruction
 execution/encoder correctness transfer and the concrete baseline proof are
 still required.
+
+## Reduced compiler-model bridge progress
+
+The checked arithmetic, immediate, multiplication/division, shift, branch,
+upper-immediate and jump simulations are composed in `RunAgreement.v`.
+All seven integer loads and interpreter signals are checked. Memory reads
+include unaligned cross-word accesses; physical translation follows from
+original validity. Fetch preserves validity. `NextAgreement.v` composes
+these results into reduced outer-step agreement with an explicit store
+simulation obligation. `TargetProperties.v` proves the reduced `target_ok`
+property through the original projection embedding. These are local build
+results, not a complete encoder correctness or baseline certificate.
+
+Verifier hardening from worker branch `agent/verifier-review` was reviewed
+and integrated as `a56baac`; all 18 Python regressions passed independently.
+It snapshots participant inputs and sealed trusted libraries into private
+replay directories, rejects unsafe source commands and parses kernel context
+sections strictly. The current operator seal needs regeneration after the
+final coherent build; full baseline acceptance remains outstanding.
