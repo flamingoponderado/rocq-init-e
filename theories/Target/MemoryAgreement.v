@@ -38,3 +38,25 @@ Proof.
    { apply N.eqb_neq; intro E; assert (bool_decide (w2n (w2w address : word 3)=0)=true) by (apply (proj2 (bool_decide_spec _)); exact E); congruence. }
    rewrite Hn; change (63%N) with (dimindex 64-1)%N; rewrite low_extract_resize; reflexivity.
 Qed.
+
+Definition physical_mode (s : ReducedTypes.riscv_state) : Prop :=
+ ReducedTypes.mstatus_VM (ReducedTypes.MachineCSR_mstatus
+ (ReducedStateOps.MCSR s)) = n2w 0.
+Theorem validity_physical_mode s : Configuration.riscvOk s = true -> physical_mode s.
+Proof.
+ unfold Configuration.riscvOk,physical_mode,ReducedStateOps.MCSR.
+ rewrite !Bool.andb_true_iff; intros [[[[Hv Ha] Hf] He] Hp].
+ apply (proj1 (bool_decide_spec _)); exact Hv.
+Qed.
+Theorem translate_physical s address ft ac :
+ physical_mode s ->
+ riscv.translateAddr (address,ft,ac) (embedriscv_state s) = (Some address,embedriscv_state s).
+Proof.
+ intros H.
+ assert (Hv : riscv.mstatus_VM (riscv.MachineCSR_mstatus (riscv.MCSR (embedriscv_state s))) = n2w 0) by exact H.
+ unfold riscv.translateAddr; rewrite Hv.
+ unfold riscv.vmType.
+ assert (Hz : bool_decide ((n2w 0 : word 5)=n2w 0)=true) by (apply (proj2 (bool_decide_spec _)); reflexivity).
+ rewrite Hz.
+ reflexivity.
+Qed.
