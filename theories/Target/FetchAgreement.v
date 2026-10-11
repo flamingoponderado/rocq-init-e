@@ -38,3 +38,12 @@ Proof.
  embedriscv_state (snd (ReducedMemory.rawReadInst (ReducedUpperJump.PC s) s)))).
  apply raw_instruction_embedding.
 Qed.
+
+Theorem fetch_preserves_validity s :
+ Configuration.riscvOk (snd (ReducedMemory.Fetch s)) = Configuration.riscvOk s.
+Proof.
+ unfold ReducedMemory.Fetch,ReducedMemory.translateAddr,ReducedMemory.rawReadInst.
+ cbn [fst].
+ destruct (fcp_index (ReducedTypes.riscv_state_MEM8 s (ReducedUpperJump.PC s)) 1 &&
+ fcp_index (ReducedTypes.riscv_state_MEM8 s (ReducedUpperJump.PC s)) 0); reflexivity.
+Qed.
