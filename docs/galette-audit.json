@@ -1,0 +1,18 @@
+{
+  "galette_commit": "6eab85e03c934eae714ecf5eb02061b55f2843c1",
+  "fresh_dependency_build_exit": 0,
+  "audit_command": "rocq compile -Q vendor/galette/_build/default/theories Galette .artifacts/CompilerAudit.v",
+  "audit_exit": 0,
+  "theorem": "Galette.cakeml.pancake.proofs.pan_to_targetProof.pan_to_target_compile_semantics",
+  "assumptions": [
+    "PropExtensionality.propositional_extensionality",
+    "ProofIrrelevance.proof_irrelevance",
+    "FunctionalExtensionality.functional_extensionality_dep",
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic"
+  ],
+  "rocq": "9.3.0",
+  "ocaml": "5.2.1",
+  "dune": "3.24.2",
+  "scope": "Compiler theorem dependency assumptions; not a completed init-e baseline certificate."
+}

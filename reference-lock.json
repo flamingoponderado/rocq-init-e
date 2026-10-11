@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "dependencies": {
+    "reference/init-e": {
+      "url": "https://github.com/flamingoponderado/init-e.git",
+      "commit": "b3831bc501713e27b9f6974a5eb3cd0b1ca0d2c2"
+    },
+    "reference/flapjack": {
+      "url": "https://github.com/flamingoponderado/flapjack.git",
+      "commit": "034bb5a1ed0b757082768d5406206bd2f8e31b7c"
+    },
+    "reference/riscv-zkvm": {
+      "url": "https://github.com/Verified-zkEVM/riscv-zkvm.git",
+      "commit": "afcbc45e1c74c2d296e032b5606dd977a304e8ad"
+    },
+    "vendor/galette": {
+      "url": "https://github.com/flamingoponderado/galette.git",
+      "commit": "6eab85e03c934eae714ecf5eb02061b55f2843c1"
+    }
+  }
+}
