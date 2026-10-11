@@ -42,3 +42,27 @@ Proof.
    change (index < 0+48) in Hb; lia.
  - lia.
 Qed.
+
+Lemma signed_small_word n : n <= 2040 -> Zs (n2w n : word 64) = Z.of_N n.
+Proof.
+ intros H; unfold Zs; rewrite w2n_n2w.
+ change ((if 9223372036854775808 <=? n mod 18446744073709551616
+ then (Z.of_N (n mod 18446744073709551616)-18446744073709551616)%Z
+ else Z.of_N (n mod 18446744073709551616)) = Z.of_N n).
+ rewrite N.mod_small by lia.
+ assert (E : (9223372036854775808 <=? n)=false) by (apply N.leb_gt; lia).
+ rewrite E; reflexivity.
+Qed.
+Theorem stack_allocation_immediate n : n <= stack_remove.max_stack_alloc ->
+ asm.valid_imm riscv_target.riscv_config (inl asm.Sub) (n2w (n*8)) = true /\
+ asm.valid_imm riscv_target.riscv_config (inl asm.Add) (n2w (n*8)) = true.
+Proof.
+ intros H; change (n<=255) in H.
+ change ((word_lt riscv_target.min12 (n2w (n*8)) && word_le (n2w (n*8)) riscv_target.max12)=true /\
+ (word_le riscv_target.min12 (n2w (n*8)) && word_le (n2w (n*8)) riscv_target.max12)=true).
+ rewrite !word_lt_Zs,!word_le_Zs.
+ rewrite signed_small_word by lia.
+ replace (Zs riscv_target.min12) with (-2048)%Z by (vm_compute; reflexivity).
+ replace (Zs riscv_target.max12) with 2047%Z by (vm_compute; reflexivity).
+ rewrite !Bool.andb_true_iff,!Z.ltb_lt,!Z.leb_le; lia.
+Qed.
