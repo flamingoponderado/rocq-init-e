@@ -115,3 +115,17 @@ Qed.
 Theorem word_memory_embedding (s : ReducedTypes.riscv_state) (index : word 61) :
  riscv.MEM index (embedriscv_state s) = ReducedMemory.MEM index s.
 Proof. unfold riscv.MEM,ReducedMemory.MEM; cbn beta iota zeta; rewrite !memory_embedding, (proj1 WORD_ADD_0); reflexivity. Qed.
+
+Theorem trap_embedding (s : ReducedTypes.riscv_state) e badaddr :
+ embedriscv_state (ReducedStateOps.setTrap e badaddr s) =
+ riscv.setTrap (embedExceptionType e,badaddr) (embedriscv_state s).
+Proof.
+ unfold ReducedStateOps.setTrap,riscv.setTrap; rewrite write_next_fetch_embedding.
+ unfold embedTransferControl,embedSynchronousTrap; cbn.
+ unfold riscv.SynchronousTrap_badaddr_fupd,riscv.SynchronousTrap_trap_fupd; cbn.
+ reflexivity.
+Qed.
+Theorem address_exception_embedding (s : ReducedTypes.riscv_state) e address :
+ embedriscv_state (ReducedUpperJump.signalAddressException e address s) =
+ riscv.signalAddressException (embedExceptionType e,address) (embedriscv_state s).
+Proof. unfold ReducedUpperJump.signalAddressException,riscv.signalAddressException; apply trap_embedding. Qed.

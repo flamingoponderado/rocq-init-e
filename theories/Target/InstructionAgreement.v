@@ -500,3 +500,31 @@ Proof.
  match goal with |- context [if ?b then _ else _] => destruct b end.
  all: rewrite ?branch_embedding; reflexivity.
 Qed.
+
+Theorem simulate_JAL (s : ReducedTypes.riscv_state) (rd : word 5) (imm : word 20) :
+ embedriscv_state (dfnJAL (rd,imm) s) =
+ riscv.dfn'JAL (rd,imm) (embedriscv_state s).
+Proof.
+ unfold dfnJAL,riscv.dfn'JAL.
+ rewrite ?gpr_embedding, !pc_embedding, !skip_embedding, !word_bit_index.
+ replace (0 <? dimindex 64) with true by reflexivity.
+ cbn [andb].
+ unfold ReducedUpperJump.PC.
+ match goal with |- context [if ?b then _ else _] => destruct b end.
+ - rewrite address_exception_embedding; reflexivity.
+ - rewrite branch_embedding, write_GPR_embedding; reflexivity.
+Qed.
+
+Theorem simulate_JALR (s : ReducedTypes.riscv_state) (rd rs1 : word 5) (imm : word 12) :
+ embedriscv_state (dfnJALR (rd,(rs1,imm)) s) =
+ riscv.dfn'JALR (rd,rs1,imm) (embedriscv_state s).
+Proof.
+ unfold dfnJALR,riscv.dfn'JALR.
+ rewrite ?gpr_embedding, !pc_embedding, !skip_embedding, !word_bit_index.
+ replace (0 <? dimindex 64) with true by reflexivity.
+ cbn [andb].
+ unfold ReducedUpperJump.PC.
+ match goal with |- context [if ?b then _ else _] => destruct b end.
+ - rewrite address_exception_embedding; reflexivity.
+ - rewrite branch_embedding, write_GPR_embedding; reflexivity.
+Qed.
