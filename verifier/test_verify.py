@@ -54,6 +54,8 @@ class FileBoundaryTests(unittest.TestCase):
    snapshot=root/'snapshot'
    with patch.object(verify,'ROOT',root),patch.object(verify,'SEAL',seal),patch.object(verify.shutil,'which',return_value=str(launcher)):
     verify.check_seal(snapshot)
+    self.assertEqual((snapshot/'_build/default/theories/A.v').read_bytes(),b'theories/A.v')
+    self.assertEqual((snapshot/'_build/default/galette-theories/B.v').read_bytes(),b'vendor/galette/theories/B.v')
     vo=root/'_build/default/theories/A.vo';vo.write_bytes(b'changed')
     self.assertEqual((snapshot/'_build/default/theories/A.vo').read_bytes(),b'_build/default/theories/A.vo')
     with self.assertRaises(Rejected):verify.check_seal()

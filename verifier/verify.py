@@ -59,8 +59,15 @@ def check_seal(snapshot=None):
   path=ROOT/name
   data=read_regular(path)
   if hashlib.sha256(data).hexdigest()!=digest:raise Rejected('trusted file changed: '+name)
-  if snapshot is not None and name.endswith('.vo'):
-   dest=snapshot/name;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
+  if snapshot is not None:
+   target_name=None
+   if name.endswith('.vo'):target_name=name
+   elif name.startswith('theories/') and name.endswith('.v'):
+    target_name='_build/default/'+name
+   elif name.startswith('vendor/galette/theories/') and name.endswith('.v'):
+    target_name='_build/default/galette-theories/'+name.removeprefix('vendor/galette/theories/')
+   if target_name is not None:
+    dest=snapshot/target_name;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
  launcher=shutil.which('rocq')
  if not launcher:raise Rejected('Rocq launcher missing')
  rocq=Path(launcher).resolve()
