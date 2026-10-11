@@ -3,6 +3,7 @@ From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.src.n_bit.words Require Import lemmas.
 From Galette.HOL.examples.l3_machine_code.riscv.model Require riscv.
+From Galette.HOL.examples.l3_machine_code.riscv.step Require riscv_step.
 From InitE.Target Require Import ReducedTypes ReducedStateOps ReducedMemory StateEmbedding StateAgreement MemoryAgreement.
 Open Scope N_scope.
 Theorem raw_instruction_embedding s address :
@@ -22,4 +23,18 @@ Proof.
  all: rewrite !memory_embedding; cbn beta iota zeta.
  all: unfold ReducedMemory.writeSkip; cbn.
  all: rewrite ?(proj1 WORD_ADD_0); reflexivity.
+Qed.
+
+Theorem fetch_embedding s : physical_mode s ->
+ let fetched := ReducedMemory.Fetch s in
+ riscv_step.Fetch (embedriscv_state s) =
+ (embedrawInstType (fst fetched),embedriscv_state (snd fetched)).
+Proof.
+ intros H; unfold ReducedMemory.Fetch,ReducedMemory.translateAddr,riscv_step.Fetch.
+ rewrite translate_physical by exact H.
+ cbn beta iota zeta.
+ change (riscv.rawReadInst (ReducedUpperJump.PC s) (embedriscv_state s) =
+ (embedrawInstType (fst (ReducedMemory.rawReadInst (ReducedUpperJump.PC s) s)),
+ embedriscv_state (snd (ReducedMemory.rawReadInst (ReducedUpperJump.PC s) s)))).
+ apply raw_instruction_embedding.
 Qed.
