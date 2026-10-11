@@ -66,3 +66,34 @@ Proof.
  replace (Zs riscv_target.max12) with 2047%Z by (vm_compute; reflexivity).
  rewrite !Bool.andb_true_iff,!Z.ltb_lt,!Z.leb_le; lia.
 Qed.
+
+Lemma signed_negative_small n : n <= 384 ->
+ Zs (word_sub (n2w 0) (n2w n) : word 64) = (-Z.of_N n)%Z.
+Proof.
+ intros H; destruct (N.eq_dec n 0) as [E|E]; [subst n; vm_compute; reflexivity|].
+ unfold word_sub; rewrite (proj2 WORD_ADD_0).
+ unfold word_2comp,Zs; rewrite !w2n_n2w.
+ change ((if 9223372036854775808 <=? (18446744073709551616-n mod 18446744073709551616) mod 18446744073709551616
+ then (Z.of_N ((18446744073709551616-n mod 18446744073709551616) mod 18446744073709551616)-18446744073709551616)%Z
+ else Z.of_N ((18446744073709551616-n mod 18446744073709551616) mod 18446744073709551616)) = (-Z.of_N n)%Z).
+ rewrite (N.mod_small n) by lia.
+ rewrite N.mod_small by lia.
+ assert (B : (9223372036854775808 <=? 18446744073709551616-n)=true) by (apply N.leb_le; lia).
+ rewrite B,N2Z.inj_sub by lia; lia.
+Qed.
+Theorem stack_store_offset_bounds name :
+ asm.addr_offset_ok riscv_target.riscv_config (stack_remove.store_offset name) = true /\
+ asm.hw_offset_ok riscv_target.riscv_config (stack_remove.store_offset name) = true.
+Proof.
+ pose proof (stack_store_position_bound name) as H.
+ change (asm.offset_ok 0 (riscv_target.min12,riscv_target.max12)
+ (word_sub (n2w 0) (n2w (8*stack_remove.store_pos name)))=true /\
+ asm.offset_ok 0 (riscv_target.min12,riscv_target.max12)
+ (word_sub (n2w 0) (n2w (8*stack_remove.store_pos name)))=true).
+ unfold asm.offset_ok; rewrite !word_le_Zs.
+ rewrite signed_negative_small by lia.
+ replace (Zs riscv_target.min12) with (-2048)%Z by (vm_compute; reflexivity).
+ replace (Zs riscv_target.max12) with 2047%Z by (vm_compute; reflexivity).
+ rewrite (proj2 aligned_0).
+ rewrite !Bool.andb_true_iff,!Z.leb_le; repeat split; try reflexivity; lia.
+Qed.
