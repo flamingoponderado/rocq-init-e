@@ -191,3 +191,34 @@ correctness remain required; the worker is auditing its path proof branch.
 Concrete guest compilation, native installation/bootstrap, the actual stack
 certificate, source declaration-order behavior transport, final reference
 fidelity review and positive full verifier acceptance remain outstanding.
+
+## 2026-10-12 checkpoint
+
+Later work supersedes the earlier pending compiler-bridge notes above:
+`ReducedEncoderCases.reduced_riscv_encoder_correct` and
+`MachineConfigCorrect.challenge_machine_configuration` are now proved and
+pass the coherent Dune build. `SourceOrder.v` proves preservation when moving
+this fixed literal's main declaration to the front. The latest full build also
+passes the independent opaque failed-THE interface regressions.
+
+The exact literal-AST compilation form in `NativeCompilation.v` is proved equal
+to `baselineCompilation`; extraction of that form produced an **untrusted
+proposal** of 904,196 native bytes, 4,614 bitmap words and stack maximum 538.
+Native SHA256: `21e4ad09c0b75c4e7d79ea8945cca480edad6b34410099ffff8760a08158c34e`.
+Bitmap SHA256: `1ff90e1caf1c69e47f3b9ece79a99e74884e9511f14e822bbc6f090bca020277`.
+The symbolic compilation-form equality does not certify those literal bytes.
+The original VM count diagnostic remains live; it is not a compilation equality
+proof. Native reduction is disabled in the installed Rocq build and falls back
+to VM reduction.
+
+`REFERENCE-AUDIT.md` records the pinned source review and remaining foundation
+obligations. Its regeneration/provenance tests and isolated corruption tests
+pass. The original reduced decoder/step source review has concrete evidence,
+but complete cross-assistant correspondence remains explicitly outstanding.
+The opaque failed-THE repair removes the extra proof-visible equality to ARB
+without adding a new axiom; its equal-choice interpretation is documented.
+
+Still required: kernel binding of actual compiler output, concrete original
+five-header bootstrap and installation/admission proofs, resource bounds,
+complete baseline certificate and positive sealed CLI verification. No main
+push or baseline-verifier success is claimed by this checkpoint.
