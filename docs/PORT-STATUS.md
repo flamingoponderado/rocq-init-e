@@ -306,3 +306,19 @@ builds; these are intermediate proofs, not a complete baseline certificate.
 The full copy-loop induction, installed relation, compilation equality and
 positive isolated verifier acceptance remain outstanding. Reduced Lean
  decoder/step formal correspondence remains explicitly outstanding.
+
+### Full actual bootstrap trace checkpoint
+
+`BootstrapCopyInvariant.v` proves by induction the complete4617-iteration
+control/nonfailure invariant and all36936 copied bytes, with memory framing
+outside the original destination region. `BootstrapCopyChecked.v` proves each
+actual five-operation body is checked against loaded original instruction bytes,
+then composes the prefix, entire copy loop and original tail into
+`full_bootstrap_checked_trace`. Its endpoint is computed by running the tail;
+no installed-memory or native-state premise is supplied.
+`BootstrapInitialRelation.v` proves the actual submission initial state relates
+to initialAsm for every InputBlob, with the unchanged shared overlay and no
+input-size premise. The coherent full Dune build passes. FFI guards, installed
+memory/native compiler relation, the concrete compiler equality, complete
+challenge certificate and positive isolated verifier remain open. Formal
+reduced Lean decoder/step correspondence remains explicitly outstanding.

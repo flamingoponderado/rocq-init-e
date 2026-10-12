@@ -1,0 +1,37 @@
+{
+  "base": "285841e41e9ef46dcc429478316fd37c7ec8303f",
+  "branch": "agent/bootstrap-initial",
+  "compile_status": 0,
+  "compile_seconds": 0.664499044418335,
+  "bytecode_compiler": "yes",
+  "source_sha256": "9a8f71467237f262a96168b5fae3ce56b478ca1d94b021e4029d478728298486",
+  "proved_declarations": [
+    "baseline_initial_memory_overlay",
+    "baseline_initial_memory_rom",
+    "baseline_initial_memory_shared",
+    "baseline_initial_input_frame",
+    "baseline_initial_output_frame",
+    "baseline_initial_overlay_frame",
+    "baseline_initial_domain_memory",
+    "baseline_rom_ram_zero",
+    "baseline_initial_ordinary_ram_zero",
+    "baseline_initial_relation",
+    "baseline_machine_target",
+    "baseline_machine_domain",
+    "baseline_machine_identity",
+    "baseline_machine_shared_domain",
+    "baseline_initial_interference_ok"
+  ],
+  "assumption_audits": 15,
+  "assumption_audit_seconds": 28.98536777496338,
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic"
+  ],
+  "source_policy": "PASS",
+  "compiled_source_exact_match": true,
+  "main_build_mutated": false,
+  "full_kernel_reseal_verifier_run": false,
+  "reviewed_integration_commit": "ecbc0c0",
+  "coherent_dune_build_exit": 0
+}
