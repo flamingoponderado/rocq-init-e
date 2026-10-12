@@ -1,0 +1,32 @@
+{
+  "base": "cc56050e76f2cfadc2cbfbf8befff326fa688899",
+  "branch": "agent/bootstrap-code",
+  "source_sha256": "eaa48e76792408cb0e25736a238a8e10dc91283e4bf74c2c00139a1af782e8d4",
+  "compile": "passed; -bytecode-compiler yes; 2.13s",
+  "source_matches_compiled_scratch": true,
+  "declarations": [
+    "bootstrap_code_domain",
+    "bootstrap_nth_take",
+    "bootstrap_rom_prefix",
+    "bootstrap_block_ranges",
+    "bootstrap_block_bytes",
+    "bootstrap_count_in",
+    "bootstrap_word_advance",
+    "bytes_of_offsets",
+    "block_bytes",
+    "bootstrap_block_bounds",
+    "checked_loc",
+    "prefix_checked",
+    "prefix_checked_trace"
+  ],
+  "assumption_reports": 13,
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic",
+    "FunctionalExtensionality.functional_extensionality_dep"
+  ],
+  "source_policy": "passed",
+  "full_recursive_kernel_check": "not run per assignment; final sealed check separately owned",
+  "installation_or_compilation_assumptions": false,
+  "scope": "208-byte actual bootstrap ROM/domain; all block encodings/ranges; three address-load prefix checked and finite trace to copyEntryAsm"
+}

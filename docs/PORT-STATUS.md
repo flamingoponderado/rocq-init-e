@@ -277,3 +277,15 @@ and10800s timeout. That proof has not yet passed. Monitor:
 `.artifacts/concrete-compilation-certificate.log`. The full loop/tail trace,
 installed relation, complete certificate and positive sealed verifier remain
 open; no completed-port or main-push claim is made.
+
+### Checked prefix and loop composition checkpoint
+
+`BootstrapCodeFacts.v` proves every original block's actual encoder bytes are
+loaded at its declared ROM address and inside the unchanged executable domain.
+It proves a checked assembly prefix trace from initialAsm to copyEntryAsm.
+`BootstrapMemoryControl.v` proves PC updates commute with memory operations;
+`BootstrapCopyLoop.v` defines exactly the original five-instruction body and
+proves its load/store pair advances PC by8 while performing copyWord.
+All current modules pass the coherent full Dune build. The full4617-iteration
+loop and tail/installation composition remain to prove; no baseline certificate
+or positive verifier acceptance is claimed here.
