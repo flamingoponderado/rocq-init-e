@@ -298,3 +298,16 @@ full verifier/reseal. No verifier success for a complete baseline is claimed.
 Validation performed on this branch: read-only audit script succeeds against
 all four clean pinned trees; isolated corruption regressions reject AST,
 parameter and accelerator-table changes. No Rocq compiler job was started.
+
+## Coordinator repair validation
+
+After integration, `Configuration.riscvNext` uses `referenceThe`. Its failed
+branch is a distinct opaque `Qed` witness in `Target/ReferenceChoices.v`;
+successful Some dispatch remains transparent. `ReferenceChoiceTests.v` rejects
+opening the witness with `Transparent` and rejects equating it to ARB by
+reflexivity. The full coherent Dune build passes, including the reduced encoder
+and machine-configuration proofs. This closes the extra proof-visible equation
+finding under the equal-choice interpretation described above. It is not an
+all-interpretations Lean/Rocq choice correspondence theorem. Native proposal
+extraction does not include target next callbacks (`NativeCompilation.v`);
+those callbacks must not be used as an extracted challenge verifier.

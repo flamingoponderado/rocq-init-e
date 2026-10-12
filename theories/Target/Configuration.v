@@ -5,7 +5,7 @@ From Galette.HOL.src.coretypes Require Import option.
 From Galette.HOL.examples.machine_code.hoare_triple Require set_sep.
 From Galette.cakeml.compiler.encoders.asm Require asmProps.
 From Galette.cakeml.compiler.encoders.riscv Require riscv_target.
-From InitE.Target Require Import ReducedTypes ReducedStep.
+From InitE.Target Require Import ReducedTypes ReducedStep ReferenceChoices.
 Open Scope N_scope.
 Definition RiscVProjection : Type :=
  (word 5 * (word 2 * (option TransferControl * (exception * ((word 5 -> word 64) *
@@ -27,7 +27,7 @@ Definition riscvOk (s : riscv_state) : bool :=
  asmProps.mk_target riscv_target.riscv_config (fun s => s)
  (fun _ => n2w 0) (fun _ _ => n2w 0) (fun _ _ => n2w 0)
  (fun _ _ => n2w 0) (fun _ => true) riscvProj.
-Definition riscvNext (s : riscv_state) : riscv_state := THE (ReducedStep.NextRISCV s).
+Definition riscvNext (s : riscv_state) : riscv_state := referenceThe (ReducedStep.NextRISCV s).
 Definition riscvTarget : asmProps.target 64 riscv_state RiscVProjection :=
  asmProps.mk_target riscv_target.riscv_config riscvNext
  (fun s => riscv_state_c_PC s (riscv_state_procID s))
