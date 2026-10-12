@@ -1,0 +1,32 @@
+{
+  "base": "84bc21043cdb10944aa8a01842621f40a83d859c",
+  "branch": "agent/bootstrap-evaluator",
+  "compile_status": 0,
+  "compile_seconds": 0.656853437423706,
+  "bytecode_compiler": "yes",
+  "source_sha256": "bd087a0b53af876d70720b31fa2926b26a9ee7e5af02c4053126fdcd77a514ea",
+  "proved_declarations": [
+    "assembly_step_after",
+    "identity_interference_ok",
+    "evaluator_step",
+    "rtc_evaluator",
+    "edge_rtc_evaluator",
+    "guard_assembly_trace",
+    "assembly_rtc_evaluator",
+    "evaluator_trace_termination"
+  ],
+  "assumption_audits": 8,
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic",
+    "FunctionalExtensionality.functional_extensionality_dep",
+    "PropExtensionality.propositional_extensionality"
+  ],
+  "source_policy": "PASS",
+  "compiled_source_exact_match": true,
+  "main_build_mutated": false,
+  "full_kernel_reseal_verifier_run": false,
+  "assumption_audit_seconds": 92.90370893478394,
+  "reviewed_integration_commit": "15430c9",
+  "coherent_dune_build_exit": 0
+}

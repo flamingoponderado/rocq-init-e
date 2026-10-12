@@ -289,3 +289,20 @@ proves its load/store pair advances PC by8 while performing copyWord.
 All current modules pass the coherent full Dune build. The full4617-iteration
 loop and tail/installation composition remain to prove; no baseline certificate
 or positive verifier acceptance is claimed here.
+
+### Exact tail and evaluator composition checkpoint
+
+The original 32-operation tail is now proved to write all eight original
+startup/header words, preserve memory outside its two write regions, and reach
+the actual native PC through checked execution over arbitrary incoming memory
+with agreement on the 208-byte bootstrap code. No installed state is assumed.
+The complete five-operation loop iteration now has exact counter, branch,
+selected-byte, memory-frame, control and success equations. Numeric domain and
+alignment facts cover every one of the 4617 original iterations.
+`BootstrapEvaluator.v` lifts guarded assembly traces to FFI-aware clock shifts
+and constructs a related final target state. Concrete edge guards and the
+initial relation still need discharge. All current modules pass coherent Dune
+builds; these are intermediate proofs, not a complete baseline certificate.
+The full copy-loop induction, installed relation, compilation equality and
+positive isolated verifier acceptance remain outstanding. Reduced Lean
+ decoder/step formal correspondence remains explicitly outstanding.

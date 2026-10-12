@@ -9,6 +9,7 @@ From Galette.HOL.src.combin Require Import combin.
 From Galette.cakeml.compiler.encoders.asm Require Import asm asmSem asmProps.
 From Galette.cakeml.compiler.backend.proofs.lab_to_targetProof Require Import inst.
 From Galette.cakeml.compiler.encoders.riscv.proofs Require riscv_targetProof.
+From InitE.Baseline Require Import BootstrapMemoryControl.
 Import ByteBits.
 Open Scope N_scope.
 Definition copyWord (s : asm_state 64) : asm_state 64 :=
@@ -148,4 +149,39 @@ Proof.
  - exact Hbl.
  - intros j Hj; rewrite Hd,Hr; apply Hdest; exact Hj.
  - rewrite Hr; exact Had.
+Qed.
+
+Theorem copyWord_registers (s : asm_state 64) : be s = false ->
+ regs (copyWord s) = UPDATE 28 (fst (read_mem_word (regs s 5) 8 s)) (regs s).
+Proof.
+ intro Hb; unfold copyWord; rewrite mem_store_registers,mem_load_registers by exact Hb.
+ unfold addr,read_reg; rewrite (proj1 WORD_ADD_0); reflexivity.
+Qed.
+
+Theorem copyWord_other_register (s : asm_state 64) r : be s = false -> r <> 28 ->
+ regs (copyWord s) r = regs s r.
+Proof.
+ intros Hb Hr; rewrite copyWord_registers by exact Hb.
+ unfold UPDATE; destruct (decide (28=r)) as [E|E]; [congruence|reflexivity].
+Qed.
+
+Theorem copyWord_endian s : be (copyWord s) = be s.
+Proof.
+ unfold copyWord; rewrite (proj1 (mem_store_consts 8 28 (Addr 6 (n2w 0)) _)).
+ exact (proj1 (mem_load_consts 8 28 (Addr 5 (n2w 0)) s)).
+Qed.
+Theorem copyWord_domain s : mem_domain (copyWord s) = mem_domain s.
+Proof.
+ unfold copyWord; rewrite (proj2 (proj2 (proj2 (mem_store_consts 8 28 (Addr 6 (n2w 0)) _)))).
+ exact (proj2 (proj2 (proj2 (mem_load_consts 8 28 (Addr 5 (n2w 0)) s)))).
+Qed.
+Theorem copyWord_link s : lr (copyWord s) = lr s.
+Proof.
+ unfold copyWord; rewrite (proj1 (proj2 (mem_store_consts 8 28 (Addr 6 (n2w 0)) _))).
+ exact (proj1 (proj2 (mem_load_consts 8 28 (Addr 5 (n2w 0)) s))).
+Qed.
+Theorem copyWord_alignment s : align (copyWord s) = align s.
+Proof.
+ unfold copyWord; rewrite (proj1 (proj2 (proj2 (mem_store_consts 8 28 (Addr 6 (n2w 0)) _)))).
+ exact (proj1 (proj2 (proj2 (mem_load_consts 8 28 (Addr 5 (n2w 0)) s)))).
 Qed.
