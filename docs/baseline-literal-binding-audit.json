@@ -1,0 +1,18 @@
+{
+  "session": 14112,
+  "exit": 0,
+  "source_sha256": "65335eca6e9b7698b8eb755ab2d4c4ccf282d03434946883f9d416cf0ecf3b10",
+  "rom_bytes": 950344,
+  "rom_sha256": "22a1dd0963f12a3492e647b2626101fad2312dfcff813978b8ff1aca9897d7cc",
+  "theorem": "submitted_code_binding",
+  "assumptions": [],
+  "uses_actual_verifier_literal_generator": true,
+  "positive_isolated_verifier": "pending",
+  "fresh_checkout_package_reconstruction": "PASS: matches draft bytes and source",
+  "release_followup": {
+    "date": "2026-10-12",
+    "positive_sealed_verifier": "passed",
+    "evidence": "baseline-positive-verifier-result.json",
+    "formal_Lean_decoder_step_correspondence": "outstanding"
+  }
+}

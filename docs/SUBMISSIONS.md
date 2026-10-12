@@ -2,10 +2,11 @@
 
 The isolated verifier is implemented and the existing negative CLI cases passed.
 The standalone exact compiler-output theorem and whole sanitized-ROM binding
-also passed. At this documentation checkpoint the final coherent library rebuild,
-unconditional baseline certificate kernel replay and positive sealed verifier
-acceptance are pending. Commands below are a reproduction procedure for the
-final reviewed checkout, not a claim that these release gates have passed.
+also passed. The coherent library build, including the unconditional baseline
+certificate and its five-foundation assumption audit, has now passed. Recursive
+kernel replay and positive sealed verifier acceptance passed on 2026-10-12. Commands below reproduce the reviewed checkout; the accepted result and full
+kernel context are retained in baseline-positive-verifier-result.json and
+baseline-positive-verifier-kernel.log.
 See [PORT-STATUS.md](PORT-STATUS.md) and
 [FINAL-PORT-REVIEW.md](FINAL-PORT-REVIEW.md) for dated evidence and open obligations.
 Do not restart the coordinator's active rebuild or verifier pipeline.
@@ -167,7 +168,7 @@ rtk proxy opam exec --switch=rocq-init-e -- python3 scripts/test_verifier_cli.py
   --output .artifacts/negative-replay-release
 rtk proxy opam exec --switch=rocq-init-e -- python3 verifier/verify.py \
   .artifacts/baseline-package-release --output .artifacts/baseline-replay-release \
-  --timeout 10800
+  --timeout 21600
 ```
 
 The existing real negative suite requires wrong-statement, wrong-ROM and
@@ -202,7 +203,9 @@ reads all its inputs read-only. Plugins, extraction, notation/export substitutio
 file redirection, Load and load-path directives are unsupported, including
 wrapped commands. Source guards support the sandbox and kernel gates; they do
 not replace those stages or constitute a general Rocq grammar proof. The default
-timeout is 10,800 seconds per stage with a 112 GiB address-space ceiling.
+default timeout is 10,800 seconds per stage with a 112 GiB address-space ceiling.
+The accepted baseline replay used `--timeout 21600`: the first run reached the
+three-hour timeout without a proof failure; the unchanged sealed retry passed.
 
 Original init-e is the authority, with exact pins and definition comparisons in
 [REFERENCE-AUDIT.md](REFERENCE-AUDIT.md) and

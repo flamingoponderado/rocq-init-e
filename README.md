@@ -4,12 +4,14 @@ Rocq port of [original init-e](https://github.com/flamingoponderado/init-e),
 using pinned [Galette](https://github.com/flamingoponderado/galette) and its
 proved Pancake `pan_to_target_compile_semantics` theorem.
 
-**The isolated submission verifier is implemented. Release validation is still
-in progress.** The actual original native bytes, bitmaps, stack maximum and
-returned dispatch metadata passed the standalone concrete compilation proof;
-the whole sanitized-ROM binding passed too. The final coherent library rebuild,
-unconditional certificate kernel replay and positive sealed CLI acceptance are
-pending. No completed-port or successful baseline acceptance is claimed here.
+**The original baseline passed the sealed isolated submission verifier.**
+The exact native bytes, bitmaps, stack maximum and dispatch metadata passed
+concrete compilation; the unconditional baseline certificate and sanitized ROM
+binding passed recursive kernel checking. The accepted ROM is 950,344 bytes with
+literal score `infinity`, using only the five existing Galette foundations.
+See [accepted result](docs/baseline-positive-verifier-result.json) and
+[complete kernel context](docs/baseline-positive-verifier-kernel.log).
+Formal correspondence with the Lean decoder and step function remains outstanding.
 See [port status](docs/PORT-STATUS.md) for subsequent results and
 [final port review](docs/FINAL-PORT-REVIEW.md) for evidence and remaining gates.
 
@@ -67,14 +69,14 @@ resource-limit relaxation using stack maximum 538 below the actual limit
 2,097,104. TargetTotality produces a finite native Halt with the source outcome
 and events; the bootstrap clock shift transports it to the original zeroed
 initial state. The final certificate source composes this chain with concrete
-compilation. Its final coherent/kernel/verifier replay remains a release gate.
+compilation. Its coherent build and sealed recursive kernel verification passed.
 Installation, compiler equality and a native starting state are not added
 challenge premises.
 
 The verifier snapshots sanitized ROM/score, candidate sources and sealed trusted
 libraries, compiles inside Bubblewrap, compares the exact module interface and
 recursively checks the kernel context. Existing 18 security unit tests and four
-real negative CLI cases passed. A fresh positive baseline run is still required.
+real negative CLI cases passed. The fresh positive baseline run passed too.
 See [submission protocol](docs/SUBMISSIONS.md) for package contents, operator
 sealing, negative tests and the positive command.
 

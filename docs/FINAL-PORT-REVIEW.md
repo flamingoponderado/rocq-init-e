@@ -301,3 +301,15 @@ evidence: coordinator
 `/tmp/rocq-baseline-literal-binding.log`. The coordinator's newly announced
 coherent build is separate; an empty/incomplete build log is not success. Temporary evidence paths are local session
 artifacts, not durable release attestations; retain final reports in the release.
+
+## Release follow-up, 2026-10-12
+
+The previously pending coherent compilation equality, unconditional certificate,
+and positive sealed recursive kernel replay now passed. The accepted result and
+entire context are in baseline-positive-verifier-result.json and
+baseline-positive-verifier-kernel.log; baseline-release-seal.json preserves the
+747-file operator inventory. The current seal and certificate source hashes
+match the accepted run. Earlier review-time seal failures and missing-proof
+reports above are historical. Formal Lean decoder/step and shared-foundation
+correspondence remain outstanding. Operator toolchain and runtime trust limits
+still apply.

@@ -1,0 +1,27 @@
+
+CONTEXT SUMMARY
+===============
+
+* Theory: Set is predicative
+  
+* Theory: Rewrite rules are not allowed
+  
+* Axioms:
+    Stdlib.Logic.ClassicalEpsilon.constructive_indefinite_description
+    Stdlib.Logic.ProofIrrelevance.proof_irrelevance
+    Stdlib.Logic.FunctionalExtensionality.functional_extensionality_dep
+    Stdlib.Logic.PropExtensionality.propositional_extensionality
+    Stdlib.Logic.Classical_Prop.classic
+  
+* Constants/Inductives relying on type-in-type: <none>
+  
+* Constants/Inductives relying on unsafe (co)fixpoints: <none>
+  
+* Inductives whose positivity is assumed: <none>
+  
+* Inductives relying on indices not mattering:
+    Corelib.Init.Datatypes.eq_true
+    Stdlib.btauto.Algebra.null
+    Stdlib.Logic.EqdepFacts.eq_dep
+    Corelib.Init.Logic.eq
+  

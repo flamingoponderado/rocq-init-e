@@ -1,0 +1,31 @@
+{
+  "base": "7ed2a4dde65c5e1eeb169b6925e3fb471f5a5c44",
+  "branch": "agent/final-port-review",
+  "file": "docs/FINAL-PORT-REVIEW.md",
+  "document_sha256": "64324f6f5e268d13bb8e767f977eacedcffcb0bc1d747de05c4e4ec223f87e9b",
+  "local_markdown_links_checked": 15,
+  "reference_regeneration_selftest": "PASS",
+  "baseline_literals_and_metadata": "PASS",
+  "existing_verifier_unit_tests": 18,
+  "observed_toolchain": {
+    "rocq": "9.3.0",
+    "ocaml": "5.2.1",
+    "dune": "3.24.2"
+  },
+  "seal_check": "REJECTED: trusted file inventory differs from seal",
+  "no_build_or_compiler_job_started": true,
+  "no_reseal": true,
+  "shared_builds_mutated": false,
+  "live_compiler_equality_touched": false,
+  "code_changed": false,
+  "later_coordinator_evidence": {
+    "standalone_concrete_compilation_exit": 0,
+    "compilation_source_sha256": "f564b94adc736974bee96b820fb14c249f8cc0314557a0df9f920cf1b2c62e3a",
+    "standalone_compilation_axioms": 4,
+    "whole_rom_binding_exit": 0,
+    "whole_rom_binding_context": "closed",
+    "unconditional_certificate_source_prepared": true,
+    "coherent_final_build": "pending",
+    "positive_isolated_verifier": "pending"
+  }
+}

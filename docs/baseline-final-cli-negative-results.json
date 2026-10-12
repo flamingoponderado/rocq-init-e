@@ -1,0 +1,18 @@
+{
+  "wrong-statement": {
+    "rejected": true,
+    "gate": "comparison.log"
+  },
+  "wrong-rom": {
+    "rejected": true,
+    "gate": "comparison.log"
+  },
+  "wrong-score": {
+    "rejected": true,
+    "gate": "comparison.log"
+  },
+  "extra-axiom": {
+    "rejected": true,
+    "gate": "kernel.log"
+  }
+}

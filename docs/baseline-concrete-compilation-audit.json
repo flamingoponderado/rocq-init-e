@@ -1,0 +1,24 @@
+{
+  "stage": "standalone actual compiler equality",
+  "session": 77063,
+  "exit": 0,
+  "source_sha256": "f564b94adc736974bee96b820fb14c249f8cc0314557a0df9f920cf1b2c62e3a",
+  "observed_peak_rss_kib": 30743220,
+  "actual_bytes_bitmaps_stack_and_metadata": true,
+  "assumptions": [
+    "propositional_extensionality",
+    "functional_extensionality_dep",
+    "constructive_indefinite_description",
+    "classic"
+  ],
+  "coherent_library_rebuild": "PASS",
+  "positive_isolated_verifier": "pending",
+  "coherent_library_build_exit": 0,
+  "coherent_library_module": "InitE.Baseline.CompilationCertificate",
+  "release_followup": {
+    "date": "2026-10-12",
+    "positive_sealed_verifier": "passed",
+    "evidence": "baseline-positive-verifier-result.json",
+    "formal_Lean_decoder_step_correspondence": "outstanding"
+  }
+}

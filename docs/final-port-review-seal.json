@@ -1,0 +1,4 @@
+{
+  "seal_check": "rejected",
+  "reason": "trusted file inventory differs from seal"
+}

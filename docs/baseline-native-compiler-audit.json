@@ -1,0 +1,33 @@
+{
+  "base": "90229979ab5580c11f73b5b839dbe2ea9cbb6d80",
+  "branch": "agent/native-compiler-correctness",
+  "file": "theories/Baseline/NativeCompilerCorrectness.v",
+  "source_sha256": "384bf7c937d7fd074fd99da285abbde33b7d658d165b9634ad40bfdc1ecb286b",
+  "compile_exit": 0,
+  "compile_seconds": 1.3184138209326193,
+  "audit_seconds": 208.79236591106746,
+  "audited_count": 7,
+  "declarations": [
+    "native_compile_config_congruence",
+    "baseline_compile_at_machine",
+    "native_entry_registers",
+    "native_machine_target",
+    "native_baseline_correct",
+    "native_baseline_terminates",
+    "native_baseline_finite_execution"
+  ],
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic",
+    "FunctionalExtensionality.functional_extensionality_dep",
+    "ProofIrrelevance.proof_irrelevance",
+    "PropExtensionality.propositional_extensionality"
+  ],
+  "source_policy": "PASS",
+  "compiled_source_matches_workspace": true,
+  "shared_builds_mutated": false,
+  "live_compiler_equality_touched": false,
+  "integrated_commit": "7ed2a4d",
+  "coherent_build_log": "/tmp/rocq-native-compiler-integrated-build.log",
+  "coherent_build_exit": 0
+}

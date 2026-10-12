@@ -1,0 +1,18 @@
+{
+  "base": "c2bb768baf01b6c5d218e4d5db170ecf2254d066",
+  "branch": "agent/release-docs",
+  "exclusive_files": [
+    "README.md",
+    "docs/SUBMISSIONS.md"
+  ],
+  "sha256": {
+    "README.md": "4bffcbcdd9a1ed3e36fd34229a2c9fa983bdaeb8b1b1fb1d9d74ce0e18fda05e",
+    "docs/SUBMISSIONS.md": "b2f589a58d66f8fe5899185d5cce2b020506fab8ef7384fb65c0fbb5fb68802e"
+  },
+  "local_links_checked": 14,
+  "shell_commands_checked": 24,
+  "shell_block_syntax": "PASS (bash -n only; none executed)",
+  "cli_argument_names": "PASS against source AST",
+  "package_generator_dependency": "root-owned pending integration; inspected read-only",
+  "new_builds_kernel_jobs_reseal_package_or_cli_stages": 0
+}

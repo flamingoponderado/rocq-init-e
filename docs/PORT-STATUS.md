@@ -4,6 +4,47 @@ The goal remains a complete port of original init-e pushed to `main`.
 A passing module build is not evidence of a baseline certificate or of
 acceptance by an isolated submission verifier.
 
+## Release checkpoint: sealed original baseline accepted (2026-10-12)
+
+The complete original baseline passed the isolated sealed verifier with kernel
+exit 0, exact original ROM SHA256
+`22a1dd0963f12a3492e647b2626101fad2312dfcff813978b8ff1aca9897d7cc`,
+950344 bytes and literal score `infinity`. The full context contains exactly the
+five permitted foundations and no type-in-type, unsafe fixpoint or assumed
+positivity dependencies. The current trusted seal and certificate source hashes
+were rechecked against this accepted result before release.
+
+The first replay timed out at 10800 seconds; the unchanged sealed retry used
+21600 seconds and passed. Full evidence is retained in
+[verifier result](baseline-positive-verifier-result.json),
+[kernel context](baseline-positive-verifier-kernel.log), and
+[release seal](baseline-release-seal.json). All 18 boundary tests and four real
+negative CLI cases passed. Reference provenance and literal regeneration checks
+passed again after acceptance. Formal reduced Lean decoder/step correspondence
+remains outstanding; this release does not claim a cross-assistant theorem.
+
+Earlier checkpoints below describe their then-current gaps.
+
+## Historical checkpoint: unconditional original certificate built
+
+The coherent Dune build passed, including CompilationCertificate,
+CertificateFromCompilation and BaselineCertificate. The final theorem is
+`Certificate baselineSubmission infinity`, without compilation, installation,
+native-state or source nonFail hypotheses. Its assumption audit reports exactly
+the five existing Galette foundations. The concrete compilation proves actual
+904196 native bytes,4614 bitmap words, stack538 and returned dispatch metadata.
+The whole950344-byte sanitized ROM equality also compiled, closed under the
+global context. Fresh-checkout package reconstruction matches the exact original
+ROM and the checked draft source.
+
+The complete build, fresh747-file operator seal and all18 boundary tests passed.
+All four real negative CLI tests passed at their intended gates. The positive
+isolated recursive kernel verifier is now running. No positive acceptance or main release is
+claimed yet. See baseline-certificate-build-audit.json and its full assumption
+log. Formal reduced Lean decoder/step correspondence remains outstanding.
+
+Earlier checkpoints below are historical and describe their then-current gaps.
+
 ## Implemented, requiring final port review
 
 | Rocq module | Original reference |
