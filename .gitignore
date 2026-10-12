@@ -8,3 +8,4 @@ __pycache__/
 .artifacts/
 .lia.cache
 .nra.cache
+.nia.cache
