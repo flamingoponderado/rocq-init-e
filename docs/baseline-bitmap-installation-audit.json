@@ -1,0 +1,26 @@
+{
+  "coherent_dune_build_exit": 0,
+  "build_log": "/tmp/rocq-bitmap-word-certificate-build.log",
+  "assumption_audit_exit": 0,
+  "assumption_log": "/tmp/rocq-bitmap-installed-assumptions.log",
+  "audited_theorems": [
+    "original_rom_bitmap_byte",
+    "installed_bitmap_word_location",
+    "baseline_certificate_from_native_correctness"
+  ],
+  "axioms": [
+    "Classical_Prop.classic",
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "FunctionalExtensionality.functional_extensionality_dep",
+    "ProofIrrelevance.proof_irrelevance",
+    "PropExtensionality.propositional_extensionality"
+  ],
+  "source_sha256": {
+    "theories/Baseline/BitmapImageFacts.v": "9ca14f0b2564701ee594be8e78a4d07a720bf31304ed3b82e48e1f57b729344b",
+    "theories/Baseline/BitmapInstallation.v": "944ade40f69e3df21bb8e1917da70beff388a092bf237be1684bf0881f0fcc61",
+    "theories/Baseline/BootstrapCertificate.v": "f73c76e64ab2c184609ca7960951d6ca49b6fb328cee5da455af3b0b03955d45"
+  },
+  "literal_bitmap_equality": "kernel numeric byte equality lifted through word injectivity",
+  "native_correctness_still_required": true,
+  "positive_verifier": false
+}

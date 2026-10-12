@@ -338,3 +338,31 @@ compiler-output equality still must certify the concrete compile result. Exact
 endpoint-memory equality is being audited by the worker. Native pan_installed,
 complete challenge certificate, positive isolated verifier, final review/main
 push and reduced Lean decoder/step formal correspondence remain outstanding.
+
+### Exact installed bytes and word-memory checkpoint
+
+The actual bootstrap endpoint memory equals the unchanged installedMemory
+formula, with native PC, heap registers and control fields proved. General
+packedWordMemory witnesses every byte of arbitrary memory without support,
+input-size or accessibility assumptions. BitmapImageFacts proves the exact
+original ROM bitmap slice equals expansion of the original4614word literals;
+numeric byte equality is kernel computed and lifted through word injectivity.
+BitmapInstallation proves all installed bitmap bytes and full aligned words.
+The coherent Dune builds and direct assumption audits pass. BootstrapCertificate
+proves a completion bridge from native endpoint correctness to the exact original
+Certificate; native correctness is still required, so this is not a baseline
+certificate. Native code-loaded/source-memory/good_init_state, bitmap STAR,
+pan_installed, concrete compiler equality, positive isolated verifier and main
+push remain open. Reduced Lean decoder/step formal agreement remains explicitly
+outstanding.
+
+### Native code and complete headers checkpoint
+
+NativeCodeInstallation proves every original native byte survives the actual
+bootstrap and is accessible in the unchanged executable domain. It proves the
+compiler code_loaded relation for each actual target state related to the
+computed endpoint, without assuming loaded native code. HeaderInstallation
+recovers the complete little-endian words of all eight original startup/header
+writes. All current sources pass coherent Dune build. Native source-memory,
+full good_init_state/pan_installed and complete certificate remain to assemble;
+no positive isolated verifier or main push is claimed.

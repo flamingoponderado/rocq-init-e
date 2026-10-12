@@ -1,0 +1,35 @@
+{
+  "base": "a8ad16cf0111f1368054aa2fe1bf0ce6dc9dff1e",
+  "branch": "agent/bootstrap-installed-memory",
+  "compile_status": 0,
+  "compile_seconds": 1.0145998001098633,
+  "bytecode_compiler": "yes",
+  "source_sha256": "91573fd51603b7f795f165203267caec30e76b8f65d8928f44f8fd49e258e13f",
+  "proved_declarations": [
+    "installed_word_byte",
+    "installed_word_decompose",
+    "installed_guard_range",
+    "installed_guard_outside",
+    "installed_source_header",
+    "installed_init_header",
+    "bootstrap_endpoint_headers",
+    "bootstrap_endpoint_tail_frame",
+    "bootstrap_endpoint_memory",
+    "bootstrap_endpoint_pc",
+    "bootstrap_endpoint_heap_registers",
+    "bootstrap_endpoint_controls"
+  ],
+  "assumption_audits": 12,
+  "assumption_audit_seconds": 18.567234992980957,
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic",
+    "FunctionalExtensionality.functional_extensionality_dep"
+  ],
+  "source_policy": "PASS",
+  "compiled_source_exact_match": true,
+  "main_build_mutated": false,
+  "full_kernel_reseal_verifier_run": false,
+  "reviewed_integration_commit": "13fbde1",
+  "coherent_dune_build_exit": 0
+}

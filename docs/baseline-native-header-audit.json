@@ -1,0 +1,21 @@
+{
+  "coherent_dune_build_exit": 0,
+  "build_log": "/tmp/rocq-header-native-install-build.log",
+  "assumption_audit_exit": 0,
+  "assumption_log": "/tmp/rocq-native-installed-assumptions.log",
+  "audited_theorems": [
+    "endpoint_native_code_loaded",
+    "installed_header_word"
+  ],
+  "axioms": [
+    "Classical_Prop.classic",
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "FunctionalExtensionality.functional_extensionality_dep"
+  ],
+  "source_sha256": {
+    "theories/Baseline/NativeCodeInstallation.v": "49e5bcb3a7f173429ffac0518d7f79d761f7f5c884f88b0cb9569b863842a8e5",
+    "theories/Baseline/HeaderInstallation.v": "aa05c4a44e77ade4b513f3e87f65383ab977d80baf13906d5be14c7d525c8ed4"
+  },
+  "installation_assumption": false,
+  "positive_verifier": false
+}

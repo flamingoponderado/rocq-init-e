@@ -1,0 +1,36 @@
+{
+  "base": "13fbde1cedd1b5e2617c077024dcc994903bc15d",
+  "branch": "agent/packed-word-memory",
+  "compile_status": 0,
+  "compile_seconds": 0.5645084381103516,
+  "bytecode_compiler": "yes",
+  "source_sha256": "52d076ebbc66cba0c626e9d9aee5a3b98c9f13192f4e7e044c9ca2d43ed2a40b",
+  "proved_declarations": [
+    "packedMemoryWord_lane",
+    "packed_byte_align_twice",
+    "packedMemoryWord_align",
+    "packedMemoryWord_byte",
+    "packedMemoryWord_of_bytes",
+    "packedWordMemory_align",
+    "packedWordMemory_of_bytes",
+    "packedWordMemory_certificate",
+    "packed_word_memory_exists",
+    "packed_good_init_word_witness",
+    "packed_address_advance",
+    "packed_nth_successor",
+    "read_bytearray_literal",
+    "bytes_in_mem_literal"
+  ],
+  "assumption_audits": 14,
+  "assumption_audit_seconds": 2.4491727352142334,
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic"
+  ],
+  "source_policy": "PASS",
+  "compiled_source_exact_match": true,
+  "main_build_mutated": false,
+  "full_kernel_reseal_verifier_run": false,
+  "reviewed_integration_commit": "d4462d6",
+  "coherent_dune_build_exit": 0
+}
