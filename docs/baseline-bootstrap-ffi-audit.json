@@ -1,0 +1,22 @@
+{
+  "coherent_build_exit": 0,
+  "build_log": "/tmp/rocq-bootstrap-resources-integrated-build.log",
+  "scratch_ffi_compile_exit": 0,
+  "assumption_audit_exit": 0,
+  "assumption_log": "/tmp/rocq-bootstrap-ffi-assumptions.log",
+  "audited_theorems": [
+    "full_bootstrap_clock_shift",
+    "full_bootstrap_guarded_trace"
+  ],
+  "axioms": [
+    "Classical_Prop.classic",
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "FunctionalExtensionality.functional_extensionality_dep",
+    "PropExtensionality.propositional_extensionality"
+  ],
+  "source_sha256": {
+    "theories/Baseline/BootstrapFfiTrace.v": "e8e0231ccff288675012379a5acdedb413d7d95359bd4127e4b6a192a667d17c",
+    "theories/Baseline/NativeEntryResources.v": "77aa46476a25d5267aba7c79066231c79e4ba7d00a364f87b6c0f6f76f596572"
+  },
+  "positive_verifier": false
+}

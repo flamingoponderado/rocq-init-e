@@ -322,3 +322,19 @@ input-size premise. The coherent full Dune build passes. FFI guards, installed
 memory/native compiler relation, the concrete compiler equality, complete
 challenge certificate and positive isolated verifier remain open. Formal
 reduced Lean decoder/step correspondence remains explicitly outstanding.
+
+### FFI-aware bootstrap and stack-resource checkpoint
+
+`BootstrapFfiTrace.v` proves every concrete prefix, loop and tail instruction
+footprint excludes the unchanged FFI entries. The guarded full bootstrap trace
+constructs `full_bootstrap_clock_shift` for every input and every initial FFI
+state, yielding an actual related native-entry target state. Coherent Dune build
+and two assumption audits pass, using only the existing classical/CID and
+functional/propositional extensionality foundations. No initial/native state or
+FFI guard is left as a challenge premise.
+`NativeEntryResources.v` proves the actual heap registers give read_limits
+(2097104,1944059904), and538 is strictly below the stack limit. The running
+compiler-output equality still must certify the concrete compile result. Exact
+endpoint-memory equality is being audited by the worker. Native pan_installed,
+complete challenge certificate, positive isolated verifier, final review/main
+push and reduced Lean decoder/step formal correspondence remain outstanding.
