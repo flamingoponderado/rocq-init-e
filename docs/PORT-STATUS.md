@@ -366,3 +366,22 @@ recovers the complete little-endian words of all eight original startup/header
 writes. All current sources pass coherent Dune build. Native source-memory,
 full good_init_state/pan_installed and complete certificate remain to assemble;
 no positive isolated verifier or main push is claimed.
+
+### Complete original native installation checkpoint
+
+SourceMemoryInstallation proves every ordinary source word equals actual
+packed installed memory. InstallationDomains proves original data/shared domain
+closure, executable subset/disjointness, shared-source intersection and620-byte
+code buffer. NativeStart proves the actual native PC and reserved dispatch
+conditions, using the unconditional classical MMIO boundary theorem.
+MachineInterference proves the exact original FFI/cache contracts for arbitrary
+returned byte lists. GoodInitState discharges every native initialization field.
+PanInstallation proves baseline_pan_installed and its every-input version for
+any actual target state related to the computed endpoint. Such a target state
+is constructed by the completed FFI-aware bootstrap; native installation is
+never a supplied challenge premise. Coherent Dune build and both full
+installation assumption audits pass, with only four existing classical and
+extensionality foundations. Compiler-derived native behaviour/termination,
+concrete compiler equality, final Certificate, positive isolated verifier,
+final fidelity review and main push remain pending. Formal reduced Lean
+ decoder/step correspondence remains explicitly outstanding.

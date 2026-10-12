@@ -1,0 +1,27 @@
+{
+  "coherent_dune_build_exit": 0,
+  "build_log": "/tmp/rocq-full-native-install-build.log",
+  "assumption_audit_exit": 0,
+  "assumption_log": "/tmp/rocq-pan-install-assumptions.log",
+  "audited_theorems": [
+    "baseline_pan_installed",
+    "baseline_pan_installed_input"
+  ],
+  "axioms": [
+    "Classical_Prop.classic",
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "FunctionalExtensionality.functional_extensionality_dep",
+    "PropExtensionality.propositional_extensionality"
+  ],
+  "source_sha256": {
+    "theories/Baseline/SourceMemoryInstallation.v": "79969b4d4138b89521dadb20ccf139bb5587f8bd7786a158bfd6901c471cd44f",
+    "theories/Baseline/InstallationDomains.v": "0238fc4b83fe62d2b5ef68e564361c8193455378354a2966df1d993b249712ea",
+    "theories/Baseline/NativeStart.v": "20993dab01ef1d09f5cb6420e27a249dc424ec1cc0e817c7bcaa7e7f2eeb92b3",
+    "theories/Baseline/GoodInitState.v": "2f5d1611d980a2a551bfd396d5b6daa184e8448c9d6f7ab2b67ab7ab3c7c3f11",
+    "theories/Baseline/PanInstallation.v": "493ebfc75f1366e516b1365d200d5b01e03a1f6ea309b38f604eb2979499eb14"
+  },
+  "native_installation_assumed": false,
+  "target_relation_source": "proved full actual bootstrap evaluator shift",
+  "concrete_compiler_equality_still_pending": true,
+  "positive_verifier": false
+}
