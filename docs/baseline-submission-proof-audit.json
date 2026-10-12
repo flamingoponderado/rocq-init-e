@@ -1,0 +1,31 @@
+{
+  "base": "2af6c8b56fd3dc4018f907e6b71289798a0fab89",
+  "branch": "agent/baseline-submission",
+  "source_sha256": {
+    "theories/Baseline/Submission.v": "667433689ca92ec74cd22bba06335d02ca82d879c5e8476aa79d3805f2f38c00",
+    "theories/Baseline/SubmissionFacts.v": "b5ec177c63eec319ddc87c6b250435b44fbb228604723993dbd9f6c0afdedbaa"
+  },
+  "compiled_sources_match": true,
+  "compile": "passed; -bytecode-compiler yes",
+  "theorems": [
+    "baselineSubmission_literals",
+    "baselineSubmission_code_length",
+    "baselineSubmission_program_domain",
+    "baselineSubmission_machine_config",
+    "baselineSubmission_entry_pcs",
+    "baselineSubmission_admitted",
+    "baselineSubmission_initial_ok",
+    "baselineSubmission_initial_pc",
+    "baselineSubmission_initial_registers"
+  ],
+  "assumption_reports": 9,
+  "axioms": [
+    "ClassicalEpsilon.constructive_indefinite_description",
+    "Classical_Prop.classic"
+  ],
+  "source_policy": "passed both files",
+  "full_recursive_kernel_check": "not run per coordinator instruction; final sealed verifier remains separate",
+  "unconditional_admitted": true,
+  "admission_fields": 16,
+  "compiler_equality_or_installation_assumptions": false
+}

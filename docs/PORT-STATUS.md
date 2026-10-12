@@ -253,3 +253,27 @@ frame, and the final installed-machine relation. The full concrete compiler
 output equality, complete certificate and positive sealed verifier gate remain
 open. The source evaluator audit is now integrated as `EVALUATOR-AUDIT.md`,
 with its source-review evidence and formal transport limits retained.
+
+### Original submission and copy-word checkpoint
+
+`Metadata.v` imports the original pinned compiler-config FFI/MMIO literals.
+`MetadataFacts.v` proves all finite dispatch/layout obligations and passed a
+full recursive kernel check with exactly the existing five foundations and
+no unsafe declarations. `Submission.v` uses the original literal ROM,
+infinity score and metadata. `SubmissionFacts.baselineSubmission_admitted`
+proves **every** original admission field unconditionally, using actual
+literal lengths. The full coherent build with these files passes.
+
+`BootstrapCopy.v` now proves the actual LD/SD pair copies each of its eight
+source bytes, frames every other byte, and succeeds under exactly the source/
+destination domain and alignment obligations. Opaque assertion/store helper
+lemmas avoid unnecessary expansion of nested state records in conversion.
+
+The original VM count probe exited0 with Some(904196,4614,Some538). It is
+count evidence only. A separate concrete byte/bitmap/configuration equality
+proof is live, including original FFI/MMIO metadata, under112GiB address-space
+and10800s timeout. That proof has not yet passed. Monitor:
+`/tmp/rocq-concrete-compilation-state.json`; log:
+`.artifacts/concrete-compilation-certificate.log`. The full loop/tail trace,
+installed relation, complete certificate and positive sealed verifier remain
+open; no completed-port or main-push claim is made.

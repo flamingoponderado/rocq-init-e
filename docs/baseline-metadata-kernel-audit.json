@@ -1,0 +1,50 @@
+{
+  "base": "ea6527a9c0a5aa108bae1e3eb82faf8fcf9914d8",
+  "branch": "agent/baseline-metadata",
+  "theorems": [
+    "baseline_metadata_lengths",
+    "baseline_name_boundary",
+    "baseline_mmio_valid",
+    "baseline_entry_distinct",
+    "baseline_entry_loaded",
+    "baseline_entry_aligned",
+    "baseline_entry_dispatch_separate",
+    "baseline_mmio_program",
+    "baseline_exit_loaded",
+    "baseline_numeric_admission",
+    "baseline_ordinary_slots_loaded",
+    "baseline_entry_config",
+    "baseline_ordinary_entry_index",
+    "baseline_configuration_metadata",
+    "baseline_submission_program",
+    "baseline_submission_entries",
+    "baseline_submission_mmio_program"
+  ],
+  "source_sha256": {
+    "theories/Baseline/Metadata.v": "2c5f4420f96bf1c21ea3d125f71c4412c8aef2e1549690e4b89f7772d840303c",
+    "theories/Baseline/MetadataFacts.v": "5a959cea378accd8cec47f0fd022cb5082fb284ea5995a5b245aaf2fe8aa725c",
+    "scripts/import_baseline_metadata.py": "9bf3d09d980748f272d8f8174a41fc886992cca1c8c410272b733c4a2507baae"
+  },
+  "assumption_reports": 17,
+  "compile": "passed",
+  "kernel_check": "passed; full recursive -bytecode-compiler yes",
+  "kernel_seconds": 382.36,
+  "kernel_axioms": [
+    "Stdlib.Logic.ClassicalEpsilon.constructive_indefinite_description",
+    "Stdlib.Logic.Classical_Prop.classic",
+    "Stdlib.Logic.FunctionalExtensionality.functional_extensionality_dep",
+    "Stdlib.Logic.ProofIrrelevance.proof_irrelevance",
+    "Stdlib.Logic.PropExtensionality.propositional_extensionality"
+  ],
+  "unsafe_declarations": "none",
+  "source_matches_compiled_scratch": true,
+  "importer": {
+    "original_sha256": "caa50933d9d7ef7200e5785b1b371e527e833f836263b759e8c9572d2330020d",
+    "names": 33,
+    "mmio": 13,
+    "proposal_cross_check": true,
+    "source_corruption_rejected": true,
+    "regeneration": true
+  },
+  "prior_default_kernel_attempt": "terminated for slower conversion; no pass claimed"
+}
