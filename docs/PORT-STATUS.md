@@ -228,3 +228,28 @@ that native bytes and bitmaps are identical to original pinned Lean literals.
 The original full ROM extracted from those literals is 950,344 bytes, SHA256
 `22a1dd0963f12a3492e647b2626101fad2312dfcff813978b8ff1aca9897d7cc`.
 These comparisons do not replace a kernel compilation equality or certificate.
+
+### Original literal and bootstrap checkpoint
+
+`Baseline/Artifacts.v` imports only the pinned original byte and bitmap
+literals, through `scripts/import_baseline.py` with clean-reference/pin checks.
+`ArtifactFacts.v` proves actual ROM/native/bitmap sizes and binds the first208
+ROM bytes to the verified original bootstrap encoder output. Explicit splits
+and lazy reduction avoid unnecessary byte-value normalization for size facts.
+The coherent full Dune build passes with these modules.
+
+`BootstrapProgram.v` proves exact208-byte encoder agreement, instruction
+admission, and original23132 assembly-step count. `BootstrapSteps.v` lifts
+checked assembly traces to the real reduced target and FFI-aware evaluator.
+`BootstrapComposition.v` proves finite clock-shift composition and termination
+transport. `BootstrapPrefix.v` proves the three address loads reach the actual
+copy-entry state and relates checked instruction lists to finite assembly
+traces. `BootstrapMemory.v` defines the original expected installed state;
+its reachability is still to prove, not assumed by the challenge.
+
+Remaining concrete bootstrap work includes installed-byte/domain proofs,
+checked prefix, symbolic bitmap-copy loop, tail writes/control, shared-input
+frame, and the final installed-machine relation. The full concrete compiler
+output equality, complete certificate and positive sealed verifier gate remain
+open. The source evaluator audit is now integrated as `EVALUATOR-AUDIT.md`,
+with its source-review evidence and formal transport limits retained.

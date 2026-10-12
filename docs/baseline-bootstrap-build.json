@@ -1,0 +1,21 @@
+{
+  "time_utc": "2026-10-12T00:52:01.350931+00:00",
+  "command": "rtk proxy dune build -j 2",
+  "exit": 0,
+  "scope": "coherent module build, original literal/encoder binding and prefix arithmetic; not baseline certificate or verifier acceptance",
+  "compiled_modules": [
+    "Artifacts",
+    "ArtifactFacts",
+    "BootstrapProgram",
+    "BootstrapSteps",
+    "BootstrapComposition",
+    "BootstrapMemory",
+    "BootstrapPrefix"
+  ],
+  "pending": [
+    "concrete compiler equality",
+    "checked bootstrap installation trace",
+    "baseline certificate",
+    "positive sealed verifier"
+  ]
+}
