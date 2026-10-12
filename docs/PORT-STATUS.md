@@ -222,3 +222,9 @@ Still required: kernel binding of actual compiler output, concrete original
 five-header bootstrap and installation/admission proofs, resource bounds,
 complete baseline certificate and positive sealed CLI verification. No main
 push or baseline-verifier success is claimed by this checkpoint.
+
+The reproducible `scripts/compare_baseline_proposal.py` comparison confirms
+that native bytes and bitmaps are identical to original pinned Lean literals.
+The original full ROM extracted from those literals is 950,344 bytes, SHA256
+`22a1dd0963f12a3492e647b2626101fad2312dfcff813978b8ff1aca9897d7cc`.
+These comparisons do not replace a kernel compilation equality or certificate.
