@@ -1,5 +1,4 @@
-(** Fixed original InitE/SourceSemantics.lean, instantiated with the
-    closed original accelerator computations and literal guest AST. *)
+(** Software precompile guest semantics with only host memory and terminal calls. *)
 From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words alignment.
 From Galette.HOL.src.list.src Require Import list rich_list.
@@ -9,7 +8,7 @@ From Galette.cakeml.basis.pure Require Import mlstring.
 From Galette.cakeml.semantics.ffi Require Import ffi.
 From Galette.cakeml.pancake.semantics Require panSem.
 From Galette.cakeml.compiler.backend.proofs Require stack_removeProof.
-From InitE.Guest Require Import Ast GasLimit ByteCodec Bookkeeping HostMemory AccelFfi.
+From InitE.Guest Require Import Ast GasLimit ByteCodec Bookkeeping HostMemory.
 From InitE.InitE Require Import Parameters.
 Open Scope N_scope.
 Open Scope hol_string_scope.
@@ -17,13 +16,7 @@ Definition sourceOracle : oracle HostMemory :=
  fun name host configuration bytes =>
  match name with
  | SharedMem op => sharedOracle op host configuration bytes
- | ExtCall name =>
-   if bool_decide (name = strlit "halt") || bool_decide (name = strlit "trap")
-   then Oracle_final FFI_failed else
-   match acceleratorBytes name configuration bytes with
-   | Some result => Oracle_return host result
-   | None => Oracle_final FFI_failed
-   end
+ | ExtCall _ => Oracle_final FFI_failed
  end.
 Definition sourceFfi (input : InputBlob) : ffi_state HostMemory :=
  initial_ffi_state sourceOracle (guestHostMemory input).

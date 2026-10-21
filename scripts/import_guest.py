@@ -5,7 +5,7 @@ No Pancake parser or textual-source agreement is assumed by the challenge.
 import hashlib, re
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'reference/init-e/Guest/Ast.lean'
+SOURCE = ROOT / 'source/stateless-pancaketh/Guest/SoftwareAst.lean'
 TARGET = ROOT / 'theories/Guest/Ast.v'
 MAP = {
 'Decl.decl':'panLang.Decl', 'Decl.exnDecl':'ExnDecl', 'Decl.function':'Function',
@@ -25,7 +25,7 @@ MAP = {
 'BinOp.add':'Add','BinOp.sub':'Sub','BinOp.and':'And','BinOp.or':'Or',
 'BinOp.xor':'Xor','Cmp.equal':'Equal','Cmp.notEqual':'NotEqual',
 'Cmp.less':'Less','Cmp.notLess':'NotLess','Cmp.lower':'Lower',
-'Cmp.notLower':'NotLower','Shift.asr':'Asr','Shift.lsl':'Lsl','Shift.lsr':'Lsr',
+'Cmp.notLower':'NotLower','Shift.asr':'Asr','Shift.lsl':'Lsl','Shift.lsr':'Lsr','Shift.ror':'Ror',
 'some':'Some','none':'None'}
 def translate(body):
     body = re.sub(r'BitVec\.ofNat 64 ([0-9]+)', r'n2w \1', body)
@@ -73,7 +73,7 @@ def render():
     source=SOURCE.read_text()
     declarations=list(re.finditer(r'^def (guest\w+) : (Decl \(BitVec 64\)|List \(Decl \(BitVec 64\)\)) :=\n',source,re.M))
     if not declarations: raise ValueError('no declarations')
-    result=['(* Generated from original init-e Guest/Ast.lean; do not edit. *)',
+    result=['(* Generated from stateless-pancaketh Guest/SoftwareAst.lean; do not edit. *)',
         '(* SHA256: '+hashlib.sha256(SOURCE.read_bytes()).hexdigest()+' *)',
         'From Galette Require Import Base.',
         'From Galette.HOL.src.n_bit Require Import words.',
@@ -84,7 +84,7 @@ def render():
         'From Galette.cakeml.pancake Require Import panLang.',
         'Open Scope N_scope.','Open Scope hol_string_scope.']
     for i,m in enumerate(declarations):
-        end=declarations[i+1].start() if i+1<len(declarations) else source.index('\nend Guest',m.end())
+        end=declarations[i+1].start() if i+1<len(declarations) else source.index('\nend Guest.Software',m.end())
         body=re.sub(r'/\-.*?\-/', '', source[m.end():end], flags=re.S).strip()
         typ='list (decl 64)' if m[2].startswith('List') else 'decl 64'
         result.append('Definition '+m[1]+' : '+typ+' :=\n'+translate(body)+'.\n')

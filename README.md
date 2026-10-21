@@ -1,5 +1,17 @@
 # rocq-init-e
 
+## Software guest update
+
+The challenge source now uses the software precompile guest from
+`flamingoponderado/stateless-pancaketh` commit
+`35e422bb3fb28e89948114d1415484afdd78a4db`. Its source and literal
+AST are pinned in `source/stateless-pancaketh/Guest/`. The guest performs
+precompiles in Pancake code; its only external calls are `halt` and `trap`.
+The source FFI therefore terminates on every external call, and the old
+accelerator implementation has been removed from the Rocq guest model.
+The accepted baseline described below belongs to the previous guest and
+must be regenerated and verified before it can be submitted for this update.
+
 Rocq port of [original init-e](https://github.com/flamingoponderado/init-e),
 using pinned [Galette](https://github.com/flamingoponderado/galette) and its
 proved Pancake `pan_to_target_compile_semantics` theorem.
@@ -23,7 +35,7 @@ Reference submodules are read-only inputs; Galette is pinned and unmodified.
 The original reduced RISC-V interpreter remains the public target for arbitrary
 admitted ROM submissions. The full-model embedding serves the compiler proof.
 
-The literal guest includes PR25's input arena check. The challenge quantifies
+The previous literal guest includes PR25's input arena check. The challenge quantifies
 over every input with declared gas at most **200,000,000**, retaining the original
 128 MiB input arena and 16-byte framing without an extra input-size premise.
 Score `infinity` still requires an input-dependent **finite matching Halt**;

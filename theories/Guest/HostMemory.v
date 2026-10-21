@@ -1,5 +1,4 @@
-(** Original Guest/Model.lean: input framing and shared-memory handlers.
-    External accelerator calls are implemented separately. *)
+(** Guest input framing and shared-memory handlers. *)
 From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.src.list.src Require Import list rich_list.

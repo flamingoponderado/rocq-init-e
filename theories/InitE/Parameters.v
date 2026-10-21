@@ -18,7 +18,7 @@ Definition scratchEnd : N := 2713714688.
 Definition heapStart : N := scratchEnd.
 Definition stackSize : N := 16 * 1024 * 1024.
 Definition stackStart : N := ramEnd - stackSize.
-Definition globalsWords : N := 93.
+Definition globalsWords : N := 67.
 Definition heapEnd : N := stackStart - globalsWords * 8.
 Definition gasLimit : N := 200000000.
 Theorem regions_disjoint :

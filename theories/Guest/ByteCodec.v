@@ -1,4 +1,4 @@
-(** Guest/AccelFfi.lean byte codecs; binary words are Galette words. *)
+(** Byte codecs for the guest host-memory framing. *)
 From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.src.list.src Require Import list rich_list.

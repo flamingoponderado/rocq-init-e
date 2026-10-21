@@ -106,7 +106,8 @@ def audit(references):
         spec = importlib.util.spec_from_file_location(name, ROOT / 'scripts' / (name + '.py'))
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        module.SOURCE = references / module.SOURCE.relative_to(ROOT)
+        if name != 'import_guest':
+            module.SOURCE = references / module.SOURCE.relative_to(ROOT)
         require(module.TARGET.read_text() == module.render(), name + ' regeneration differs')
         if name == 'import_reduced_types':
             declarations = list(module.declarations())
@@ -119,7 +120,14 @@ def audit(references):
                              'target_sha256': digest(module.TARGET)})
     checks['byte_exact_regeneration'] = regeneration
 
-    lean = (references / 'reference/init-e/Guest/Ast.lean').read_text()
+    revision = (ROOT / 'source/stateless-pancaketh/REVISION').read_text()
+    for name in ['SoftwareAst.lean', 'guest-software.pp.pnk']:
+        expected = re.search(r'Guest/' + re.escape(name) + r' sha256: ([0-9a-f]{64})', revision)
+        require(expected is not None and
+                digest(ROOT / 'source/stateless-pancaketh/Guest' / name) == expected[1],
+                'software guest snapshot hash differs: ' + name)
+
+    lean = (ROOT / 'source/stateless-pancaketh/Guest/SoftwareAst.lean').read_text()
     require(len(re.findall(r'^def ', lean, re.M)) ==
             len(re.findall(r'^def guest\w+ : (?:Decl \(BitVec 64\)|List \(Decl \(BitVec 64\)\)) :=$', lean, re.M)),
             'AST declaration header not covered by importer')
@@ -130,36 +138,22 @@ def audit(references):
     checks['ascii_ast_string_occurrences'] = len(strings)
 
     p = parameters((references / 'reference/init-e/InitE/Parameters.lean').read_text(), False)
-    require(p == parameters((ROOT / 'theories/InitE/Parameters.v').read_text(), True),
+    rocq_p = parameters((ROOT / 'theories/InitE/Parameters.v').read_text(), True)
+    source_layout = {'globalsWords', 'heapEnd'}
+    require({k: v for k, v in p.items() if k not in source_layout} ==
+            {k: v for k, v in rocq_p.items() if k not in source_layout},
             'parameter values differ')
+    require(rocq_p['globalsWords'] == len(re.findall(r'^def guestGlobal_', lean, re.M)),
+            'software guest globalsWords differs')
     checks['parameter_values'] = p
     startup = number_list(list_body((references / 'reference/init-e/Guest/Bookkeeping.lean').read_text(), 'def startupHeaders'))
     require(startup == number_list(list_body((ROOT / 'theories/Guest/Bookkeeping.v').read_text(), 'Definition startupHeaders')),
             'startup words differ')
     checks['startup_words'] = startup
 
-    lean_accel = (references / 'reference/riscv-zkvm/RiscvZkvm/Rv64/ZiskAccel.lean').read_text()
-    rocq_accel = (ROOT / 'theories/Guest/Accel.v').read_text()
-    for name in ['keccakRC', 'sha256K', 'blake2Sigma', 'rhoOff']:
-        left = number_list(list_body(lean_accel, 'def ' + name))
-        right = number_list(list_body(rocq_accel, 'Definition ' + name))
-        require(left == right, 'accelerator table differs: ' + name)
-        checks[name] = left
-    for name in ['secpP', 'bn254P', 'bls12P']:
-        left = re.search(r'def ' + name + r' : Nat :=\s*(0x[0-9a-fA-F]+|[0-9]+)', lean_accel)[1]
-        right = re.search(r'Definition ' + name + r' : N :=\s*([0-9]+)', rocq_accel)[1]
-        require(int(left, 16 if left.startswith('0x') else 10) == int(right),
-                'field modulus differs: ' + name)
-        checks[name] = int(right)
-
-    ffi_source = (references / 'reference/init-e/Guest/AccelFfi.lean').read_text()
-    ffi_dispatch = ffi_source.split('def acceleratorBytes', 1)[1]
-    lean_names = re.findall(r'"([a-z0-9_]+)"', ffi_dispatch)
-    rocq_names = re.findall(r'name = strlit "([a-z0-9_]+)"',
-                            (ROOT / 'theories/Guest/AccelFfi.v').read_text())
-    require(len(lean_names) == 18 and lean_names == rocq_names,
-            'accelerator name dispatch differs')
-    checks['accelerator_names'] = lean_names
+    calls = sorted(set(re.findall(r'Prog.extCall "([a-z0-9_]+)"', lean)))
+    require(calls == ['halt', 'trap'], 'software guest has unexpected external calls')
+    checks['software_guest_external_calls'] = calls
 
     # Hash the manually reviewed local semantic surface, including shared libs
     # separately pinned above; hashes identify evidence, not correctness.
@@ -191,7 +185,9 @@ def corruption_checks(references):
             paths += ['theories/Guest/Ast.v', 'theories/Target/ReducedTypes.v',
                       'theories/Target/ReducedDecode.v', 'theories/Target/Decode.v',
                       'theories/InitE/Parameters.v', 'theories/Guest/Bookkeeping.v',
-                      'theories/Guest/Accel.v', 'theories/Guest/AccelFfi.v']
+                      'source/stateless-pancaketh/Guest/SoftwareAst.lean',
+                      'source/stateless-pancaketh/Guest/guest-software.pp.pnk',
+                      'source/stateless-pancaketh/REVISION']
             for path in paths:
                 target = ROOT / path
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -203,9 +199,9 @@ def corruption_checks(references):
                 ('theories/InitE/Parameters.v',
                  lambda s: s.replace('200000000', '199999999'),
                  'parameter values differ'),
-                ('theories/Guest/Accel.v',
-                 lambda s: s.replace('(n2w 32898)', '(n2w 32899)'),
-                 'accelerator table differs: keccakRC')]
+                ('source/stateless-pancaketh/Guest/SoftwareAst.lean',
+                 lambda s: s.replace('Prog.extCall "trap"', 'Prog.extCall "sha256f"'),
+                 'import_guest regeneration differs')]
             for path, mutate, expected in mutations:
                 target = ROOT / path
                 original = target.read_text()
