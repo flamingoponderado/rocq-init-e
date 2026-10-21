@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""Package the exact original baseline for the isolated literal-bound verifier."""
+"""Package the pinned software-guest baseline for the isolated verifier."""
 import argparse
 import hashlib
 import json
-import subprocess
 from pathlib import Path
 from compare_baseline_proposal import literal
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE_PIN = "b3831bc501713e27b9f6974a5eb3cd0b1ca0d2c2"
-ROM_SHA256 = "22a1dd0963f12a3492e647b2626101fad2312dfcff813978b8ff1aca9897d7cc"
-ROM_BYTES = 950344
+MANIFEST = ROOT / "source/init-e-baseline/MANIFEST.json"
+SOURCE = ROOT / "source/init-e-baseline/InitECandidate"
 SOLUTION = r"""From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From InitE.InitE Require Import NatE SubmissionModel Challenge.
@@ -28,32 +26,34 @@ Proof. rewrite submitted_code_binding; exact baseline_certificate. Qed.
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rom", type=Path, help="optional existing ROM; default reconstructs pinned original literals")
+    parser.add_argument("--rom", type=Path, help="optional existing ROM; default reconstructs pinned software guest literals")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    reference = ROOT / "reference/init-e"
-    pin = subprocess.check_output(["git", "-C", str(reference), "rev-parse", "HEAD"], text=True).strip()
-    if pin != REFERENCE_PIN:
-        raise SystemExit("original init-e reference pin changed")
-    dirty = subprocess.check_output(["git", "-C", str(reference), "status", "--porcelain",
-                                     "--untracked-files=all"], text=True)
-    if dirty.strip():
-        raise SystemExit("original init-e reference is dirty")
+    manifest = json.loads(MANIFEST.read_text())
+    expected_files = manifest["files_sha256"]
+    actual_files = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in SOURCE.glob("*.lean")}
+    if actual_files != expected_files:
+        raise SystemExit("pinned software guest literal hashes differ")
     if args.rom is None:
-        source = reference / "submission/InitECandidate"
-        data = b"".join(literal(source / (prefix.title() + f"{i:03}.lean"),
-                                prefix + f"{i:03}", 1)
-                        for prefix, count in [("prefix", 2), ("bytes", 221), ("suffix", 11)]
-                        for i in range(count))
+        chunks = []
+        for prefix in ("prefix", "bytes", "suffix"):
+            paths = sorted(SOURCE.glob(prefix.title() + "[0-9][0-9][0-9].lean"))
+            if not paths or [p.name for p in paths] != [prefix.title() + f"{i:03}.lean"
+                                                        for i in range(len(paths))]:
+                raise SystemExit("missing or noncontiguous " + prefix + " literals")
+            chunks.extend(literal(path, prefix + f"{i:03}", 1)
+                          for i, path in enumerate(paths))
+        data = b"".join(chunks)
     else:
         if args.rom.is_symlink() or not args.rom.is_file():
             raise SystemExit("ROM must be a regular file")
-        if args.rom.stat().st_size != ROM_BYTES:
-            raise SystemExit("ROM differs from the pinned original baseline")
+        if args.rom.stat().st_size != manifest["rom_bytes"]:
+            raise SystemExit("ROM differs from the pinned software guest baseline")
         data = args.rom.read_bytes()
     digest = hashlib.sha256(data).hexdigest()
-    if len(data) != ROM_BYTES or digest != ROM_SHA256:
-        raise SystemExit("ROM differs from the pinned original baseline")
+    if len(data) != manifest["rom_bytes"] or digest != manifest["rom_sha256"]:
+        raise SystemExit("ROM differs from the pinned software guest baseline")
     if args.output.exists():
         raise SystemExit("output directory already exists")
     args.output.mkdir(parents=True)
