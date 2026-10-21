@@ -21,7 +21,7 @@ Proof.
  - split.
    + change (~stack_removeProof.addresses (n2w sourceBase : word 64) (baselineHeapLen-globalsWords) (n2w stackStart)).
      intros Hin; apply pan_globalsProof.in_addresses in Hin as [i [E Hi]].
-     change (i<3888119715) in Hi.
+     change (i<3888119741) in Hi.
      change (n2w stackStart = (n2w sourceBase+n2w i*n2w 8 : word 64)%w) in E.
      rewrite word_mul_n2w,word_add_n2w in E.
      apply (f_equal (@w2n 64)) in E; rewrite !w2n_n2w in E.

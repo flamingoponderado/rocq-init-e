@@ -22,7 +22,7 @@ Proof.
  rewrite Hs,Hr,Hb,!andb_false_r; apply baseline_rom_ram_zero; cbv [sourceBase ramStart] in *; lia.
 Qed.
 Lemma source_index_bound i : i < (stackStart-sourceBase)/8-globalsWords -> sourceBase+8*i+8 < 2^64.
-Proof. intro Hi; change (i < 3888119715) in Hi; unfold sourceBase; lia. Qed.
+Proof. intro Hi; change (i < 3888119741) in Hi; unfold sourceBase; lia. Qed.
 Lemma source_cell_value i : sourceBase+8*i < 2^64 ->
  w2n (n2w (sourceBase+8*i) : word 64) = sourceBase+8*i.
 Proof. intro Hi; rewrite w2n_n2w; change (dimword 64) with (2^64); apply N.mod_small; exact Hi. Qed.
