@@ -31,7 +31,7 @@ Proof.
  - inversion H as [[Hhead Htail]].
    f_equal; [apply w2n_11; exact Hhead|apply IH; exact Htail].
 Qed.
-Theorem bitmap_suffix_bytes : DROP 4740 suffix = bitmapBytes.
+Theorem bitmap_suffix_bytes : DROP 7908 suffix = bitmapBytes.
 Proof. apply word_list_numeric_ext; vm_compute; reflexivity. Qed.
 Local Opaque bootPrefix nativeCode suffix bitmaps bitmapBytes.
 Theorem bitmap_image_bytes : DROP (initDataRom-2147483648+24) code = bitmapBytes.
@@ -39,9 +39,9 @@ Proof.
  destruct original_literal_sizes as [Hnative [Hbitmaps [Hprefix Hcode]]].
  change (LENGTH nativeCode = 979140) in Hnative.
  change (LENGTH bootPrefix = 4208) in Hprefix.
- unfold code; change (DROP 913432 (bootPrefix++nativeCode++suffix) = bitmapBytes).
+ unfold code; change (DROP 991256 (bootPrefix++nativeCode++suffix) = bitmapBytes).
  rewrite drop_append_skip by (rewrite Hprefix; lia).
- rewrite Hprefix; change (DROP 908936 (nativeCode++suffix) = bitmapBytes).
+ rewrite Hprefix; change (DROP 987048 (nativeCode++suffix) = bitmapBytes).
  rewrite drop_append_skip by (rewrite Hnative; lia).
  rewrite Hnative; exact bitmap_suffix_bytes.
 Qed.
