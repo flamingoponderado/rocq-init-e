@@ -418,7 +418,7 @@ Proof.
    + cbv [initDataRam sourceBase inputStart inputEnd inputSize outputStart outputEnd outputSize] in *.
      intros [[H1 H2]|[H1 H2]]; lia.
  - intros i Hi E.
-   assert (Hin : In i (COUNT_LIST 22)) by (apply bootstrap_count_in; exact Hi).
+   assert (Hin : In i (COUNT_LIST 4)) by (apply bootstrap_count_in; exact Hi).
    assert (Hslot : w2n ((n2w nativePc-n2w (16*(i+1)))%w : word 64) < initDataRam).
    { vm_compute in Hin; repeat destruct Hin as [Hin|Hin]; try contradiction;
      subst i; vm_compute; congruence. }

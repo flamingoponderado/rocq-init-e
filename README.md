@@ -9,8 +9,12 @@ AST are pinned in `source/stateless-pancaketh/Guest/`. The guest performs
 precompiles in Pancake code; its only external calls are `halt` and `trap`.
 The source FFI therefore terminates on every external call, and the old
 accelerator implementation has been removed from the Rocq guest model.
-The accepted baseline described below belongs to the previous guest and
-must be regenerated and verified before it can be submitted for this update.
+The updated initial ROM literals are pinned from init-e commit
+`e77282a23cb2d6c71f6add008ac504a32f57cb8f` in
+`source/init-e-baseline/`. The importer checks each source file and the
+native, bitmap, and complete ROM hashes. The accepted certificate described
+below belongs to the previous guest; the Rocq compilation equality and
+certificate must be rebuilt for this ROM.
 
 Rocq port of [original init-e](https://github.com/flamingoponderado/init-e),
 using pinned [Galette](https://github.com/flamingoponderado/galette) and its

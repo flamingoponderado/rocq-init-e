@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare an untrusted native proposal with fixed original Lean literals.
+"""Compare an untrusted native proposal with pinned software guest Lean literals.
 
 This is an artifact comparison, never a kernel compilation certificate.
 Only the pinned decimal/hex list syntax is accepted.
@@ -34,14 +34,16 @@ def main():
     parser.add_argument("--output-dir", type=Path,
                         help="create a fresh directory with original full ROM and bitmap bytes")
     args = parser.parse_args()
-    root = ROOT / "reference/init-e/submission/InitECandidate"
-    def chunks(prefix, count):
-        return b"".join(literal(root / (prefix.title() + f"{i:03}.lean"),
-                                prefix + f"{i:03}", 1) for i in range(count))
-    native = chunks("bytes", 221)
+    root = ROOT / "source/init-e-baseline/InitECandidate"
+    def chunks(prefix):
+        paths = sorted(root.glob(prefix.title() + "[0-9][0-9][0-9].lean"))
+        if not paths or [int(path.stem[-3:]) for path in paths] != list(range(len(paths))):
+            raise ValueError("noncontiguous " + prefix + " chunks")
+        return b"".join(literal(path, prefix + path.stem[-3:], 1) for path in paths)
+    native = chunks("bytes")
     bitmaps = literal(root / "Bitmaps.lean", "bitmaps", 8)
-    prefix = chunks("prefix", 2)
-    suffix = chunks("suffix", 11)
+    prefix = chunks("prefix")
+    suffix = chunks("suffix")
     rom = prefix + native + suffix
     result = {"scope": "byte comparison only; no kernel compilation certificate",
               "native_same_as_original": native == (args.proposal / "native.bin").read_bytes(),

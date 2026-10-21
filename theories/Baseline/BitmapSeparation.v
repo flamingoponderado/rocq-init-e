@@ -53,7 +53,7 @@ Lemma bitmap_word_list_bound :
  w2n (n2w (initDataRam+24) : word 64)+LENGTH (MAP (@Word 64) bitmaps)*8 < dimword 64.
 Proof.
  rewrite bitmap_map_length; pose proof (proj1 (proj2 original_literal_sizes)) as Hsize.
- change (LENGTH bitmaps = 4614) in Hsize; rewrite Hsize; vm_compute; reflexivity.
+ change (LENGTH bitmaps = 4603) in Hsize; rewrite Hsize; vm_compute; reflexivity.
 Qed.
 Lemma bitmap_word_list_value i : i < LENGTH (MAP (@Word 64) bitmaps) ->
  packedWordMemory installedMemory (n2w (initDataRam+24)+n2w i*bytes_in_word)%w =
@@ -108,7 +108,7 @@ Lemma baseline_bitmap_lane_range a j : baselineBitmapDomain a -> j < 8 ->
 Proof.
  rewrite baseline_bitmap_address; intros [i [Hi ->]] Hj.
  pose proof (proj1 (proj2 original_literal_sizes)) as Hsize.
- change (LENGTH bitmaps = 4614) in Hsize; rewrite Hsize in Hi.
+ change (LENGTH bitmaps = 4603) in Hsize; rewrite Hsize in Hi.
  replace (initDataRam+24+8*i) with (initDataRam+8*(i+3)) by lia.
  rewrite copy_address_value by (auto; lia).
  unfold initDataEnd,bitmapWordCount; lia.
@@ -177,7 +177,7 @@ Proof.
  change (bytes_in_word : word 64) with (n2w 8 : word 64).
  rewrite word_mul_n2w,word_add_n2w.
  pose proof (proj1 (proj2 original_literal_sizes)) as Hsize.
- change (LENGTH bitmaps = 4614) in Hsize; rewrite Hsize; reflexivity.
+ change (LENGTH bitmaps = 4603) in Hsize; rewrite Hsize; reflexivity.
 Qed.
 Theorem baseline_bitmap_installed_separation :
  STAR (word_list (n2w (initDataRam+24)) (MAP (@Word 64) bitmaps))

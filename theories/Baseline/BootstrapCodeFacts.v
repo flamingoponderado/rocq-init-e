@@ -24,7 +24,7 @@ Proof.
    + cbv [initialPc inputStart inputEnd inputSize outputStart outputEnd outputSize] in *.
      intros [[H1 H2]|[H1 H2]]; lia.
  - intros i Hi E.
-   assert (Hcases : In i (COUNT_LIST 22)) by (vm_compute; lia).
+   assert (Hcases : In i (COUNT_LIST 4)) by (vm_compute; lia).
    assert (Hslot : initialPc+208 < w2n ((n2w nativePc-n2w (16*(i+1)))%w : word 64)).
    { vm_compute in Hcases; repeat destruct Hcases as [Hcases|Hcases]; try contradiction;
      subst i; vm_compute; congruence. }

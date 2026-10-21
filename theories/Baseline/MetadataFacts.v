@@ -12,15 +12,15 @@ From InitE.Baseline Require Import Metadata.
 Open Scope N_scope.
 
 Theorem baseline_metadata_lengths :
- LENGTH baselineNames = 33 /\ LENGTH baselineMmio = 13 /\
- LENGTH baselineEntryPcs = 33 /\ LENGTH baselineNames = baselineFirst+LENGTH baselineMmio.
+ LENGTH baselineNames = 17 /\ LENGTH baselineMmio = 15 /\
+ LENGTH baselineEntryPcs = 17 /\ LENGTH baselineNames = baselineFirst+LENGTH baselineMmio.
 Proof. repeat split; reflexivity. Qed.
 
 Theorem baseline_name_boundary : ffiNameBoundaryValid baselineNames baselineFirst.
 Proof.
  unfold ffiNameBoundaryValid; split; [vm_compute; congruence|].
- intros i Hi; change (i < 33) in Hi.
- assert (Hcases : In i (COUNT_LIST 33)) by (vm_compute; lia).
+ intros i Hi; change (i < 17) in Hi.
+ assert (Hcases : In i (COUNT_LIST 17)) by (vm_compute; lia).
  vm_compute in Hcases.
  repeat destruct Hcases as [Hcases|Hcases]; try contradiction;
  subst i; vm_compute; congruence.
@@ -29,8 +29,8 @@ Qed.
 Theorem baseline_mmio_valid : forall i, i < LENGTH baselineNames -> baselineFirst <= i ->
  mmioRecordValid (n2w baselineNativePc) baselineFirst baselineMmio i = true.
 Proof.
- intros i Hi Hfirst; change (i < 33) in Hi; change (20 <= i) in Hfirst.
- assert (Hcases : In i (COUNT_LIST 33)) by (vm_compute; lia).
+ intros i Hi Hfirst; change (i < 17) in Hi; change (2 <= i) in Hfirst.
+ assert (Hcases : In i (COUNT_LIST 17)) by (vm_compute; lia).
  vm_compute in Hcases.
  repeat destruct Hcases as [Hcases|Hcases]; try contradiction;
  subst i; try lia; vm_compute; reflexivity.
@@ -86,7 +86,7 @@ Proof.
  split.
  - split; [left; auto|]. unfold inputStart, outputStart in *; intros [[Ha Hb]|[Ha Hb]]; lia.
  - intros i Hi E.
-   assert (Hcases : In i (COUNT_LIST 22)) by (change (i < 22) in Hi; vm_compute; lia).
+   assert (Hcases : In i (COUNT_LIST 4)) by (change (i < 4) in Hi; vm_compute; lia).
    assert (Hd : w2n (baselineDispatchAddress i) < baselineNativePc).
    { vm_compute in Hcases; repeat destruct Hcases as [Hcases|Hcases]; try contradiction;
      subst i; vm_compute; congruence. }
@@ -113,8 +113,8 @@ Theorem baseline_ordinary_slots_loaded : forall i, i < baselineFirst+2 ->
  initialPc < w2n (baselineDispatchAddress i) /\
  w2n (baselineDispatchAddress i) < initialPc+baselineRomLength.
 Proof.
- intros i Hi; change (i < 22) in Hi.
- assert (Hcases : In i (COUNT_LIST 22)) by (vm_compute; lia).
+ intros i Hi; change (i < 4) in Hi.
+ assert (Hcases : In i (COUNT_LIST 4)) by (vm_compute; lia).
  vm_compute in Hcases; repeat destruct Hcases as [Hcases|Hcases]; try contradiction;
  subst i; split; vm_compute; congruence.
 Qed.
@@ -128,8 +128,8 @@ Theorem baseline_ordinary_entry_index : forall i, i < baselineFirst ->
  find_index (n2w baselineNativePc-n2w ((3+i)*lab_to_target.ffi_offset))%w
   baselineEntryPcs 0 = Some i.
 Proof.
- intros i Hi; change (i < 20) in Hi.
- assert (Hcases : In i (COUNT_LIST 20)) by (vm_compute; lia).
+ intros i Hi; change (i < 2) in Hi.
+ assert (Hcases : In i (COUNT_LIST 2)) by (vm_compute; lia).
  vm_compute in Hcases; repeat destruct Hcases as [Hcases|Hcases]; try contradiction;
  subst i; vm_compute; reflexivity.
 Qed.
@@ -138,13 +138,13 @@ Theorem baseline_configuration_metadata program shared :
  let mc := challengeMachineConfig (n2w baselineNativePc) program shared
   baselineNames baselineFirst baselineMmio in
  ffi_names mc = baselineNames /\
- LENGTH (ffi_entry_pcs mc) = 33 /\
+ LENGTH (ffi_entry_pcs mc) = 17 /\
  NoDup (ffi_entry_pcs mc) /\
  (forall a, In a (ffi_entry_pcs mc) -> aligned 2 a = true) /\
  (forall a, In a (ffi_entry_pcs mc) ->
   a <> halt_pc mc /\ a <> ccache_pc mc).
 Proof.
- cbn zeta; change (baselineNames = baselineNames /\ LENGTH baselineEntryPcs = 33 /\
+ cbn zeta; change (baselineNames = baselineNames /\ LENGTH baselineEntryPcs = 17 /\
  NoDup baselineEntryPcs /\ (forall a, In a baselineEntryPcs -> aligned 2 a = true) /\
  (forall a, In a baselineEntryPcs ->
  a <> baselineDispatchAddress 0 /\ a <> baselineDispatchAddress 1)).

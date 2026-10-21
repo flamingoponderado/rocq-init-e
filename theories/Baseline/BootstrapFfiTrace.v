@@ -69,10 +69,10 @@ Proof.
  all: try rewrite Hp.
  all: vm_compute; (congruence || exact I).
 Qed.
-Theorem copy_safe_code k s : k < 4617 -> CopyControl k s -> SafeCode copyLoopCode s.
+Theorem copy_safe_code k s : k < 4606 -> CopyControl k s -> SafeCode copyLoopCode s.
 Proof.
  intros Hk [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
- assert (Ek : (k <? 4617) = true) by (apply N.ltb_lt; exact Hk); rewrite Ek in Hp.
+ assert (Ek : (k <? 4606) = true) by (apply N.ltb_lt; exact Hk); rewrite Ek in Hp.
  cbn [copyLoopCode SafeCode BootstrapRange].
  repeat apply conj.
  all: copy_check_pc.
@@ -87,7 +87,7 @@ Proof.
  all: try rewrite Hp.
  all: vm_compute; (congruence || exact I).
 Qed.
-Theorem copy_guarded_loop_trace k : k <= 4617 ->
+Theorem copy_guarded_loop_trace k : k <= 4606 ->
  RTC (EvaluatorStep (machineConfig baselineSubmission)) copyEntryAsm (copyState k).
 Proof.
  induction k using N.peano_ind; intro Hk.
@@ -104,18 +104,18 @@ Proof.
  - rewrite <- prefix_endpoint; apply safe_checked_trace.
    + exact prefix_checked.
    + apply prefix_safe_code; reflexivity.
- - eapply RTC_RTC with (y:=copyState 4617).
+ - eapply RTC_RTC with (y:=copyState 4606).
    + apply copy_guarded_loop_trace; lia.
    + unfold bootstrapEndpoint; apply safe_checked_trace.
      * apply tail_checked.
-       -- exact (copy_pc 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-       -- exact (copy_endian 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-       -- exact (copy_domain 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-       -- exact (copy_link 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-       -- exact (copy_alignment 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-       -- exact (copy_failed 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-       -- apply copy_control_code with (k:=4617); [lia|apply copy_bytes_all; lia].
-     * apply tail_safe_code; exact (copy_pc 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
+       -- exact (copy_pc 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+       -- exact (copy_endian 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+       -- exact (copy_domain 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+       -- exact (copy_link 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+       -- exact (copy_alignment 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+       -- exact (copy_failed 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+       -- apply copy_control_code with (k:=4606); [lia|apply copy_bytes_all; lia].
+     * apply tail_safe_code; exact (copy_pc 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
 Qed.
 Theorem full_bootstrap_clock_shift {F} (input : InputBlob) (io : ffi_state F) :
  exists count ms2,

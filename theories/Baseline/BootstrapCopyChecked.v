@@ -11,7 +11,7 @@ From InitE.Baseline Require Import BootstrapProgram BootstrapMemory BootstrapSte
 Open Scope N_scope.
 Definition CopyCodeAgreement (s : asm_state 64) : Prop :=
  forall x, initialPc <= w2n x -> w2n x < initialPc+208 -> mem s x = romMemory x.
-Lemma copy_control_code k s : k <= 4617 -> CopyBytes k s -> CopyCodeAgreement s.
+Lemma copy_control_code k s : k <= 4606 -> CopyBytes k s -> CopyCodeAgreement s.
 Proof.
  intros Hk [_ Hframe] x Hlo Hhi; apply Hframe; copy_numbers; lia.
 Qed.
@@ -30,7 +30,7 @@ Lemma copy_add_failure s r : failed (after s (bootAdd r)) = failed s.
 Proof. rewrite after_bootAdd,upd_pc_failure,upd_reg_failure; reflexivity. Qed.
 Lemma copy_add_pc s r : pc (after s (bootAdd r)) = (pc s+n2w 4)%w.
 Proof. reflexivity. Qed.
-Lemma copy_load_failure k s : k < 4617 -> CopyControl k s ->
+Lemma copy_load_failure k s : k < 4606 -> CopyControl k s ->
  failed (after s copyLoad) = false.
 Proof.
  intros Hk [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
@@ -40,7 +40,7 @@ Proof.
  - intros j Hj; rewrite Hd,H5; apply copy_source_domain; assumption.
  - rewrite H5; apply copy_address_alignment; auto.
 Qed.
-Lemma copy_pair_failure k s : k < 4617 -> CopyControl k s ->
+Lemma copy_pair_failure k s : k < 4606 -> CopyControl k s ->
  failed (after (after s copyLoad) copyStore) = false.
 Proof.
  intros Hk [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
@@ -54,7 +54,7 @@ Proof.
 Qed.
 Lemma copy_load_code s : be s = false -> CopyCodeAgreement s -> CopyCodeAgreement (after s copyLoad).
 Proof. intros Hb Hcode x Hlo Hhi; rewrite copy_load_memory by exact Hb; apply Hcode; assumption. Qed.
-Lemma copy_pair_code k s : k < 4617 -> CopyControl k s -> CopyCodeAgreement s ->
+Lemma copy_pair_code k s : k < 4606 -> CopyControl k s -> CopyCodeAgreement s ->
  CopyCodeAgreement (after (after s copyLoad) copyStore).
 Proof.
  intros Hk [H5 H6 H7 Hb Hd Hl Ha Hf Hp] Hcode x Hlo Hhi.
@@ -83,7 +83,7 @@ Ltac copy_check_bytes address Hp Hd Hcode :=
    copy_check_pc; rewrite Hp; vm_compute; reflexivity |
    copy_check_controls; exact Hd |
    exact Hcode ].
-Theorem copy_body_checked k s : k < 4617 -> CopyControl k s -> CopyCodeAgreement s ->
+Theorem copy_body_checked k s : k < 4606 -> CopyControl k s -> CopyCodeAgreement s ->
  Checked copyLoopCode s.
 Proof.
  intros Hk Hcontrol Hcode.
@@ -91,7 +91,7 @@ Proof.
  pose proof (copy_load_failure k s Hk Hcontrol) as F1.
  pose proof (copy_pair_failure k s Hk Hcontrol) as F2.
  destruct Hcontrol as [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
- assert (Ek : (k <? 4617) = true) by (apply N.ltb_lt; exact Hk); rewrite Ek in Hp.
+ assert (Ek : (k <? 4606) = true) by (apply N.ltb_lt; exact Hk); rewrite Ek in Hp.
  pose proof (copy_load_code s Hb Hcode) as M1.
  assert (M2 : CopyCodeAgreement (after (after s copyLoad) copyStore)).
  { apply copy_pair_code with (k:=k); [exact Hk|exact Hfull|exact Hcode]. }
@@ -143,21 +143,21 @@ Proof.
           ++ vm_compute; reflexivity.
 Qed.
 
-Theorem copy_body_state_checked k : k < 4617 -> Checked copyLoopCode (copyState k).
+Theorem copy_body_state_checked k : k < 4606 -> Checked copyLoopCode (copyState k).
 Proof.
  intro Hk; apply copy_body_checked with (k:=k).
  - exact Hk.
  - apply copy_control_all; lia.
  - apply copy_control_code with (k:=k); [lia|apply copy_bytes_all; lia].
 Qed.
-Theorem copy_body_state_trace k : k < 4617 ->
+Theorem copy_body_state_trace k : k < 4606 ->
  RTC (fun before post => exists i, asm_step riscv_target.riscv_config before i post)
  (copyState k) (copyState (N.succ k)).
 Proof.
  intro Hk; rewrite copy_state_successor,copy_iteration_run.
  apply checked_trace; apply copy_body_state_checked; exact Hk.
 Qed.
-Theorem copy_loop_checked_trace k : k <= 4617 ->
+Theorem copy_loop_checked_trace k : k <= 4606 ->
  RTC (fun before post => exists i, asm_step riscv_target.riscv_config before i post)
  copyEntryAsm (copyState k).
 Proof.
@@ -167,21 +167,21 @@ Proof.
    + apply IHk; lia.
    + apply copy_body_state_trace; lia.
 Qed.
-Definition bootstrapEndpoint : asm_state 64 := runCode tailCode (copyState 4617).
+Definition bootstrapEndpoint : asm_state 64 := runCode tailCode (copyState 4606).
 Theorem full_bootstrap_checked_trace :
  RTC (fun before post => exists i, asm_step riscv_target.riscv_config before i post)
  initialAsm bootstrapEndpoint.
 Proof.
  eapply RTC_RTC with (y:=copyEntryAsm).
  - exact prefix_checked_trace.
- - eapply RTC_RTC with (y:=copyState 4617).
+ - eapply RTC_RTC with (y:=copyState 4606).
    + apply copy_loop_checked_trace; lia.
    + unfold bootstrapEndpoint; apply checked_trace; apply tail_checked.
-     * exact (copy_pc 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-     * exact (copy_endian 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-     * exact (copy_domain 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-     * exact (copy_link 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-     * exact (copy_alignment 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-     * exact (copy_failed 4617 (copyState 4617) (copy_control_all 4617 ltac:(lia))).
-     * apply copy_control_code with (k:=4617); [lia|apply copy_bytes_all; lia].
+     * exact (copy_pc 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+     * exact (copy_endian 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+     * exact (copy_domain 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+     * exact (copy_link 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+     * exact (copy_alignment 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+     * exact (copy_failed 4606 (copyState 4606) (copy_control_all 4606 ltac:(lia))).
+     * apply copy_control_code with (k:=4606); [lia|apply copy_bytes_all; lia].
 Qed.

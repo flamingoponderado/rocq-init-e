@@ -23,17 +23,17 @@ Record CopyControl (k : N) (s : asm_state 64) : Prop := {
  copy_link : lr s = 1;
  copy_alignment : align s = 2;
  copy_failed : failed s = false;
- copy_pc : pc s = if k <? 4617 then n2w 0x80000018 else n2w 0x8000002c
+ copy_pc : pc s = if k <? 4606 then n2w 0x80000018 else n2w 0x8000002c
 }.
 Lemma copy_counter_advance base k :
  (n2w (base+8*k)+n2w 8 : word 64)%w = n2w (base+8*N.succ k).
 Proof. rewrite word_add_n2w; f_equal; lia. Qed.
-Lemma copy_branch_bound k : k < 4617 ->
+Lemma copy_branch_bound k : k < 4606 ->
  word_cmp Lower (n2w (initDataRam+8*N.succ k) : word 64) (n2w initDataEnd) =
- (N.succ k <? 4617).
+ (N.succ k <? 4606).
 Proof.
  intro Hk; apply Bool.eq_true_iff_eq.
- change (is_true ((n2w (initDataRam+8*N.succ k) : word 64) <+ n2w initDataEnd)%w <-> (N.succ k <? 4617) = true).
+ change (is_true ((n2w (initDataRam+8*N.succ k) : word 64) <+ n2w initDataEnd)%w <-> (N.succ k <? 4606) = true).
  rewrite WORD_LO, N.ltb_lt, !w2n_n2w.
  change (dimword 64) with (2^64).
  rewrite !N.mod_small by (copy_numbers; lia).
@@ -41,7 +41,7 @@ Proof.
 Qed.
 Theorem copy_control_initial : CopyControl 0 copyEntryAsm.
 Proof. constructor; reflexivity. Qed.
-Theorem copy_control_step k s : k < 4617 -> CopyControl k s ->
+Theorem copy_control_step k s : k < 4606 -> CopyControl k s ->
  CopyControl (N.succ k) (copyIteration s).
 Proof.
  intros Hk H; destruct H as [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
@@ -62,26 +62,26 @@ Proof.
    + rewrite H6; apply copy_address_alignment; auto.
  - rewrite (copy_iteration_normal_form s Hb),upd_pc_current.
    rewrite H6,H7,copy_counter_advance,copy_branch_bound by exact Hk.
-   assert (E : (k <? 4617) = true) by (apply N.ltb_lt; exact Hk).
+   assert (E : (k <? 4606) = true) by (apply N.ltb_lt; exact Hk).
    rewrite E in Hp; rewrite Hp.
-   destruct (N.succ k <? 4617); [reflexivity|vm_compute; reflexivity].
+   destruct (N.succ k <? 4606); [reflexivity|vm_compute; reflexivity].
 Qed.
-Theorem copy_control_all k : k <= 4617 -> CopyControl k (copyState k).
+Theorem copy_control_all k : k <= 4606 -> CopyControl k (copyState k).
 Proof.
  induction k using N.peano_ind; intro Hk.
  - rewrite copy_state_zero; apply copy_control_initial.
  - rewrite copy_state_successor; apply copy_control_step; [lia|apply IHk; lia].
 Qed.
 Theorem copy_loop_control_endpoint :
- regs (copyState 4617) 5 = n2w (initDataRom+8*4617) /\
- regs (copyState 4617) 6 = n2w initDataEnd /\
- regs (copyState 4617) 7 = n2w initDataEnd /\
- pc (copyState 4617) = n2w 0x8000002c /\
- be (copyState 4617) = false /\ failed (copyState 4617) = false /\
- mem_domain (copyState 4617) = bootstrapDomain /\
- lr (copyState 4617) = 1 /\ align (copyState 4617) = 2.
+ regs (copyState 4606) 5 = n2w (initDataRom+8*4606) /\
+ regs (copyState 4606) 6 = n2w initDataEnd /\
+ regs (copyState 4606) 7 = n2w initDataEnd /\
+ pc (copyState 4606) = n2w 0x8000002c /\
+ be (copyState 4606) = false /\ failed (copyState 4606) = false /\
+ mem_domain (copyState 4606) = bootstrapDomain /\
+ lr (copyState 4606) = 1 /\ align (copyState 4606) = 2.
 Proof.
- destruct (copy_control_all 4617 ltac:(lia)) as [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
+ destruct (copy_control_all 4606 ltac:(lia)) as [H5 H6 H7 Hb Hd Hl Ha Hf Hp].
  split; [exact H5|].
  split; [exact H6|].
  split; [exact H7|].
@@ -93,7 +93,7 @@ Proof.
 Qed.
 
 Lemma copy_offset_value base offset :
- base = initDataRom \/ base = initDataRam -> offset <= 8*4617+8 ->
+ base = initDataRom \/ base = initDataRam -> offset <= 8*4606+8 ->
  w2n (n2w (base+offset) : word 64) = base+offset.
 Proof.
  intros Hb Ho; rewrite w2n_n2w; change (dimword 64) with (2^64).
@@ -105,7 +105,7 @@ Record CopyBytes (k : N) (s : asm_state 64) : Prop := {
  outside_copied : forall x,
   ~ (initDataRam <= w2n x /\ w2n x < initDataRam+8*k) -> mem s x = romMemory x
 }.
-Lemma copy_source_unchanged k s offset : k <= 4617 -> offset <= 8*4617+8 ->
+Lemma copy_source_unchanged k s offset : k <= 4606 -> offset <= 8*4606+8 ->
  CopyBytes k s -> mem s (n2w (initDataRom+offset)) = romMemory (n2w (initDataRom+offset)).
 Proof.
  intros Hk Ho [_ Hframe]; apply Hframe.
@@ -117,7 +117,7 @@ Proof.
  - intros offset Hoffset; lia.
  - intros x Hout; reflexivity.
 Qed.
-Theorem copy_bytes_step k s : k < 4617 -> CopyControl k s -> CopyBytes k s ->
+Theorem copy_bytes_step k s : k < 4606 -> CopyControl k s -> CopyBytes k s ->
  CopyBytes (N.succ k) (copyIteration s).
 Proof.
  intros Hk Hcontrol Hbytes.
@@ -145,7 +145,7 @@ Proof.
      rewrite copy_address_value by (auto; lia); split; lia).
    apply Hframe; intro Hin; apply Hout; destruct Hin as [Hlo Hhi]; split; lia.
 Qed.
-Theorem copy_bytes_all k : k <= 4617 -> CopyBytes k (copyState k).
+Theorem copy_bytes_all k : k <= 4606 -> CopyBytes k (copyState k).
 Proof.
  induction k using N.peano_ind; intro Hk.
  - rewrite copy_state_zero; apply copy_bytes_initial.
@@ -154,17 +154,17 @@ Proof.
    + apply copy_control_all; lia.
    + apply IHk; lia.
 Qed.
-Theorem copy_loop_bytes_endpoint offset : offset < 8*4617 ->
- mem (copyState 4617) (n2w (initDataRam+offset)) =
+Theorem copy_loop_bytes_endpoint offset : offset < 8*4606 ->
+ mem (copyState 4606) (n2w (initDataRam+offset)) =
  romMemory (n2w (initDataRom+offset)).
 Proof.
- intro Ho; exact (copied_bytes 4617 (copyState 4617)
-  (copy_bytes_all 4617 ltac:(lia)) offset Ho).
+ intro Ho; exact (copied_bytes 4606 (copyState 4606)
+  (copy_bytes_all 4606 ltac:(lia)) offset Ho).
 Qed.
 Theorem copy_loop_frame_endpoint x :
  ~ (initDataRam <= w2n x /\ w2n x < initDataEnd) ->
- mem (copyState 4617) x = romMemory x.
+ mem (copyState 4606) x = romMemory x.
 Proof.
- intro Hout; apply (outside_copied 4617 (copyState 4617)
-  (copy_bytes_all 4617 ltac:(lia))); exact Hout.
+ intro Hout; apply (outside_copied 4606 (copyState 4606)
+  (copy_bytes_all 4606 ltac:(lia))); exact Hout.
 Qed.

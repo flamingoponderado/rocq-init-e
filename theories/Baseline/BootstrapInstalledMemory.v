@@ -44,22 +44,22 @@ Theorem bootstrap_endpoint_headers address value j :
  In (address,value) tailHeaders -> j < 8 ->
  mem bootstrapEndpoint (n2w address+n2w j)%w = (w2w (value >>> (8*j))%w : word 8).
 Proof.
- intros Hi Hj; pose proof (copy_control_all 4617 ltac:(lia)) as Hcopy.
+ intros Hi Hj; pose proof (copy_control_all 4606 ltac:(lia)) as Hcopy.
  unfold bootstrapEndpoint; apply tail_headers_bytes.
- - exact (copy_pc 4617 (copyState 4617) Hcopy).
- - exact (copy_endian 4617 (copyState 4617) Hcopy).
+ - exact (copy_pc 4606 (copyState 4606) Hcopy).
+ - exact (copy_endian 4606 (copyState 4606) Hcopy).
  - exact Hi.
  - exact Hj.
 Qed.
 Theorem bootstrap_endpoint_tail_frame a :
  ~ (initDataRam <= w2n a /\ w2n a < initDataRam+24) ->
  ~ (sourceBase <= w2n a /\ w2n a < sourceBase+40) ->
- mem bootstrapEndpoint a = mem (copyState 4617) a.
+ mem bootstrapEndpoint a = mem (copyState 4606) a.
 Proof.
- intros Hinit Hsource; pose proof (copy_control_all 4617 ltac:(lia)) as Hcopy.
+ intros Hinit Hsource; pose proof (copy_control_all 4606 ltac:(lia)) as Hcopy.
  unfold bootstrapEndpoint; apply tail_memory_frame_outside.
- - exact (copy_pc 4617 (copyState 4617) Hcopy).
- - exact (copy_endian 4617 (copyState 4617) Hcopy).
+ - exact (copy_pc 4606 (copyState 4606) Hcopy).
+ - exact (copy_endian 4606 (copyState 4606) Hcopy).
  - exact Hinit.
  - exact Hsource.
 Qed.
@@ -89,9 +89,9 @@ Proof.
        rewrite bootstrap_endpoint_tail_frame by (exact HoutInit || exact HoutSource).
        assert (Ha : a = n2w (initDataRam+(w2n a-initDataRam))).
        { rewrite <- (n2w_w2n a) at 1; f_equal; lia. }
-       assert (Ho : w2n a-initDataRam < 8*4617) by (cbv [initDataEnd bitmapWordCount] in Hhi; lia).
+       assert (Ho : w2n a-initDataRam < 8*4606) by (cbv [initDataEnd bitmapWordCount] in Hhi; lia).
        eapply eq_trans.
-       -- exact (f_equal (mem (copyState 4617)) Ha).
+       -- exact (f_equal (mem (copyState 4606)) Ha).
        -- rewrite (copy_loop_bytes_endpoint _ Ho).
           replace (initDataRom+(w2n a-initDataRam)) with (initDataRom+w2n a-initDataRam) by lia; reflexivity.
      * pose proof (installed_guard_outside _ _ a Hbitmap) as HoutBitmap.
@@ -102,32 +102,32 @@ Qed.
 Local Transparent bootstrapEndpoint mem.
 Theorem bootstrap_endpoint_pc : pc bootstrapEndpoint = n2w nativePc.
 Proof.
- pose proof (copy_control_all 4617 ltac:(lia)) as Hcopy; unfold bootstrapEndpoint.
- exact (proj1 (tail_control (copyState 4617) (copy_pc 4617 (copyState 4617) Hcopy))).
+ pose proof (copy_control_all 4606 ltac:(lia)) as Hcopy; unfold bootstrapEndpoint.
+ exact (proj1 (tail_control (copyState 4606) (copy_pc 4606 (copyState 4606) Hcopy))).
 Qed.
 Theorem bootstrap_endpoint_heap_registers :
  regs bootstrapEndpoint 10 = n2w nativePc /\ regs bootstrapEndpoint 11 = n2w sourceBase /\
  regs bootstrapEndpoint 12 = n2w stackStart /\ regs bootstrapEndpoint 13 = n2w ramEnd.
 Proof.
- pose proof (copy_control_all 4617 ltac:(lia)) as Hcopy; unfold bootstrapEndpoint.
- exact (tail_heap_registers (copyState 4617) (copy_pc 4617 (copyState 4617) Hcopy)).
+ pose proof (copy_control_all 4606 ltac:(lia)) as Hcopy; unfold bootstrapEndpoint.
+ exact (tail_heap_registers (copyState 4606) (copy_pc 4606 (copyState 4606) Hcopy)).
 Qed.
 Theorem bootstrap_endpoint_controls :
  mem_domain bootstrapEndpoint = bootstrapDomain /\ lr bootstrapEndpoint = 1 /\
  align bootstrapEndpoint = 2 /\ be bootstrapEndpoint = false /\ failed bootstrapEndpoint = false.
 Proof.
- pose proof (copy_control_all 4617 ltac:(lia)) as Hcopy.
- pose proof (copy_pc 4617 (copyState 4617) Hcopy) as Hp.
- pose proof (copy_endian 4617 (copyState 4617) Hcopy) as Hb.
- pose proof (copy_domain 4617 (copyState 4617) Hcopy) as Hd.
- destruct (tail_control (copyState 4617) Hp) as [_ [_ [_ [Hdomain [Hlr [Halign Hbe]]]]]].
+ pose proof (copy_control_all 4606 ltac:(lia)) as Hcopy.
+ pose proof (copy_pc 4606 (copyState 4606) Hcopy) as Hp.
+ pose proof (copy_endian 4606 (copyState 4606) Hcopy) as Hb.
+ pose proof (copy_domain 4606 (copyState 4606) Hcopy) as Hd.
+ destruct (tail_control (copyState 4606) Hp) as [_ [_ [_ [Hdomain [Hlr [Halign Hbe]]]]]].
  unfold bootstrapEndpoint; apply conj.
  - rewrite Hdomain; exact Hd.
  - apply conj.
-   + rewrite Hlr; exact (copy_link 4617 (copyState 4617) Hcopy).
+   + rewrite Hlr; exact (copy_link 4606 (copyState 4606) Hcopy).
    + apply conj.
-     * rewrite Halign; exact (copy_alignment 4617 (copyState 4617) Hcopy).
+     * rewrite Halign; exact (copy_alignment 4606 (copyState 4606) Hcopy).
      * apply conj.
        -- rewrite Hbe; exact Hb.
-       -- rewrite (tail_success (copyState 4617) Hp Hb Hd); exact (copy_failed 4617 (copyState 4617) Hcopy).
+       -- rewrite (tail_success (copyState 4606) Hp Hb Hd); exact (copy_failed 4606 (copyState 4606) Hcopy).
 Qed.

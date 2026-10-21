@@ -37,8 +37,8 @@ Local Opaque bootPrefix nativeCode suffix bitmaps bitmapBytes.
 Theorem bitmap_image_bytes : DROP (initDataRom-2147483648+24) code = bitmapBytes.
 Proof.
  destruct original_literal_sizes as [Hnative [Hbitmaps [Hprefix Hcode]]].
- change (LENGTH nativeCode = 904196) in Hnative.
- change (LENGTH bootPrefix = 4496) in Hprefix.
+ change (LENGTH nativeCode = 979140) in Hnative.
+ change (LENGTH bootPrefix = 4208) in Hprefix.
  unfold code; change (DROP 913432 (bootPrefix++nativeCode++suffix) = bitmapBytes).
  rewrite drop_append_skip by (rewrite Hprefix; lia).
  rewrite Hprefix; change (DROP 908936 (nativeCode++suffix) = bitmapBytes).

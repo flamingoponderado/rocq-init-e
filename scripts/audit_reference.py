@@ -126,6 +126,11 @@ def audit(references):
         require(expected is not None and
                 digest(ROOT / 'source/stateless-pancaketh/Guest' / name) == expected[1],
                 'software guest snapshot hash differs: ' + name)
+    baseline_manifest = json.loads((ROOT / 'source/init-e-baseline/MANIFEST.json').read_text())
+    require(digest(ROOT / 'source/init-e-baseline/Bookkeeping.lean') ==
+            baseline_manifest['bookkeeping_sha256'], 'baseline bookkeeping snapshot differs')
+    require(digest(ROOT / 'source/init-e-baseline/CompilerConfigLiteral.lean') ==
+            baseline_manifest['compiler_config_sha256'], 'baseline compiler config snapshot differs')
 
     lean = (ROOT / 'source/stateless-pancaketh/Guest/SoftwareAst.lean').read_text()
     require(len(re.findall(r'^def ', lean, re.M)) ==
@@ -146,7 +151,7 @@ def audit(references):
     require(rocq_p['globalsWords'] == len(re.findall(r'^def guestGlobal_', lean, re.M)),
             'software guest globalsWords differs')
     checks['parameter_values'] = p
-    startup = number_list(list_body((references / 'reference/init-e/Guest/Bookkeeping.lean').read_text(), 'def startupHeaders'))
+    startup = number_list(list_body((ROOT / 'source/init-e-baseline/Bookkeeping.lean').read_text(), 'def startupHeaders'))
     require(startup == number_list(list_body((ROOT / 'theories/Guest/Bookkeeping.v').read_text(), 'Definition startupHeaders')),
             'startup words differ')
     checks['startup_words'] = startup
@@ -187,7 +192,10 @@ def corruption_checks(references):
                       'theories/InitE/Parameters.v', 'theories/Guest/Bookkeeping.v',
                       'source/stateless-pancaketh/Guest/SoftwareAst.lean',
                       'source/stateless-pancaketh/Guest/guest-software.pp.pnk',
-                      'source/stateless-pancaketh/REVISION']
+                      'source/stateless-pancaketh/REVISION',
+                      'source/init-e-baseline/Bookkeeping.lean',
+                      'source/init-e-baseline/CompilerConfigLiteral.lean',
+                      'source/init-e-baseline/MANIFEST.json']
             for path in paths:
                 target = ROOT / path
                 target.parent.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
-(** Original fixed BootstrapProgram.lean; no change to guest startup words. *)
+(** Software guest bootstrap encoded by the admitted RISC-V assembler. *)
 From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.src.list.src Require Import list.
@@ -41,9 +41,9 @@ Definition bootstrapBlocks : list (N * asm 64) := [
  (0x80000084,bootStore 6 5 8);
  (0x80000088,bootLoc 6 0x80000088 initDataEnd);
  (0x80000090,bootStore 6 5 16);
- (0x80000094,bootLoc 6 0x80000094 0x800ddd94);
+ (0x80000094,bootLoc 6 0x80000094 0x800f0134);
  (0x8000009c,bootStore 6 5 24);
- (0x800000a0,bootLoc 6 0x800000a0 0x800de000);
+ (0x800000a0,bootLoc 6 0x800000a0 0x800f1000);
  (0x800000a8,bootStore 6 5 32);
  (0x800000ac,bootConst 11 161);
  (0x800000b0,bootShift 11 24);
@@ -54,8 +54,7 @@ Definition bootstrapBlocks : list (N * asm 64) := [
  (0x800000c4,bootLoc 10 0x800000c4 nativePc);
  (0x800000cc,Jump (n2w nativePc-n2w 0x800000cc)%w)
 ].
-Definition originalBootstrapBytes : list (word 8) := [
-n2w 151;n2w 242;n2w 13;n2w 0;n2w 147;n2w 130;n2w 2;n2w 0;n2w 23;n2w 3;n2w 2;n2w 32;n2w 19;n2w 3;n2w 131;n2w 255;n2w 151;n2w 147;n2w 2;n2w 32;n2w 147;n2w 131;n2w 131;n2w 3;n2w 3;n2w 190;n2w 2;n2w 0;n2w 35;n2w 48;n2w 195;n2w 1;n2w 147;n2w 130;n2w 130;n2w 0;n2w 19;n2w 3;n2w 131;n2w 0;n2w 227;n2w 104;n2w 115;n2w 254;n2w 151;n2w 2;n2w 2;n2w 32;n2w 147;n2w 130;n2w 66;n2w 253;n2w 19;n2w 99;n2w 16;n2w 10;n2w 19;n2w 19;n2w 131;n2w 1;n2w 35;n2w 176;n2w 98;n2w 0;n2w 151;n2w 2;n2w 2;n2w 32;n2w 147;n2w 130;n2w 130;n2w 252;n2w 19;n2w 99;n2w 240;n2w 125;n2w 19;n2w 19;n2w 131;n2w 1;n2w 35;n2w 176;n2w 98;n2w 0;n2w 151;n2w 2;n2w 2;n2w 32;n2w 147;n2w 130;n2w 194;n2w 251;n2w 19;n2w 99;n2w 240;n2w 3;n2w 19;n2w 19;n2w 211;n2w 1;n2w 35;n2w 176;n2w 98;n2w 0;n2w 147;n2w 98;n2w 16;n2w 10;n2w 147;n2w 146;n2w 130;n2w 1;n2w 23;n2w 3;n2w 2;n2w 32;n2w 19;n2w 3;n2w 131;n2w 250;n2w 35;n2w 176;n2w 98;n2w 0;n2w 23;n2w 147;n2w 2;n2w 32;n2w 19;n2w 3;n2w 195;n2w 252;n2w 35;n2w 180;n2w 98;n2w 0;n2w 23;n2w 147;n2w 2;n2w 32;n2w 19;n2w 3;n2w 3;n2w 252;n2w 35;n2w 184;n2w 98;n2w 0;n2w 23;n2w 227;n2w 13;n2w 0;n2w 19;n2w 3;n2w 3;n2w 208;n2w 35;n2w 188;n2w 98;n2w 0;n2w 23;n2w 227;n2w 13;n2w 0;n2w 19;n2w 3;n2w 3;n2w 246;n2w 35;n2w 176;n2w 98;n2w 2;n2w 147;n2w 101;n2w 16;n2w 10;n2w 147;n2w 149;n2w 133;n2w 1;n2w 19;n2w 102;n2w 240;n2w 125;n2w 19;n2w 22;n2w 134;n2w 1;n2w 147;n2w 102;n2w 240;n2w 3;n2w 147;n2w 150;n2w 214;n2w 1;n2w 23;n2w 21;n2w 0;n2w 0;n2w 19;n2w 5;n2w 197;n2w 12;n2w 111;n2w 16;n2w 64;n2w 12].
+Definition originalBootstrapBytes : list (word 8) := [n2w 151;n2w 34;n2w 15;n2w 0;n2w 147;n2w 130;n2w 2;n2w 0;n2w 23;n2w 3;n2w 2;n2w 32;n2w 19;n2w 3;n2w 131;n2w 255;n2w 151;n2w 147;n2w 2;n2w 32;n2w 147;n2w 131;n2w 3;n2w 254;n2w 3;n2w 190;n2w 2;n2w 0;n2w 35;n2w 48;n2w 195;n2w 1;n2w 147;n2w 130;n2w 130;n2w 0;n2w 19;n2w 3;n2w 131;n2w 0;n2w 227;n2w 104;n2w 115;n2w 254;n2w 151;n2w 2;n2w 2;n2w 32;n2w 147;n2w 130;n2w 66;n2w 253;n2w 19;n2w 99;n2w 16;n2w 10;n2w 19;n2w 19;n2w 131;n2w 1;n2w 35;n2w 176;n2w 98;n2w 0;n2w 151;n2w 2;n2w 2;n2w 32;n2w 147;n2w 130;n2w 130;n2w 252;n2w 19;n2w 99;n2w 240;n2w 125;n2w 19;n2w 19;n2w 131;n2w 1;n2w 35;n2w 176;n2w 98;n2w 0;n2w 151;n2w 2;n2w 2;n2w 32;n2w 147;n2w 130;n2w 194;n2w 251;n2w 19;n2w 99;n2w 240;n2w 3;n2w 19;n2w 19;n2w 211;n2w 1;n2w 35;n2w 176;n2w 98;n2w 0;n2w 147;n2w 98;n2w 16;n2w 10;n2w 147;n2w 146;n2w 130;n2w 1;n2w 23;n2w 3;n2w 2;n2w 32;n2w 19;n2w 3;n2w 131;n2w 250;n2w 35;n2w 176;n2w 98;n2w 0;n2w 23;n2w 147;n2w 2;n2w 32;n2w 19;n2w 3;n2w 67;n2w 247;n2w 35;n2w 180;n2w 98;n2w 0;n2w 23;n2w 147;n2w 2;n2w 32;n2w 19;n2w 3;n2w 131;n2w 246;n2w 35;n2w 184;n2w 98;n2w 0;n2w 23;n2w 3;n2w 15;n2w 0;n2w 19;n2w 3;n2w 3;n2w 10;n2w 35;n2w 188;n2w 98;n2w 0;n2w 23;n2w 19;n2w 15;n2w 0;n2w 19;n2w 3;n2w 3;n2w 246;n2w 35;n2w 176;n2w 98;n2w 2;n2w 147;n2w 101;n2w 16;n2w 10;n2w 147;n2w 149;n2w 133;n2w 1;n2w 19;n2w 102;n2w 240;n2w 125;n2w 19;n2w 22;n2w 134;n2w 1;n2w 147;n2w 102;n2w 240;n2w 3;n2w 147;n2w 150;n2w 214;n2w 1;n2w 23;n2w 21;n2w 0;n2w 0;n2w 19;n2w 5;n2w 197;n2w 250;n2w 111;n2w 0;n2w 80;n2w 122].
 Theorem bootstrap_bytes_match :
  concat (MAP (fun block => riscv_target.riscv_enc (snd block)) bootstrapBlocks) = originalBootstrapBytes.
 Proof. vm_compute; reflexivity. Qed.
@@ -64,5 +63,5 @@ Theorem bootstrap_instructions_admitted :
 Proof. vm_compute; reflexivity. Qed.
 Definition initDataWords : N := (initDataEnd-initDataRam)/8.
 Definition bootstrapSteps : N := 6+5*initDataWords+41.
-Theorem original_bootstrap_step_count : initDataWords = 4617 /\ bootstrapSteps = 23132.
+Theorem original_bootstrap_step_count : initDataWords = 4606 /\ bootstrapSteps = 23077.
 Proof. split; vm_compute; reflexivity. Qed.

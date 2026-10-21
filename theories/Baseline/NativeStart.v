@@ -12,19 +12,19 @@ From InitE.InitE Require Import Parameters BaselineArtifactLayout SubmissionMode
 From InitE.Baseline Require Import Metadata MetadataFacts Submission BootstrapMemory BootstrapInstalledMemory BootstrapCopyChecked.
 Open Scope N_scope.
 Local Opaque bootstrapEndpoint.
-Theorem baseline_dispatch_not_program i : i < 22 -> ~ bootstrapDomain (baselineDispatchAddress i).
+Theorem baseline_dispatch_not_program i : i < 4 -> ~ bootstrapDomain (baselineDispatchAddress i).
 Proof.
  intros Hi [_ Hslots]; apply (Hslots i Hi).
  unfold baselineDispatchAddress; change ((n2w nativePc-n2w ((1+i)*16) : word 64)%w = (n2w nativePc-n2w (16*(i+1)))%w).
  replace ((1+i)*16) with (16*(i+1)) by lia; reflexivity.
 Qed.
-Theorem baseline_dispatch_not_shared i : i < 22 -> ~ submissionSharedDomain (baselineDispatchAddress i).
+Theorem baseline_dispatch_not_shared i : i < 4 -> ~ submissionSharedDomain (baselineDispatchAddress i).
 Proof.
  intro Hi; pose proof (baseline_ordinary_slots_loaded i Hi) as [Hlo Hhi].
  unfold submissionSharedDomain; cbv [initialPc baselineRomLength inputStart inputEnd inputSize outputStart outputEnd outputSize] in *.
  intros [[H1 H2]|[H1 H2]]; lia.
 Qed.
-Theorem baseline_start_pc_from_boundary (Hboundary : mmio_pcs_min_index baselineNames = Some 20) : start_pc_ok (machineConfig baselineSubmission) (n2w nativePc).
+Theorem baseline_start_pc_from_boundary (Hboundary : mmio_pcs_min_index baselineNames = Some 2) : start_pc_ok (machineConfig baselineSubmission) (n2w nativePc).
 Proof.
  change (~ bootstrapDomain (baselineDispatchAddress 0) /\
  ~ bootstrapDomain (baselineDispatchAddress 1) /\
@@ -49,7 +49,7 @@ Proof.
  split; [apply baseline_dispatch_not_shared; lia|].
  split; [apply baseline_dispatch_not_shared; lia|].
  split; [reflexivity|]. split; [reflexivity|]. split; [vm_compute; reflexivity|].
- exists 20; split; [exact Hboundary|]. split.
+ exists 2; split; [exact Hboundary|]. split.
  - intros index Hi.
    assert (E : (n2w nativePc-n2w ((3+index)*16) : word 64)%w = baselineDispatchAddress (index+2)).
    { unfold baselineDispatchAddress; replace (3+index) with (1+(index+2)) by lia; reflexivity. }
@@ -57,16 +57,16 @@ Proof.
    split; [rewrite E; apply baseline_dispatch_not_shared; lia|].
    split.
    + intro He; apply (f_equal w2n) in He.
-     assert (Hin : In index (COUNT_LIST 20)) by (vm_compute; lia).
+     assert (Hin : In index (COUNT_LIST 2)) by (vm_compute; lia).
      vm_compute in Hin; repeat destruct Hin as [Hin|Hin]; try contradiction; subst index; vm_compute in He; discriminate.
    + split.
      * intro He; apply (f_equal w2n) in He.
-       assert (Hin : In index (COUNT_LIST 20)) by (vm_compute; lia).
+       assert (Hin : In index (COUNT_LIST 2)) by (vm_compute; lia).
        vm_compute in Hin; repeat destruct Hin as [Hin|Hin]; try contradiction; subst index; vm_compute in He; discriminate.
      * apply baseline_ordinary_entry_index; exact Hi.
  - split.
    + intros index [Hi Hfirst].
-     change (index < 33) in Hi; assert (Hin : In index (COUNT_LIST 33)) by (vm_compute; lia).
+     change (index < 17) in Hi; assert (Hin : In index (COUNT_LIST 17)) by (vm_compute; lia).
      vm_compute in Hin; repeat destruct Hin as [Hin|Hin]; try contradiction; subst index; try lia; split; vm_compute; congruence.
    + reflexivity.
 Qed.
@@ -76,7 +76,7 @@ Proof.
  unfold target_configured; split; [rewrite Hf; discriminate|].
  split; [exact Hb|]. split; [exact Ha|]. split; [exact Hd|exact Hl].
 Qed.
-Theorem endpoint_start_pc_from_boundary (Hboundary : mmio_pcs_min_index baselineNames = Some 20) : start_pc_ok (machineConfig baselineSubmission) (pc bootstrapEndpoint).
+Theorem endpoint_start_pc_from_boundary (Hboundary : mmio_pcs_min_index baselineNames = Some 2) : start_pc_ok (machineConfig baselineSubmission) (pc bootstrapEndpoint).
 Proof. rewrite bootstrap_endpoint_pc; exact (baseline_start_pc_from_boundary Hboundary). Qed.
 Theorem endpoint_pc_mask : (n2w (2^align bootstrapEndpoint-1) && pc bootstrapEndpoint : word 64)%w = n2w 0.
 Proof.

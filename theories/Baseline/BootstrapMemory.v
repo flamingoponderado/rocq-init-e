@@ -12,7 +12,7 @@ Definition romMemory (a : word 64) : word 8 :=
  if (initialPc <=? w2n a) && (w2n a <? initialPc+LENGTH code)
  then nthN (w2n a-initialPc) code (n2w 0) else n2w 0.
 Definition bootstrapDomain (a : word 64) : Prop :=
- submissionMemoryDomain a /\ forall i, i < 22 ->
+ submissionMemoryDomain a /\ forall i, i < 4 ->
  a <> (n2w nativePc-n2w (16*(i+1)))%w.
 Definition initialAsm : asm_state 64 :=
  mk_asm_state (fun _ => n2w 0) (fun _ => n2w 0) romMemory bootstrapDomain

@@ -19,7 +19,7 @@ Theorem original_rom_bitmap_byte i j : i < LENGTH bitmaps -> j < 8 ->
  romMemory (n2w (initDataRom+24+8*i+j)) = wordByte (nthN i bitmaps (n2w 0)) j.
 Proof.
  intros Hi Hj; destruct original_literal_sizes as [Hnative [Hbitmaps [Hprefix Hcode]]].
- change (LENGTH bitmaps = 4614) in Hbitmaps; rewrite Hbitmaps in Hi.
+ change (LENGTH bitmaps = 4603) in Hbitmaps; rewrite Hbitmaps in Hi.
  assert (Ha : w2n (n2w (initDataRom+24+8*i+j) : word 64) = initDataRom+24+8*i+j).
  { replace (initDataRom+24+8*i+j) with (initDataRom+(24+8*i+j)) by lia.
    apply copy_offset_value; [auto|lia]. }
@@ -39,7 +39,7 @@ Theorem installed_bitmap_byte i j : i < LENGTH bitmaps -> j < 8 ->
  installedMemory (n2w (initDataRam+24+8*i)+n2w j)%w = wordByte (nthN i bitmaps (n2w 0)) j.
 Proof.
  intros Hi Hj; pose proof (proj1 (proj2 original_literal_sizes)) as Hbitmaps.
- change (LENGTH bitmaps = 4614) in Hbitmaps; rewrite Hbitmaps in Hi.
+ change (LENGTH bitmaps = 4603) in Hbitmaps; rewrite Hbitmaps in Hi.
  assert (Ha : w2n (n2w (initDataRam+24+8*i)+n2w j : word 64)%w = initDataRam+24+8*i+j).
  { replace (initDataRam+24+8*i) with (initDataRam+8*(i+3)) by lia.
    apply copy_address_value; [auto|lia|exact Hj]. }

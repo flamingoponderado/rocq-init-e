@@ -13,9 +13,9 @@ From InitE.InitE Require Import Parameters SubmissionModel BaselineArtifactLayou
 From InitE.Baseline Require Import Artifacts ArtifactFacts BitmapImageFacts BootstrapMemory BootstrapCopyBounds BootstrapCodeFacts BootstrapCopyChecked BootstrapInstalledMemory PackedWordMemory Submission BootstrapInitialRelation.
 Open Scope N_scope.
 Local Opaque bootPrefix nativeCode suffix bitmaps bootstrapEndpoint.
-Lemma native_literal_length : LENGTH nativeCode = 904196.
+Lemma native_literal_length : LENGTH nativeCode = 979140.
 Proof. exact (proj1 original_literal_sizes). Qed.
-Lemma native_address_value offset : offset <= 904816 ->
+Lemma native_address_value offset : offset <= 979760 ->
  w2n (n2w nativePc+n2w offset : word 64)%w = nativePc+offset.
 Proof.
  intro Ho; rewrite word_add_n2w,w2n_n2w; change (dimword 64) with (2^64).
@@ -54,7 +54,7 @@ Proof.
    + cbv [nativePc codeBufferLimit inputStart inputEnd inputSize outputStart outputEnd outputSize] in *.
      intros [[H1 H2]|[H1 H2]]; lia.
  - intros i Hi E.
-   assert (Hin : In i (COUNT_LIST 22)) by (apply bootstrap_count_in; exact Hi).
+   assert (Hin : In i (COUNT_LIST 4)) by (apply bootstrap_count_in; exact Hi).
    assert (Hslot : w2n ((n2w nativePc-n2w (16*(i+1)))%w : word 64) < nativePc).
    { vm_compute in Hin; repeat destruct Hin as [Hin|Hin]; try contradiction; subst i; vm_compute; congruence. }
    rewrite <- E in Hslot; lia.
