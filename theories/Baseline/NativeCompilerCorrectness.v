@@ -66,7 +66,7 @@ Proof. reflexivity. Qed.
 (** Exactly the source-memory, ordinary-domain and shared-domain arguments
     of Galette's [pan_installed], at the original fixed registers and metadata. *)
 Definition baseline_native_pan_installed (ms : riscv_state) : Prop :=
- pan_installed nativeCode 620 bitmaps 0 (Some baselineNames) (11,13)
+ pan_installed nativeCode 3788 bitmaps 0 (Some baselineNames) (11,13)
   (machineConfig baselineSubmission) baselineMmio ms
   (fun a => crep_to_loopProof.wlab_wloc (sourceMemory a)) ordinaryDomain sharedDomain.
 
@@ -96,7 +96,7 @@ Proof.
    unfold native_precision.
    apply (pan_to_target_compile_semantics baselineBackendConfig (machineConfig baselineSubmission)
     sourceDeclarations nativeCode bitmaps cprime (Some 538) (sourceInitialState input) ms
-    globalsWords baselineHeapLen (n2w baselineAdj2) (n2w baselineAdj4) (sourceFfi input) 620 0 (strlit "main")).
+    globalsWords baselineHeapLen (n2w baselineAdj2) (n2w baselineAdj4) (sourceFfi input) 3788 0 (strlit "main")).
    apply conj; [exact Hcompile|].
    apply conj; [exact source_good_panops|].
    apply conj; [exact source_distinct_parameters|].

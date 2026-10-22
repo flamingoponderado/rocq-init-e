@@ -15,7 +15,7 @@ Open Scope N_scope.
 Local Opaque bootPrefix nativeCode suffix bitmaps bootstrapEndpoint.
 Lemma native_literal_length : LENGTH nativeCode = 979140.
 Proof. exact (proj1 original_literal_sizes). Qed.
-Lemma native_address_value offset : offset <= 979760 ->
+Lemma native_address_value offset : offset <= 982928 ->
  w2n (n2w nativePc+n2w offset : word 64)%w = nativePc+offset.
 Proof.
  intro Ho; rewrite word_add_n2w,w2n_n2w; change (dimword 64) with (2^64).

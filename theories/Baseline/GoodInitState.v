@@ -23,7 +23,7 @@ Proof.
    + apply endpoint_native_byte; exact Hj.
 Qed.
 Theorem baseline_good_init_state ms : target_state_rel riscvTarget bootstrapEndpoint ms ->
- good_init_state (machineConfig baselineSubmission) ms nativeCode 620 bootstrapEndpoint
+ good_init_state (machineConfig baselineSubmission) ms nativeCode 3788 bootstrapEndpoint
  (packedWordMemory installedMemory) baselineDataDomain submissionSharedDomain.
 Proof.
  intro Hrelated; pose proof Hrelated as [_ [Hpc _]].

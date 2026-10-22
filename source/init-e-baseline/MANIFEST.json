@@ -259,7 +259,7 @@
     "Suffix009.lean": "05a7b87d3d9874c662eedb06c91c67d9387c2c6e9b6fe057d9cf4f36469d2646",
     "Suffix010.lean": "c3933fff41ba1a65601635c480b44f26de96634b56caf7e519be665ecbc52faa"
   },
-  "guest_commit": "35e422bb3fb28e89948114d1415484afdd78a4db",
+  "guest_commit": "35569814e3fd569fd98cccdf2a9704683d42d2d9",
   "native_sha256": "e800f2e5f1845c6428008be2e49d5725c4b342819ece4e128ba6e4c44e58face",
   "prefix_sha256": "1d1dbdd4520de0e86bd8f4e472f957dab36bd0ef82714465efec544406b96a2f",
   "rom_bytes": 1028080,

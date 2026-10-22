@@ -4,7 +4,7 @@
 
 The challenge source now uses the software precompile guest from
 `flamingoponderado/stateless-pancaketh` commit
-`35e422bb3fb28e89948114d1415484afdd78a4db`. Its source and literal
+`35569814e3fd569fd98cccdf2a9704683d42d2d9`. Its source and literal
 AST are pinned in `source/stateless-pancaketh/Guest/`. The guest performs
 precompiles in Pancake code; its only external calls are `halt` and `trap`.
 The source FFI therefore terminates on every external call, and the old

@@ -66,7 +66,7 @@ Theorem baseline_source_shared_domain : sharedDomain = submissionSharedDomain IN
 Proof.
  apply set_ext; intro a; unfold sharedDomain,pred_set.INTER; change ((aligned 3 a = true /\ submissionSharedDomain a) <-> (submissionSharedDomain a /\ aligned 3 a = true)); tauto.
 Qed.
-Theorem native_byte_data_excluded offset : offset <= 979760 ->
+Theorem native_byte_data_excluded offset : offset <= 982928 ->
  ~ baselineDataDomain (n2w nativePc+n2w offset)%w.
 Proof.
  intros Ho [Hheap|Hbitmap].
@@ -75,7 +75,7 @@ Proof.
  - apply baseline_bitmap_code_disjoint with (a:=(n2w nativePc+n2w offset)%w); [exact Hbitmap|].
    rewrite native_address_value by exact Ho; cbv [initialPc codeSizeLimit nativePc] in *; split; lia.
 Qed.
-Theorem baseline_code_buffer n : n < 620 ->
+Theorem baseline_code_buffer n : n < 3788 ->
  bootstrapDomain (n2w (n+LENGTH nativeCode)+n2w nativePc)%w /\
  ~ baselineDataDomain (n2w (n+LENGTH nativeCode)+n2w nativePc)%w.
 Proof.
@@ -84,5 +84,5 @@ Proof.
  - apply native_code_buffer_domain; rewrite native_address_value by lia; cbv [nativePc codeBufferLimit]; lia.
  - apply native_byte_data_excluded; lia.
 Qed.
-Theorem baseline_code_size_bound : 620+LENGTH nativeCode < dimword 64.
+Theorem baseline_code_size_bound : 3788+LENGTH nativeCode < dimword 64.
 Proof. rewrite native_literal_length; vm_compute; congruence. Qed.

@@ -31,7 +31,7 @@ Proof.
  rewrite WORD_LS,WORD_LO; unfold baselineHeapStackDomain; change (sourceBase <= w2n a /\ w2n a < ramEnd <-> sourceBase <= w2n a /\ w2n a < ramEnd); reflexivity.
 Qed.
 Theorem baseline_pan_installed ms : target_state_rel riscvTarget bootstrapEndpoint ms ->
- pan_installed nativeCode 620 bitmaps 0 (Some baselineNames) (11,13)
+ pan_installed nativeCode 3788 bitmaps 0 (Some baselineNames) (11,13)
  (machineConfig baselineSubmission) baselineMmio ms
  (fun a => crep_to_loopProof.wlab_wloc (sourceMemory a)) ordinaryDomain sharedDomain.
 Proof.
@@ -70,7 +70,7 @@ Proof.
                 change (packedWordMemory installedMemory (n2w (sourceBase+8*3)) = wordLang.Word (nthN 3 startupHeaders (n2w 0))).
                 exact (installed_source_header_word 3 ltac:(lia)).
              ** split.
-                --- change (packedWordMemory installedMemory (n2w sourceBase+n2w 4*bytes_in_word)%w = wordLang.Word (get_pc riscvTarget ms+n2w 620+n2w (LENGTH nativeCode))%w).
+                --- change (packedWordMemory installedMemory (n2w sourceBase+n2w 4*bytes_in_word)%w = wordLang.Word (get_pc riscvTarget ms+n2w 3788+n2w (LENGTH nativeCode))%w).
                     rewrite Hpc,(proj1 original_literal_sizes).
                     change (packedWordMemory installedMemory (n2w (sourceBase+8*4)) = wordLang.Word (nthN 4 startupHeaders (n2w 0))).
                     exact (installed_source_header_word 4 ltac:(lia)).
@@ -85,7 +85,7 @@ Proof.
                         *** rewrite (proj1 original_literal_sizes); vm_compute; congruence.
 Qed.
 Theorem baseline_pan_installed_input input ms : target_state_rel riscvTarget bootstrapEndpoint ms ->
- pan_installed nativeCode 620 bitmaps 0 (Some baselineNames) (11,13)
+ pan_installed nativeCode 3788 bitmaps 0 (Some baselineNames) (11,13)
  (machineConfig baselineSubmission) baselineMmio ms
  (fun a => crep_to_loopProof.wlab_wloc (Galette.cakeml.pancake.semantics.panSem.memory (sourceInitialState input) a))
  (Galette.cakeml.pancake.semantics.panSem.memaddrs (sourceInitialState input))
