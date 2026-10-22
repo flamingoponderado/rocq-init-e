@@ -4,6 +4,18 @@ The goal remains a complete port of original init-e pushed to `main`.
 A passing module build is not evidence of a baseline certificate or of
 acceptance by an isolated submission verifier.
 
+## Software guest update (verification pending)
+
+The challenge now pins stateless-pancaketh main commit
+`35569814e3fd569fd98cccdf2a9704683d42d2d9` and its software-precompile
+guest. The source has only `halt` and `trap` external calls; the RISC-V
+precompile accelerator is absent from the current semantics. The initial
+submission uses a 1,028,080-byte ROM with SHA256
+`44b6a6b828293a54cf2e8698a6a0af6a0d08b4ea825f6504547996c31969d04b`.
+The current exact compilation proof, coherent build, and positive sealed
+verifier replay are pending. The release checkpoint below is historical evidence
+for the previous guest and ROM.
+
 ## Release checkpoint: sealed original baseline accepted (2026-10-12)
 
 The complete original baseline passed the isolated sealed verifier with kernel
