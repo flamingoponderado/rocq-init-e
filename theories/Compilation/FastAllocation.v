@@ -6,7 +6,7 @@ From Galette.cakeml.translator.monadic.monad_base Require Import ml_monadBase.
 From Galette.cakeml.compiler.backend.reg_alloc Require Import reg_alloc linear_scan.
 From Galette.cakeml.compiler.backend Require word_alloc.
 From InitE.Compilation Require Import Allocation.
-From InitE.Compilation Require FastGraph.
+From InitE.Compilation Require FastGraph IRCSelection.
 Open Scope N_scope.
 
 Lemma advance_extend_graph_exact {A B} (r : exc A state_exn * ra_state) (ta : B -> N) edges :
@@ -33,7 +33,7 @@ Definition reg_alloc_aux_fast alg scost k moves ct forced fs tfn :=
  let mvs := resort_moves (moves_to_sp moves0 LN) in
  let init := initialize ct forced fs ta fa n (initialState n) in
  let filtered := advance init (fun _ => st_ex_FILTER (fun '(_, (x,y)) => full_consistency_ok k x y) moves0 []) in
- let allocated := advance filtered (fun moves => do_alloc1 (if bool_decide (alg = Simple) then [] else moves) scost k) in
+ let allocated := advance filtered (fun moves => IRCSelection.do_alloc1_fast (if bool_decide (alg = Simple) then [] else moves) scost k) in
  let assignedA := advance allocated (fun ls => assign_Atemps k ls (biased_pref mvs)) in
  let assignedS := advance assignedA (fun _ => assign_Stemps k (neg_biased_pref k mvs)) in
  fst (advance assignedS (fun _ => extract_color ta)).
@@ -41,7 +41,7 @@ Theorem reg_alloc_aux_fast_exact alg scost k moves ct forced fs tfn :
  reg_alloc_aux_fast alg scost k moves ct forced fs tfn = reg_alloc_aux alg scost k moves ct forced fs tfn.
 Proof.
  destruct tfn as [ta [fa n]]. unfold reg_alloc_aux_fast.
- rewrite allocator_phases, initialize_exact. reflexivity.
+ rewrite allocator_phases, initialize_exact, IRCSelection.advance_do_alloc1_fast_exact. reflexivity.
 Qed.
 Definition reg_alloc_fast alg scost k moves ct forced fs :=
  reg_alloc_aux_fast alg scost k moves ct forced fs (mk_bij ct).

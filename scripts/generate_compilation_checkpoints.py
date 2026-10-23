@@ -17,7 +17,6 @@ From Galette.cakeml.compiler.backend Require wordLang word_to_word word_simp
  word_inst word_alloc word_cse word_copy word_unreach word_remove.
 From Galette.cakeml.compiler.encoders.asm Require asm.
 From Galette.cakeml.compiler.encoders.riscv Require riscv_target.
-From InitE.InitE Require Import BaselineCompiler.
 From InitE.Compilation Require Import Frontend.
 Open Scope N_scope.
 From InitE.Compilation Require Import CompilerConfig.
@@ -96,7 +95,7 @@ Proof.
 
 def aggregate(count):
     modules = [f'Word{i:04}' for i in range(count)]
-    text = HEADER + 'From InitE.Compilation Require ' + ' '.join(modules) + '.\n'
+    text = HEADER + 'From InitE.InitE Require Import BaselineCompiler.\n' + 'From InitE.Compilation Require ' + ' '.join(modules) + '.\n'
     inputs = '[' + ';'.join(m+'.input' for m in modules) + ']'
     outputs = '[' + ';'.join(m+'.output' for m in modules) + ']'
     pairs = '[' + ';'.join('('+m+'.input,None)' for m in modules) + ']'
@@ -149,7 +148,15 @@ def split_allocation(i, root):
     Qed.
     ''')
     emit('02Filter',checkpoint('filtered','advance initialized (fun _ => reg_alloc.st_ex_FILTER (fun \'(_, (x,y)) => reg_alloc.full_consistency_ok regs x y) moves0 [])'))
-    emit('03Select',checkpoint('selected','advance filtered (fun moves => reg_alloc.do_alloc1 moves (snd heuristics) regs)'))
+    emit('03aHeuristics', 'From InitE.Compilation Require SparseIRC.\n' + checkpoint('selectionInitialized','advance filtered (fun moves s => reg_alloc.init_alloc1_heu moves (reg_alloc.dim s) regs s)', 'advance filtered (fun moves => SparseIRC.initialize_fast moves regs)', 'SparseIRC.advance_initialize_fast_exact'))
+    emit('03bLoop','From InitE.Compilation Require SparseIRC.\n'+checkpoint('selectionLoop','advance selectionInitialized (fun count => reg_alloc.rpt_do_step (snd heuristics) regs count)', 'advance selectionInitialized (fun count => SparseIRC.repeat_fast (snd heuristics) regs count)', 'SparseIRC.advance_repeat_fast_exact'))
+    emit('03cSelect','From InitE.Compilation Require IRCSelection.\n'+checkpoint('selected','advance selectionLoop (fun _ => reg_alloc.get_stack)').replace('Lemma selected_eq :','Lemma selected_result_eq :')+'''Lemma selected_eq : advance filtered (fun moves => reg_alloc.do_alloc1 moves (snd heuristics) regs) = selected.
+    Proof.
+     rewrite IRCSelection.selection_phases.
+     unfold IRCSelection.initialize_selection.
+     rewrite selectionInitialized_eq, selectionLoop_eq, selected_result_eq. reflexivity.
+    Qed.
+    ''')
     emit('04AssignA',checkpoint('assignedA','advance selected (fun ls => reg_alloc.assign_Atemps regs ls (reg_alloc.biased_pref prefs))'))
     emit('05AssignS',checkpoint('assignedS','advance assignedA (fun _ => reg_alloc.assign_Stemps regs (reg_alloc.neg_biased_pref regs prefs))'))
     emit('06Colour',checkpoint('extracted','advance assignedS (fun _ => reg_alloc.extract_color (fst bijection))')+checkpoint('colouring','fst extracted')+'''Lemma colouring_pipeline_eq : word_alloc.select_reg_alloc alg (snd heuristics) regs (fst heuristics) clashes forced stack_only = colouring.

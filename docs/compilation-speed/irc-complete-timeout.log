@@ -1,0 +1,4 @@
+Chars 0 - 33 [From~Galette~Require~Import~Base.] 0.105 secs (0.087u,0.018s)
+Chars 34 - 133 [From~InitE.Compilation~Require...] 0.132 secs (0.113u,0.018s)
+Chars 134 - 175 [From~InitE.Compilation~Require...] 0.001 secs (0.001u,0.s)
+Chars 176 - 254 [From~Galette.cakeml.translator...] 0. secs (0.u,0.s)

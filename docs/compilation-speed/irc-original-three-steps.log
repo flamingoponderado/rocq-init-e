@@ -1,0 +1,16 @@
+Chars 0 - 33 [From~Galette~Require~Import~Base.] 0.177 secs (0.089u,0.022s)
+Chars 34 - 104 [From~InitE.Compilation~Require...] 0.157 secs (0.106u,0.018s)
+Chars 105 - 170 [From~Galette.cakeml.compiler.b...] 0. secs (0.u,0.s)
+Chars 171 - 249 [From~Galette.cakeml.translator...] 0. secs (0.u,0.s)
+Chars 250 - 282 [From~Stdlib~Require~Import~List.] 0.001 secs (0.u,0.s)
+Chars 283 - 304 [Import~ListNotations.] 0. secs (0.u,0.s)
+Chars 305 - 336 [Require~Import~IRCSparseInit87.] 0.032 secs (0.022u,0.004s)
+Chars 337 - 587 [Definition~observe~(s~:~reg_al...] 0.001 secs (0.u,0.s)
+Chars 588 - 802 [Fixpoint~trace_steps~n~s~:=~~~...] 0. secs (0.u,0.s)
+     = [[304%nat; 5799%nat; 314%nat; 2483%nat; 0%nat; 0%nat];
+        [13%nat; 5761%nat; 339%nat; 2483%nat; 0%nat; 304%nat];
+        [2%nat; 5759%nat; 339%nat; 2483%nat; 0%nat; 317%nat];
+        [0%nat; 5759%nat; 339%nat; 2483%nat; 0%nat; 319%nat]]
+     : list (list nat)
+Finished transaction in 9.22 secs (9.165u,0.044s) (successful)
+Chars 803 - 868 [Time~Eval~vm_compute~in~trace_...] 9.22 secs (9.165u,0.044s)

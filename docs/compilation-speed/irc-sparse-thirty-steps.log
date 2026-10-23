@@ -1,0 +1,44 @@
+Chars 0 - 33 [From~Galette~Require~Import~Base.] 0.106 secs (0.087u,0.018s)
+Chars 34 - 104 [From~InitE.Compilation~Require...] 0.122 secs (0.105u,0.016s)
+Chars 105 - 158 [From~InitE.Compilation~Require...] 0.001 secs (0.001u,0.s)
+Chars 159 - 224 [From~Galette.cakeml.compiler.b...] 0. secs (0.u,0.s)
+Chars 225 - 303 [From~Galette.cakeml.translator...] 0. secs (0.u,0.s)
+Chars 304 - 336 [From~Stdlib~Require~Import~List.] 0.001 secs (0.u,0.s)
+Chars 337 - 358 [Import~ListNotations.] 0. secs (0.u,0.s)
+Chars 359 - 390 [Require~Import~IRCSparseInit87.] 0.027 secs (0.021u,0.005s)
+Chars 391 - 676 [Definition~observe~(f~:~Sparse...] 0. secs (0.u,0.s)
+Chars 677 - 891 [Fixpoint~trace_steps~n~f~:=~~~...] 0. secs (0.u,0.s)
+     = [[304%nat; 5799%nat; 314%nat; 2483%nat; 0%nat; 0%nat];
+        [13%nat; 5761%nat; 339%nat; 2483%nat; 0%nat; 304%nat];
+        [2%nat; 5759%nat; 339%nat; 2483%nat; 0%nat; 317%nat];
+        [0%nat; 5759%nat; 339%nat; 2483%nat; 0%nat; 319%nat];
+        [0%nat; 5759%nat; 339%nat; 2482%nat; 0%nat; 320%nat];
+        [0%nat; 5759%nat; 339%nat; 2479%nat; 2%nat; 321%nat];
+        [0%nat; 5759%nat; 339%nat; 2478%nat; 2%nat; 322%nat];
+        [0%nat; 5759%nat; 339%nat; 2477%nat; 2%nat; 323%nat];
+        [0%nat; 5759%nat; 339%nat; 2476%nat; 2%nat; 324%nat];
+        [0%nat; 5759%nat; 339%nat; 2475%nat; 2%nat; 325%nat];
+        [0%nat; 5759%nat; 339%nat; 2474%nat; 2%nat; 326%nat];
+        [0%nat; 5759%nat; 339%nat; 2473%nat; 2%nat; 327%nat];
+        [0%nat; 5759%nat; 339%nat; 2472%nat; 2%nat; 328%nat];
+        [0%nat; 5759%nat; 339%nat; 2471%nat; 2%nat; 329%nat];
+        [0%nat; 5759%nat; 339%nat; 2470%nat; 2%nat; 330%nat];
+        [0%nat; 5759%nat; 339%nat; 2469%nat; 2%nat; 331%nat];
+        [0%nat; 5759%nat; 339%nat; 2468%nat; 2%nat; 332%nat];
+        [0%nat; 5760%nat; 338%nat; 2467%nat; 2%nat; 333%nat];
+        [0%nat; 5760%nat; 338%nat; 2466%nat; 2%nat; 334%nat];
+        [0%nat; 5760%nat; 338%nat; 2465%nat; 2%nat; 335%nat];
+        [0%nat; 5760%nat; 338%nat; 2464%nat; 2%nat; 336%nat];
+        [0%nat; 5760%nat; 338%nat; 2463%nat; 2%nat; 337%nat];
+        [0%nat; 5760%nat; 338%nat; 2462%nat; 2%nat; 338%nat];
+        [0%nat; 5760%nat; 338%nat; 2461%nat; 2%nat; 339%nat];
+        [0%nat; 5760%nat; 338%nat; 2460%nat; 2%nat; 340%nat];
+        [0%nat; 5760%nat; 338%nat; 2459%nat; 2%nat; 341%nat];
+        [0%nat; 5760%nat; 338%nat; 2458%nat; 2%nat; 342%nat];
+        [0%nat; 5760%nat; 338%nat; 2457%nat; 2%nat; 343%nat];
+        [0%nat; 5760%nat; 338%nat; 2456%nat; 2%nat; 344%nat];
+        [0%nat; 5760%nat; 338%nat; 2455%nat; 2%nat; 345%nat];
+        [0%nat; 5760%nat; 338%nat; 2454%nat; 2%nat; 346%nat]]
+     : list (list nat)
+Finished transaction in 4.205 secs (4.133u,0.053s) (successful)
+Chars 892 - 977 [Time~Eval~vm_compute~in~~~trac...] 4.205 secs (4.133u,0.053s)

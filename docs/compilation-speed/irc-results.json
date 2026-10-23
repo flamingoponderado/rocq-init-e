@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-23",
+  "graph_commit": "653d753",
+  "galette_revision": "52220d8e7efa464a0fa04c8511593c907652905f",
+  "integrated_dune_build_exit_code": 0,
+  "targeted_norec_kernel_checks": {
+    "MapArray": 0,
+    "SparseState": 0,
+    "IRCBulk": 0,
+    "SparseIRC": 0,
+    "IRCSelection": 0,
+    "FastAllocation": 0,
+    "FastCompiler": 0
+  },
+  "initialization_compute_seconds_pre_bulk": 14.744,
+  "initialization_equality_seconds_pre_bulk": 6.764,
+  "original_three_steps_seconds": 9.22,
+  "sparse_three_steps_seconds_pre_bulk": 0.53,
+  "sparse_thirty_steps_seconds_pre_bulk": 4.205,
+  "bulk_thirty_steps_seconds": 2.647,
+  "complete_sparse_selection_timeout_seconds": 300,
+  "complete_sparse_selection_result_observed": false,
+  "small_function_split_pipeline_exit_code": 0,
+  "compiler_result_equality_proved": true,
+  "new_challenge_premises": [],
+  "full_recursive_verifier_replay_completed": false,
+  "source_sha256": {
+    "MapArray.v": "3c9c2763d0fa4e0553bf1ce44a19c105f40a001ad29c698b84128312de0733ec",
+    "FastCompiler.v": "0791bed4b43829734b2b90bc074b69d057c63a6b641387f5ca13d478caf78e06",
+    "SparseState.v": "8fb8e84f7f757f9d3d04a7124760c539a83926a6a8e3249239b812937a464ae0",
+    "SparseIRC.v": "e9fcffa75368ba56dd8f8b924a463e4ea75ffeeab110a20a94996fe07516c109",
+    "IRCSelection.v": "d0d07ddafa750ffc8ddaaf10391bdf27f7d0f90e75574508204bc98c71b1c647",
+    "FastAllocation.v": "be691fc13094b2c1efa54fdc36ee4191f0a6457f21f074e78af19528ce447966",
+    "FastGraph.v": "74df04bd931b354ed40a5047a62f4c12bd2a4f29ba7b4250abeb4a5f1fed76a5",
+    "Allocation.v": "f97b8deed89bbd67ca15f43c5d08985bf101654d1333ad8ca7d55f8ec684d741",
+    "IRCBulk.v": "76daf0905ac50b85f510a6759ed8392568436bd3ec82d521e98b797b8ee55916"
+  }
+}

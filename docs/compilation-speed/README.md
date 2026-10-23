@@ -1,10 +1,11 @@
-# Exact graph-construction optimization
+# Exact compiler-computation optimizations
 
 The concrete compilation certificate now evaluates a faster compiler through a
 proved equality with the original compiler. The challenge, submission theorem
 statement, literal ROM, source AST and vendored Galette sources are unchanged.
 The complete certificate and verifier replay have **not** finished within the
-bounded checks; there is still a separate IRC-selection bottleneck.
+bounded checks. IRC selection now uses sparse working arrays and bulk degree
+queries; the large complete-selection example still exceeds five minutes.
 
 ## Implementation and preservation proof
 
@@ -35,7 +36,59 @@ The proof chain is:
 computing. Its proposition is unchanged. No byte hash, additional assumption or
 weakened submission premise substitutes for an exact equality.
 
-## Bounded validation and measurements
+## IRC selection
+
+`MapArray.v` proves the exact list-array interface, including bounds failures.
+`SparseState.v` represents all five working arrays with sparse maps while
+preserving the other seven allocator fields. `SparseIRC.v` mirrors the original
+selection algorithm over that state and proves simulation for every operation.
+Its `allocate_fast_exact` theorem equates the complete returned result and
+allocator state with the original `do_alloc1`, for arbitrary starting states.
+
+Coalescing uses bounded structural recursion with a proof that the bound is
+sufficient whenever the original recursion descends. Neighbour ordering, move
+priorities, spill choices, failure fallback and iteration bounds are preserved.
+
+`IRCBulk.v` accelerates partitioning of large spill lists. It prepares a sparse
+set of low-degree, non-coalesced candidates once per partition. Small lists use
+the ordinary sparse-array predicates; states with insufficient array bounds use
+the original operation, preserving failures. Ordered partition results are
+identical. No new challenge premise or allocator well-formedness assumption is
+required.
+
+`IRCSelection.v` provides both the exact replacement and initialization/loop
+checkpoint equations. `FastAllocation.v` now calls this replacement, so the
+already proved full-compiler equality carries the change through to the
+certificate. The source ROM and challenge statement remain unchanged.
+
+Measured on the same function-87 state (6,420 nodes, 6,417 allocation candidates):
+
+| Measurement | Original | Sparse working arrays |
+| --- | ---: | ---: |
+| Heuristic initialization computation | >60s | 14.744s before bulk tuning |
+| Initialization equality checking | not completed | 6.764s before bulk tuning |
+| First three selection steps | 9.220s | 0.530s before bulk tuning |
+| First thirty selection steps | not measured | 4.205s before bulk tuning; 2.647s with bulk queries |
+
+The three-step comparison is about 17 times faster. Both implementations produce
+the same worklist traces; the formal theorem additionally preserves every
+allocator field, not just those observations. These are phase measurements, not
+an end-to-end verifier benchmark.
+
+The complete optimized selection, observed only through its final stack length
+to avoid a large state read-back, **did not finish within 300 seconds**. Its total
+runtime is unknown. The pure worklist/heuristic algorithm still does substantial
+work; no full certificate or verifier replay has completed.
+
+The new modules, the allocator integration and the full compiler equality built
+successfully after adopting the remote Galette stack-depth-cache update. Each
+new module and the integrated compiler passed a separate targeted `rocq check
+-norec` invocation. Dependencies were admitted for these checks, so this is not
+a completed recursive verifier replay. The allocator equality uses functional
+extensionality already present in the project; the full compiler equality uses
+only the existing foundations. See `irc-assumptions.log` and `irc-results.json`.
+
+## Earlier graph-only validation and measurements
 
 On the current guest and local Rocq 9.3.0 toolchain:
 
@@ -54,9 +107,8 @@ On the current guest and local Rocq 9.3.0 toolchain:
 - A 60-second Dune attempt at the complete concrete certificate timed out.
   **No end-to-end verifier speedup or completed submission replay is claimed.**
 
-The next performance target is IRC selection and its remaining list-backed
-allocator arrays. The graph-construction improvement is already integrated;
-changing that phase again alone will not remove the newly isolated bottleneck.
+These measurements describe the earlier graph-only version. The IRC changes
+and their remaining complete-selection timeout are described above.
 
 Native evaluation is disabled in this toolchain and falls back to the VM.
 Measurements, assumptions and selected timing logs are recorded here. The
@@ -68,7 +120,7 @@ The installed switch here is `galette`; select the project's appropriate switch
 on another machine. Production proof build:
 
 ```sh
-timeout -k 5 60 opam exec --switch=galette -- dune build -j 1 \
+timeout -k 5 180 opam exec --switch=galette -- dune build -j 1 \
   theories/Compilation/FastCompiler.vo
 ```
 
@@ -112,3 +164,31 @@ assignment; function 0 provides a small smoke case for the same proof wiring.
 The function count is specific to this guest. After changing it, query
 `List.length Frontend.words` and regenerate. The aggregate's exact `inputs_eq`
 also prevents an incorrect count from silently truncating an accepted proof.
+
+### Reproduce the IRC measurements
+
+After building the production proof modules and generating checkpoints, build
+only the frontend, parameters and function-87 initialization (without starting
+its whole loop):
+
+```sh
+opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
+  --timeout 60 --budget 180 \
+  experiments/compilation/Frontend.v experiments/compilation/CompilerConfig.v \
+  .artifacts/checkpoints/Word0087_0[012]*.v \
+  .artifacts/checkpoints/Word0087_03aHeuristics.v
+opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
+  --timeout 30 --budget 30 experiments/compilation/IRCMeasurements.v
+```
+
+For the complete selection use an explicit longer bound:
+
+```sh
+opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
+  --timeout 300 --budget 300 experiments/compilation/IRCComplete.v
+```
+
+The experimental parameters are constructed directly from the same pure backend
+configuration as `BaselineCompiler`, so profiling does not need to load its
+machine-semantics proof bridge. The aggregate proof still checks against the
+original baseline configuration.

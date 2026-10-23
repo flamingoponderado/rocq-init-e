@@ -30,6 +30,11 @@ def main():
               ROOT / 'experiments/compilation/Pipeline.v',
               ROOT / 'theories/Compilation/Allocation.v',
               ROOT / 'theories/Compilation/FastGraph.v',
+              ROOT / 'theories/Compilation/MapArray.v',
+              ROOT / 'theories/Compilation/SparseState.v',
+              ROOT / 'theories/Compilation/IRCBulk.v',
+              ROOT / 'theories/Compilation/SparseIRC.v',
+              ROOT / 'theories/Compilation/IRCSelection.v',
               ROOT / 'theories/Compilation/FastAllocation.v',
               ROOT / 'theories/Compilation/FastCompiler.v'] +
              sorted((ROOT / '.artifacts/checkpoints').glob('Word[0-9]*.v'),
