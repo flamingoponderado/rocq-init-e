@@ -29,6 +29,7 @@ def main():
               ROOT / 'experiments/compilation/CompilerConfig.v',
               ROOT / 'experiments/compilation/Pipeline.v',
               ROOT / 'theories/Compilation/Allocation.v',
+              ROOT / 'theories/Compilation/FastLookup.v',
               ROOT / 'theories/Compilation/FastGraph.v',
               ROOT / 'theories/Compilation/MapArray.v',
               ROOT / 'theories/Compilation/SparseState.v',

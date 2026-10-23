@@ -1,3 +1,4 @@
+From InitE.Compilation Require FastLookup.
 (** Bulk degree/parent queries for ordered worklist partitioning. *)
 From Galette Require Import Base.
 From Galette.HOL.src.finite_maps Require Import sptree.
@@ -8,7 +9,7 @@ From InitE.Compilation Require Import SparseState.
 From InitE.Compilation Require MapArray.
 Open Scope N_scope.
 Definition eligible k f := filter_v (fun b => b)
- (mapi (fun i _ => match lookup i (MapArray.data (parents f)) with
+ (mapi (fun i _ => match FastLookup.binary_lookup i (MapArray.data (parents f)) with
                    | Some p => i =? p | None => false end)
  (filter_v (fun d => d <? k) (MapArray.data (degree f)))).
 Lemma lookup_eligible k f i : lookup i (eligible k f) =
@@ -18,11 +19,12 @@ Lemma lookup_eligible k f i : lookup i (eligible k f) =
  end.
 Proof.
  unfold eligible. rewrite lookup_filter_v,lookup_mapi,lookup_filter_v.
+ rewrite FastLookup.binary_lookup_exact.
  destruct (lookup i (MapArray.data (degree f))) as [d|];
  destruct (lookup i (MapArray.data (parents f))) as [p|]; cbn; try reflexivity;
  destruct (d <? k); cbn; try reflexivity; destruct (i =? p); reflexivity.
 Qed.
-Definition has i t := match lookup i t with Some b => b | None => false end.
+Definition has i t := match FastLookup.binary_lookup i t with Some b => b | None => false end.
 Definition enough d f := Nat.leb (N.to_nat d) (MapArray.size (degree f)) &&
  Nat.leb (N.to_nat d) (MapArray.size (parents f)).
 Definition partition d k xs (fallback : IM (list N * list N)) : IM (list N * list N) := fun f =>
@@ -43,7 +45,7 @@ Lemma map_value {A} xs (a : MapArray.array A) i v : MapArray.rep xs a ->
  lookup i (MapArray.data a) = Some v -> Msub Subscript i xs = M_success v.
 Proof.
  intros Hr Hlookup. rewrite <- (MapArray.sub_rep Subscript xs a i Hr).
- unfold MapArray.sub. rewrite Hlookup. reflexivity.
+ unfold MapArray.sub. rewrite FastLookup.binary_lookup_exact,Hlookup. reflexivity.
 Qed.
 Lemma split_value d k s f : related s f -> enough d f = true -> forall i,
  reg_alloc.split_degree d k i s =
@@ -63,7 +65,7 @@ Proof.
    unfold reg_alloc.is_not_coalesced,reg_alloc.degrees_sub,reg_alloc.coalesced_sub,
     Marray_sub,st_ex_bind,st_ex_return.
    cbv beta. rewrite D. cbv beta iota. rewrite P. cbv beta iota.
-   unfold has. rewrite lookup_eligible,Ed,Ep.
+   unfold has. rewrite FastLookup.binary_lookup_exact,lookup_eligible,Ed,Ep.
    destruct ((dv <? k) && (i =? pv)); reflexivity.
  - assert (Hdi : (d <=? i) = true) by (apply N.leb_le; lia).
    rewrite Hdi. reflexivity.

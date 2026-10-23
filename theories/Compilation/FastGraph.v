@@ -1,3 +1,4 @@
+From InitE.Compilation Require FastLookup.
 (** Exact graph construction using a sparse outer adjacency array.
     Neighbour lists and the order of every read/write are unchanged. *)
 From Galette Require Import Base.
@@ -39,9 +40,9 @@ Proof. split; [reflexivity|]. intro i; change (lookup i (encode_from 0 xs) = nth
  assert ((0 <=? i) = true) by (apply N.leb_le; lia). rewrite H; reflexivity. Qed.
 
 Definition read (i : N) : M arrayState (list N) state_exn := fun a =>
- (match lookup i (arrayData a) with Some x => M_success x | None => M_failure Subscript end,a).
+ (match FastLookup.binary_lookup i (arrayData a) with Some x => M_success x | None => M_failure Subscript end,a).
 Definition write (i : N) (v : list N) : M arrayState unit state_exn := fun a =>
- match lookup i (arrayData a) with
+ match FastLookup.binary_lookup i (arrayData a) with
  | None => (M_failure Subscript,a)
  | Some _ => (M_success tt,ArrayState (arrayLength a) (insert i v (arrayData a)))
  end.
@@ -144,14 +145,14 @@ Lemma sim_read i : sim (adj_ls_sub i) (read i).
 Proof.
  intros s a [xs [-> [Hlen Hnth]]].
  unfold adj_ls_sub, Marray_sub, read. cbn [adj_ls withAdj].
- rewrite Msub_nth, Hnth. split; [reflexivity|].
+ rewrite FastLookup.binary_lookup_exact, Msub_nth, Hnth. split; [reflexivity|].
  exists xs; split; [reflexivity|split; assumption].
 Qed.
 Lemma sim_write i v : sim (update_adj_ls i v) (write i v).
 Proof.
  intros s a [xs [-> [Hlen Hnth]]].
  unfold update_adj_ls, Marray_update, write. cbn [adj_ls withAdj].
- rewrite Hnth.
+ rewrite FastLookup.binary_lookup_exact, Hnth.
  destruct (nth_error xs (N.to_nat i)) as [old|] eqn:Enth.
  - destruct (Mupdate_present Subscript v xs i old Enth) as [ys Eup].
    rewrite Eup. cbn [fst snd]. split; [reflexivity|].
@@ -292,7 +293,7 @@ End GraphSimulation.
 Fixpoint decode_from (n : nat) (k : N) (t : num_map (list N)) : list (list N) :=
  match n with
  | O => []
- | S n => (match lookup k t with Some x => x | None => [] end) :: decode_from n (k+1) t
+ | S n => (match FastLookup.binary_lookup k t with Some x => x | None => [] end) :: decode_from n (k+1) t
  end.
 Definition decode (a : arrayState) := decode_from (arrayLength a) 0 (arrayData a).
 Lemma decode_from_eq xs : forall k t,
@@ -301,7 +302,7 @@ Lemma decode_from_eq xs : forall k t,
 Proof.
  induction xs as [|x xs IH]; intros k t H; [reflexivity|].
  cbn [List.length decode_from].
- specialize (H O) as H0. cbn in H0. rewrite N.add_0_r in H0. rewrite H0.
+ specialize (H O) as H0. cbn in H0. rewrite N.add_0_r in H0. rewrite FastLookup.binary_lookup_exact,H0.
  f_equal. apply IH. intro i. specialize (H (S i)).
  replace (k+1+N.of_nat i) with (k+N.of_nat (S i)) by lia.
  exact H.

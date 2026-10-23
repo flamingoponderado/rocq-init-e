@@ -192,3 +192,33 @@ The experimental parameters are constructed directly from the same pure backend
 configuration as `BaselineCompiler`, so profiling does not need to load its
 machine-semantics proof bridge. The aggregate proof still checks against the
 original baseline configuration.
+
+## Binary lookup
+
+`FastLookup.binary_lookup` traverses the binary digits of `N.succ_pos k`
+instead of repeatedly computing parity, subtraction and division at each tree
+node. `binary_lookup_exact` proves equality with Galette lookup for every key,
+value type and tree, including absent keys. It is closed under the global
+context. Sparse graph reads, working-array reads and bulk eligibility queries
+use it; their specifications still use the original lookup. No vendored source
+or challenge definition changes.
+
+On the same function-87 checkpoint, graph evaluation took 8.206s and its proof
+1.311s (9.816s for the file), versus roughly 23s previously. Heuristic
+initialization took 8.382s plus 0.423s for its proof. Three sparse IRC steps took
+0.108s and thirty took 0.840s, versus 2.647s for thirty with the preceding bulk
+query implementation. The observed worklist traces match the earlier run.
+These are local phase measurements, not a whole-verifier timing.
+
+The isolated 6,420-key lookup sweep returned 20,604,990 with both implementations:
+arithmetic lookup took 0.055–0.058s and binary lookup 0.002–0.003s. Reproduce with
+`LookupMeasurements.v` using the checkpoint runner. Logs and measurements are
+in `binary-*.log` and `binary-results.json`.
+
+The full compiler equivalence proof builds, targeted kernel checks pass, and
+function 0 passes the complete generated compilation proof through assignment
+and extraction. The optimization introduces no additional axioms.
+
+The complete function-87 selection still exceeded a 120s cap after this change;
+see `binary-complete-timeout.log`. This does not establish an improvement over
+the previous 300s timeout, since neither run completed.

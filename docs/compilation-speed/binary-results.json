@@ -1,0 +1,27 @@
+{
+  "lookup_sweep": {
+    "keys": 6420,
+    "sum": 20604990,
+    "original_seconds": [
+      0.055,
+      0.058,
+      0.056
+    ],
+    "binary_seconds": [
+      0.003,
+      0.002,
+      0.003
+    ]
+  },
+  "function87": {
+    "graph_evaluation_seconds": 8.206,
+    "graph_proof_seconds": 1.311,
+    "graph_file_seconds": 9.816,
+    "initialization_evaluation_seconds": 8.382,
+    "initialization_proof_seconds": 0.423,
+    "sparse_three_steps_seconds": 0.108,
+    "sparse_thirty_steps_seconds": 0.84,
+    "complete_selection_timeout_seconds": 120
+  },
+  "full_verifier_complete": false
+}
