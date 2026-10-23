@@ -85,3 +85,24 @@ Proof.
     unfold MaximumCall278Context.funs, MaximumCall278Context.callee in Hbody.
     exact Hbody.
 Qed.
+
+Lemma leaf_depth_compact :
+  MaximumCall869Context.depth leaf =
+  CallDepthLemma.ret_handler_result MaximumContext.frames
+    MaximumCall869Context.funs MaximumCall869Context.callee
+    [MaximumCall869Context.callee] (sptree.size MaximumContext.funs)
+    278 ret_data handler_data callee_body_depth.
+Proof.
+  unfold MaximumCall869Context.depth.
+  rewrite leaf_shape.
+  apply (CallDepthLemma.max_depth_ret_handler_call_pair_compact
+    MaximumContext.frames MaximumCall869Context.funs
+    MaximumCall869Context.callee [MaximumCall869Context.callee]
+    (sptree.size MaximumContext.funs) 278 leaf_args ret_data handler_data
+    callee_argc MaximumCall278Context.body callee_body_depth).
+  - exact body_lookup.
+  - pose proof callee_body_depth_eq as Hbody.
+    unfold MaximumCall278Context.funs,
+      MaximumCall278Context.callee in Hbody.
+    exact Hbody.
+Qed.

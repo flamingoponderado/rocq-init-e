@@ -129,3 +129,38 @@ Proof.
   cbn [word_depth.max_depth].
   now rewrite Hdepth.
 Qed.
+
+Definition ret_handler_result {a} ss
+    (funs : num_map (N * wordLang.prog a)) n ns total d
+    (ret : list N * (wordLang.cutsets * (wordLang.prog a * (N * N))))
+    (handler : N * (wordLang.prog a * (N * N))) (depth : option N) :=
+  OPTION_MAP2 MAX
+    (word_depth.max_depth ss
+      (word_depth.Call n
+        (word_depth.Const 3 (word_depth.Call d word_depth.Leaf))))
+    (OPTION_MAP2 MAX
+      (OPTION_MAP2 N.add (sptree.lookup n ss)
+        (OPTION_MAP (N.add 3) depth))
+      (OPTION_MAP2 MAX
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total (fst (snd handler))))
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total (fst (snd (snd ret))))))).
+
+Lemma max_depth_ret_handler_call_pair_compact {a} ss
+    (funs : num_map (N * wordLang.prog a)) n ns total d
+    (args : list N)
+    (ret : list N * (wordLang.cutsets * (wordLang.prog a * (N * N))))
+    (handler : N * (wordLang.prog a * (N * N))) argc body depth :
+  sptree.lookup d funs = Some (argc, body) ->
+  word_depth.max_depth ss
+    (word_depth.call_graph (sptree.delete d funs) d [d] total body) = depth ->
+  word_depth.max_depth ss
+    (word_depth.call_graph funs n ns total
+      (wordLang.Call (Some ret) (Some d) args (Some handler))) =
+  ret_handler_result ss funs n ns total d ret handler depth.
+Proof.
+  intros Hlookup Hdepth.
+  exact (max_depth_ret_handler_call_pair_subst ss funs n ns total d
+    args ret handler argc body depth Hlookup Hdepth).
+Qed.
