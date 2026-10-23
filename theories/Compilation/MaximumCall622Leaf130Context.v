@@ -7,3 +7,4 @@ Definition leaves := StructuredDepth.leaves outer.
 Definition depth := MaximumCall622Via595Context.depth.
 Definition callee := MaximumCall622Via595Context.callee.
 Definition funs := MaximumCall622Via595Context.funs.
+Definition leaf := outer.
