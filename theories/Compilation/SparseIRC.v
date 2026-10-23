@@ -10,7 +10,7 @@ From Galette.HOL.src.list.src Require Import list rich_list.
 From Galette.cakeml.translator.monadic.monad_base Require Import ml_monadBase.
 From Galette.cakeml.compiler.backend.reg_alloc Require Import reg_alloc.
 From InitE.Compilation Require Import Allocation SparseState.
-From InitE.Compilation Require FastGraph IRCBulk.
+From InitE.Compilation Require FastGraph FastLookup IRCBulk.
 Open Scope N_scope.
 Open Scope monad_scope.
 Definition insert_edge (x y : N) : IM unit :=
@@ -314,6 +314,13 @@ Definition do_freeze (k : N) : IM bool :=
   end.
 
 
+Definition fast_lookup_any (x : N) (scost : num_map N) : N :=
+  match FastLookup.binary_lookup x scost with None => 0 | Some cost => cost end.
+Lemma fast_lookup_any_exact x scost :
+  fast_lookup_any x scost = reg_alloc.lookup_any x scost 0.
+Proof. unfold fast_lookup_any, reg_alloc.lookup_any.
+  now rewrite FastLookup.binary_lookup_exact. Qed.
+
 Fixpoint st_ex_list_MIN_cost (scost : num_map N) (l : list N) (d k v : N) (acc : list N)
     : IM (N * list N) :=
   match l with
@@ -321,7 +328,7 @@ Fixpoint st_ex_list_MIN_cost (scost : num_map N) (l : list N) (d k v : N) (acc :
   | x :: xs =>
       if x <? d then
         xv <- degrees_sub x ;;
-        cost <- st_ex_return (safe_div (lookup_any x scost 0) xv) ;;
+        cost <- st_ex_return (safe_div (fast_lookup_any x scost) xv) ;;
         if cost <? v then st_ex_list_MIN_cost scost xs d x cost (k :: acc)
         else st_ex_list_MIN_cost scost xs d k v (x :: acc)
       else st_ex_list_MIN_cost scost xs d k v acc
@@ -351,7 +358,7 @@ Definition do_spill (scostopt : option (num_map N)) (k : N) : IM bool :=
         match scostopt with
         | None => st_ex_list_MAX_deg xs d x xv []
         | Some scost =>
-            st_ex_list_MIN_cost scost xs d x (safe_div (lookup_any x scost 0) xv) []
+            st_ex_list_MIN_cost scost xs d x (safe_div (fast_lookup_any x scost) xv) []
         end ;;
       dec_degree y ;;
       push_stack y ;;
@@ -453,6 +460,7 @@ Ltac solve_sim :=
  | apply sim_map; let v := fresh "v" in intro v; solve_sim
  | apply sim_filter; let v := fresh "v" in intro v; solve_sim
  | apply sim_partition; let v := fresh "v" in intro v; solve_sim
+ | progress rewrite fast_lookup_any_exact; solve_sim
  | progress rewrite FastGraph.sortedInsert_exact; solve_sim
  | match goal with
    | |- sim (if ?b then _ else _) (if ?b then _ else _) => destruct b; solve_sim
@@ -670,7 +678,9 @@ Qed.
 #[local] Hint Resolve sim_do_freeze : irc_sim.
 Lemma sim_st_ex_list_MIN_cost scost ls : forall d k v acc,
  sim (reg_alloc.st_ex_list_MIN_cost scost ls d k v acc) (st_ex_list_MIN_cost scost ls d k v acc).
-Proof. induction ls as [|x xs IH]; intros d k v acc; cbn [reg_alloc.st_ex_list_MIN_cost st_ex_list_MIN_cost]; solve_sim. Qed.
+Proof. induction ls as [|x xs IH]; intros d k v acc;
+  cbn [reg_alloc.st_ex_list_MIN_cost st_ex_list_MIN_cost];
+  rewrite ?fast_lookup_any_exact; solve_sim. Qed.
 #[local] Hint Resolve sim_st_ex_list_MIN_cost : irc_sim.
 Lemma sim_st_ex_list_MAX_deg ls : forall d k v acc,
  sim (reg_alloc.st_ex_list_MAX_deg ls d k v acc) (st_ex_list_MAX_deg ls d k v acc).
@@ -679,6 +689,7 @@ Proof. induction ls as [|x xs IH]; intros d k v acc; cbn [reg_alloc.st_ex_list_M
 Lemma sim_do_spill (scostopt : option (num_map N)) (k : N) : sim (@reg_alloc.do_spill scostopt k) (@do_spill scostopt k).
 Proof.
  unfold reg_alloc.do_spill,do_spill.
+ rewrite ?fast_lookup_any_exact.
  solve_sim.
 Qed.
 #[local] Hint Resolve sim_do_spill : irc_sim.
