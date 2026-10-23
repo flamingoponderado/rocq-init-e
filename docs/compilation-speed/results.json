@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-23",
+  "toolchain": "The Rocq Prover, version 9.3.0\ncompiled with OCaml 5.5.1",
+  "frontend_compile_command_seconds": 34.599,
+  "lowered_functions": 814,
+  "validated_function_indices_before_allocator_split": [
+    0,
+    86
+  ],
+  "word0057_colouring_evaluation_seconds": 19.801,
+  "word0057_colouring_kernel_check_seconds": 19.955,
+  "word0087_input_compile_seconds": 14.921,
+  "word0087_allocator_nodes": 6420,
+  "word0087_clash_tree_nodes": 11889,
+  "word0087_heuristic_moves": 2483,
+  "word0087_init_timeout_seconds": 60,
+  "native_compute": "disabled at configure time; falls back to vm_compute",
+  "full_compilation_certificate_checked": false,
+  "full_verifier_speedup_established": false,
+  "guest_ast_sha256": "23d91fe0a85d88b8317415d5bc2a19529f53d295e0ae3895a30b72955ff7670a",
+  "word0087_mk_graph_timeout_seconds": 60,
+  "optimization": {
+    "production_dune_build_exit_code": 0,
+    "targeted_kernel_checks": {
+      "Allocation": 0,
+      "FastGraph": 0,
+      "FastAllocation": 0,
+      "FastCompiler": 0
+    },
+    "kernel_check_mode": "one -norec module per invocation; dependencies admitted",
+    "graph_equality_axioms": [],
+    "baseline_compiler_equality_foundations": [
+      "propositional_extensionality",
+      "functional_extensionality_dep",
+      "constructive_indefinite_description",
+      "classic"
+    ],
+    "sparse_graph_evaluation_seconds": 14.531,
+    "sparse_graph_equality_check_seconds": 7.243,
+    "sparse_graph_with_structural_insertion_compile_seconds": 22.942,
+    "irc_selection_timeout_seconds": 60,
+    "full_concrete_certificate_timeout_seconds": 60,
+    "challenge_statement_changed": false,
+    "certificate_statement_changed": false,
+    "compiler_result_equality_proved": true,
+    "full_recursive_verifier_replay_completed": false,
+    "small_split_allocator_smoke_exit_code": 0,
+    "FastGraph_sha256": "74df04bd931b354ed40a5047a62f4c12bd2a4f29ba7b4250abeb4a5f1fed76a5",
+    "FastCompiler_sha256": "0791bed4b43829734b2b90bc074b69d057c63a6b641387f5ca13d478caf78e06"
+  }
+}

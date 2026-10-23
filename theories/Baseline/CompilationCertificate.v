@@ -5,13 +5,16 @@ From Galette.cakeml.compiler.backend Require Import backend.
 From Galette.cakeml.compiler.backend Require lab_to_target.
 From InitE.InitE Require Import BaselineCompiler NativeCompilation.
 From InitE.Baseline Require Import Artifacts Metadata.
+From InitE.Compilation Require FastCompiler.
 Open Scope N_scope.
 Theorem concrete_compilation : exists configuration : backend.config,
  baselineCompilation = (Some (nativeCode,(bitmaps,configuration)),Some 538) /\
  lab_to_target.ffi_names (backend.lab_conf configuration) = Some baselineNames /\
  lab_to_target.shmem_extra (backend.lab_conf configuration) = baselineMmio.
 Proof.
- rewrite <- direct_compilation_exact.
+ (* Preserve the original certificate statement; compute with the proved
+    exact sparse-map graph builder. *)
+ rewrite <- FastCompiler.baselineCompilationFast_exact.
  eexists. split.
  - vm_compute. reflexivity.
  - split; lazy; reflexivity.
