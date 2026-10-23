@@ -98,3 +98,34 @@ Proof.
   cbn [fst snd].
   apply max_depth_ret_handler_call.
 Qed.
+
+Lemma max_depth_ret_handler_call_pair_subst {a} ss
+    (funs : num_map (N * wordLang.prog a)) n ns total d
+    (args : list N)
+    (ret : list N * (wordLang.cutsets * (wordLang.prog a * (N * N))))
+    (handler : N * (wordLang.prog a * (N * N))) argc body depth :
+  sptree.lookup d funs = Some (argc, body) ->
+  word_depth.max_depth ss
+    (word_depth.call_graph (sptree.delete d funs) d [d] total body) = depth ->
+  word_depth.max_depth ss
+    (word_depth.call_graph funs n ns total
+      (wordLang.Call (Some ret) (Some d) args (Some handler))) =
+  OPTION_MAP2 MAX
+    (word_depth.max_depth ss
+      (word_depth.Call n
+        (word_depth.Const 3 (word_depth.Call d word_depth.Leaf))))
+    (OPTION_MAP2 MAX
+      (OPTION_MAP2 N.add (sptree.lookup n ss)
+        (OPTION_MAP (N.add 3) depth))
+      (OPTION_MAP2 MAX
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total (fst (snd handler))))
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total (fst (snd (snd ret))))))).
+Proof.
+  intros Hlookup Hdepth.
+  rewrite (max_depth_ret_handler_call_pair ss funs n ns total d
+    args ret handler argc body Hlookup).
+  cbn [word_depth.max_depth].
+  now rewrite Hdepth.
+Qed.
