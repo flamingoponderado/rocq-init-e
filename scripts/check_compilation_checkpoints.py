@@ -5,6 +5,7 @@ Uses existing Dune-built dependencies. Run inside the project's opam environment
 Stops on the first failure/timeout and leaves successful .vo files reusable.
 """
 import argparse
+import hashlib
 import json
 import os
 import signal
@@ -20,47 +21,62 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--timeout', type=float, default=60)
     p.add_argument('--budget', type=float, default=180)
+    p.add_argument('--keep-going', action='store_true',
+                   help='continue independent files after a failure and skip its dependents')
     p.add_argument('files', nargs='*')
     args = p.parse_args()
     if args.timeout <= 0 or args.budget <= 0:
         p.error('timeouts must be positive')
-    paths = ([ROOT / f for f in args.files] if args.files else
-             [ROOT / 'experiments/compilation/Frontend.v',
-              ROOT / 'experiments/compilation/CompilerConfig.v',
-              ROOT / 'experiments/compilation/Pipeline.v',
-              ROOT / 'theories/Compilation/Allocation.v',
-              ROOT / 'theories/Compilation/FastLookup.v',
-              ROOT / 'theories/Compilation/FastGraph.v',
-              ROOT / 'theories/Compilation/MapArray.v',
-              ROOT / 'theories/Compilation/SparseState.v',
-              ROOT / 'theories/Compilation/IRCBulk.v',
-              ROOT / 'theories/Compilation/SparseIRC.v',
-              ROOT / 'theories/Compilation/IRCSelection.v',
-              ROOT / 'theories/Compilation/FastAllocation.v',
-              ROOT / 'theories/Compilation/FastCompiler.v'] +
-             sorted((ROOT / '.artifacts/checkpoints').glob('Word[0-9]*.v'),
-                    key=lambda path: (path.stem[:8], path.stem[8:] or 'zz')) +
-             [ROOT / '.artifacts/checkpoints/WordPipeline.v'] +
-             [ROOT / f'experiments/compilation/{name}.v' for name in
-              ['Stack', 'RawCalls', 'StackAllocation', 'StackRemoval',
-               'StackNames', 'Sections', 'Target', 'Complete', 'ConcreteCertificate']])
+    # Visit imported checkpoint files before their consumers, so each timeout
+    # measures one compilation unit rather than its entire unfinished ancestry.
+    directory = ROOT / 'theories/Compilation'
+    sources = {path.stem: path for path in directory.glob('*.v')}
+    def imports(path):
+        names = []
+        for group in re.findall(r'From InitE\.Compilation Require (?:Import |Export )?([^.]*)\.', path.read_text()):
+            names.extend(name for name in group.split() if name in sources)
+        return [sources[name] for name in names]
+    requested = ([ROOT / f for f in args.files] if args.files else
+                 [ROOT / 'theories/Baseline/CompilationCertificate.v'])
+    paths, visiting, visited = [], set(), set()
+    def visit(path):
+        if path in visited:
+            return
+        if path in visiting:
+            p.error('Cyclic checkpoint imports: ' + str(path))
+        visiting.add(path)
+        if path.exists():
+            for dependency in imports(path):
+                visit(dependency)
+        visiting.remove(path)
+        visited.add(path)
+        paths.append(path)
+    for path in requested:
+        visit(path)
     missing = [str(path.relative_to(ROOT)) for path in paths if not path.exists()]
     if missing:
         p.error('Missing checkpoint sources; run generate_compilation_checkpoints.py first: ' + ', '.join(missing[:3]))
     logs = ROOT / '_build/checkpoints'
     logs.mkdir(parents=True, exist_ok=True)
-    built = list((ROOT / '_build/default').rglob('*.vo'))
+    built = [f for f in (ROOT / '_build/default').rglob('*.vo')
+             if 'theories/Compilation' not in str(f)]
     dependency_time = max((f.stat().st_mtime for f in built), default=0)
     start = time.monotonic()
     report = logs / 'timings.json'
     results = json.loads(report.read_text()) if report.exists() else []
+    run_results = []
+    successful = {r['file']: r for r in results if r['status'] == 0}
+    failed = set()
     for path in paths:
-        production = path.parent == ROOT / 'theories/Compilation'
+        if any(dependency in failed for dependency in imports(path)):
+            failed.add(path)
+            continue
+        production = path.is_relative_to(ROOT / 'theories')
         # Invalidate against every local imported checkpoint, including split phases.
         dependency_files = []
         for names in re.findall(r'From InitE\.Compilation Require (?:Import |Export )?([^.]*)\.', path.read_text()):
             for name in names.split():
-                for directory in ['_build/default/theories/Compilation', 'experiments/compilation', '.artifacts/checkpoints']:
+                for directory in ['_build/default/theories/Compilation']:
                     dep = ROOT / directory / (name + '.vo')
                     if dep.exists():
                         dependency_files.append(dep)
@@ -68,7 +84,14 @@ def main():
                      [f.stat().st_mtime for f in dependency_files])
         vo = ((ROOT / '_build/default' / path.relative_to(ROOT)).with_suffix('.vo')
               if production else path.with_suffix('.vo'))
-        if vo.exists() and vo.stat().st_mtime >= newest:
+        key = str(path.relative_to(ROOT))
+        signature = hashlib.sha256(path.read_bytes())
+        signature.update(str(dependency_time).encode())
+        for dep in dependency_files:
+            signature.update(f'{dep}:{dep.stat().st_mtime_ns}:{dep.stat().st_size}'.encode())
+        fingerprint = signature.hexdigest()
+        if vo.exists() and (vo.stat().st_mtime >= newest or
+                            successful.get(key, {}).get('fingerprint') == fingerprint):
             continue
         remaining = args.budget - (time.monotonic() - start)
         if remaining <= 0:
@@ -77,8 +100,7 @@ def main():
         command = ['rocq', 'compile', '-time',
                    '-Q', '_build/default/galette-theories', 'Galette',
                    '-Q', '_build/default/theories', 'InitE',
-                   '-Q', 'experiments/compilation', 'InitE.Compilation',
-                   '-Q', '.artifacts/checkpoints', 'InitE.Compilation', str(path)]
+                   str(path)]
         if production:
             command = ['dune', 'build', '-j', '1', str(path.relative_to(ROOT).with_suffix('.vo'))]
         before = time.monotonic()
@@ -107,13 +129,26 @@ def main():
                     proc.wait()
                     status = 'timeout'
         seconds = round(time.monotonic() - before, 3)
-        results.append({'file': str(path.relative_to(ROOT)), 'seconds': seconds, 'status': status, 'finished_at': time.time()})
+        entry = {'file': key, 'seconds': seconds, 'status': status,
+                 'finished_at': time.time(), 'fingerprint': fingerprint}
+        results.append(entry)
+        run_results.append(entry)
         report.write_text(json.dumps(results, indent=2) + '\n')
         print(f'  {status}: {seconds}s ({log.relative_to(ROOT)})', flush=True)
         if status != 0:
             print(log.read_text()[-3000:], flush=True)
-            return 1
-    return 0
+            failed.add(path)
+            if not args.keep_going:
+                return 1
+    recent = run_results
+    slowest = sorted((r for r in recent if r['status'] == 0),
+                     key=lambda r: r['seconds'], reverse=True)[:10]
+    print('Slowest completed files:', flush=True)
+    for item in slowest:
+        print(f"  {item['seconds']:.3f}s {item['file']}", flush=True)
+    if failed:
+        print(f'{len(failed)} failed or dependency-blocked files.', flush=True)
+    return 1 if failed else 0
 
 
 if __name__ == '__main__':

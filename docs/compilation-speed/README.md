@@ -1,11 +1,12 @@
 # Exact compiler-computation optimizations
 
-The concrete compilation certificate now evaluates a faster compiler through a
-proved equality with the original compiler. The challenge, submission theorem
+The production compilation certificate now composes separately compiled
+computation checkpoints. Each checkpoint proves exact equality with its original
+compiler pass; expensive allocator passes use the proved faster implementation. The challenge, submission theorem
 statement, literal ROM, source AST and vendored Galette sources are unchanged.
 The complete certificate and verifier replay have **not** finished within the
-bounded checks. IRC selection now uses sparse working arrays and bulk degree
-queries; the large complete-selection example still exceeds five minutes.
+bounded checks. The previous whole-loop IRC experiment exceeded five minutes;
+the production path now divides that loop into resumable chunks.
 
 ## Implementation and preservation proof
 
@@ -32,8 +33,9 @@ The proof chain is:
   baseline compilation, including native bytes, bitmaps, stack maximum and
   configuration. It uses only foundations already present in the project.
 
-`Baseline/CompilationCertificate.v` rewrites with that last equality before
-computing. Its proposition is unchanged. No byte hash, additional assumption or
+`Baseline/CompilationCertificate.v` now uses `ConcreteCertificate`, which
+composes `Frontend`, `WordPipeline`, the lower backend checkpoints and `Complete`.
+Its proposition is unchanged. No byte hash, additional assumption or
 weakened submission premise substitutes for an exact equality.
 
 ## IRC selection
@@ -134,91 +136,67 @@ timeout -k 5 20 opam exec --switch=galette -- rocq check \
   -norec InitE.Compilation.FastCompiler
 ```
 
-### Resumable computation experiment
+## Production checkpoint workflow
 
-The original Lean-inspired stage experiment remains in
-`experiments/compilation/`, outside Dune's enabled directories. Its frontend's
-six passes and equality proofs compile in about 35 seconds and produce 814
-word-language functions. Before the graph optimization, function proofs 0–86
-passed, with most small functions taking roughly 0.5–1.5 seconds each. The
-full-stage aggregate and experimental final certificate remain unvalidated.
+All proof sources are under `theories/Compilation` and participate in the ordinary
+Dune theory. There is no experimental load path or external object dependency in
+the production certificate.
+
+- Six `Frontend*.v` computation files and `Frontend.v` compose source lowering.
+- Every one of the 814 word functions has `PassInput`, `PassSSA`, `PassOptimize`
+  and a final allocation/output file. Individual passes have opaque equality
+  lemmas; subsequent passes use their materialized outputs.
+- Functions 0, 57 and 87 additionally split graph construction, forced edges,
+  tagging, filtering, heuristic initialization, selection and assignment.
+- `IRCChunks.v` proves exact resumable IRC iteration, including errors and early
+  termination. Function 87 has 64 files of at most 100 steps followed by a final
+  remainder checkpoint. Function 0 exercises the same composition with two
+  smaller chunks. The remainder is evaluated, so the chosen chunk count cannot
+  truncate the algorithm or weaken the proof.
+- `WordPipeline.v` composes all function equalities. Separate files evaluate
+  stack lowering, raw calls, stack allocation/removal/naming, sections, target
+  encoding and maximum stack depth. `Complete.v` is symbolic composition.
+- `ConcreteCertificate.v` compares the resulting bytes and metadata with the
+  unchanged literal ROM, then supplies the unchanged baseline theorem.
+
+Generated `.v` sources are checked in. Regeneration preserves unchanged files
+and timestamps (the generator is outside the trust base):
 
 ```sh
 python3 scripts/generate_compilation_checkpoints.py 814
 opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
-  --timeout 60 --budget 180
+  --timeout 60 --budget 600 --keep-going
 ```
 
-The runner uses already-built trusted dependencies, compiles sequentially, and
-limits each file and the entire invocation. It reuses successful objects and
-invalidates them when sources or imported libraries change. Timings and logs go
-to `_build/checkpoints/`. Production modules are built by Dune; generated function proofs are compiled
-under `.artifacts/`, so the two build methods do not create conflicting objects.
-Timeouts terminate the entire compilation process group, including Dune children.
+The runner visits checkpoint dependencies first, builds through Dune, records
+per-file wall times in `_build/checkpoints/timings.json` and prints the slowest
+completed files. Every file and the complete invocation have explicit limits.
+With `--keep-going`, failures block their descendants but independent functions
+continue. Rerunning reuses successful objects. It does not reseal the verifier.
 
-Exit 2 indicates that the total budget expired between files; exit 1 indicates a
-compiler error or a timeout during a file. Rerun to resume. Function 87 is split
-through graph construction, forced edges, tagging, filtering, selection and
-assignment; function 0 provides a small smoke case for the same proof wiring.
-
-The function count is specific to this guest. After changing it, query
-`List.length Frontend.words` and regenerate. The aggregate's exact `inputs_eq`
-also prevents an incorrect count from silently truncating an accepted proof.
-
-### Reproduce the IRC measurements
-
-After building the production proof modules and generating checkpoints, build
-only the frontend, parameters and function-87 initialization (without starting
-its whole loop):
+For a quick complete per-function proof, including chunk composition:
 
 ```sh
 opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
-  --timeout 60 --budget 180 \
-  experiments/compilation/Frontend.v experiments/compilation/CompilerConfig.v \
-  .artifacts/checkpoints/Word0087_0[012]*.v \
-  .artifacts/checkpoints/Word0087_03aHeuristics.v
-opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
-  --timeout 30 --budget 30 experiments/compilation/IRCMeasurements.v
+  --timeout 30 --budget 90 theories/Compilation/Word0000.v
 ```
 
-For the complete selection use an explicit longer bound:
+For a bounded prefix of the larger loop:
 
 ```sh
 opam exec --switch=galette -- python3 scripts/check_compilation_checkpoints.py \
-  --timeout 300 --budget 300 experiments/compilation/IRCComplete.v
+  --timeout 45 --budget 180 theories/Compilation/Word0087_Loop0002.v
 ```
 
-The experimental parameters are constructed directly from the same pure backend
-configuration as `BaselineCompiler`, so profiling does not need to load its
-machine-semantics proof bridge. The aggregate proof still checks against the
-original baseline configuration.
+The diagnostic sources still in `experiments/compilation` import these production
+objects. The earlier `irc-*.log` and `binary-*.log` files record historical
+measurements of the sparse arrays, bulk degree queries and binary lookup; they
+do not establish a full verifier runtime. Full production certificate validation
+and a verifier run below three hours remain required.
 
-## Binary lookup
-
-`FastLookup.binary_lookup` traverses the binary digits of `N.succ_pos k`
-instead of repeatedly computing parity, subtraction and division at each tree
-node. `binary_lookup_exact` proves equality with Galette lookup for every key,
-value type and tree, including absent keys. It is closed under the global
-context. Sparse graph reads, working-array reads and bulk eligibility queries
-use it; their specifications still use the original lookup. No vendored source
-or challenge definition changes.
-
-On the same function-87 checkpoint, graph evaluation took 8.206s and its proof
-1.311s (9.816s for the file), versus roughly 23s previously. Heuristic
-initialization took 8.382s plus 0.423s for its proof. Three sparse IRC steps took
-0.108s and thirty took 0.840s, versus 2.647s for thirty with the preceding bulk
-query implementation. The observed worklist traces match the earlier run.
-These are local phase measurements, not a whole-verifier timing.
-
-The isolated 6,420-key lookup sweep returned 20,604,990 with both implementations:
-arithmetic lookup took 0.055–0.058s and binary lookup 0.002–0.003s. Reproduce with
-`LookupMeasurements.v` using the checkpoint runner. Logs and measurements are
-in `binary-*.log` and `binary-results.json`.
-
-The full compiler equivalence proof builds, targeted kernel checks pass, and
-function 0 passes the complete generated compilation proof through assignment
-and extraction. The optimization introduces no additional axioms.
-
-The complete function-87 selection still exceeded a 120s cap after this change;
-see `binary-complete-timeout.log`. This does not establish an improvement over
-the previous 300s timeout, since neither run completed.
+Current split-layout validation: function 0 (including chunked IRC) and function
+1 pass complete per-function proofs. Function 87 passes chunks 0–8 (900 loop
+iterations); chunk 9 exceeds a 30s cap. Its first chunks take roughly 10–14s,
+and chunk 8 took 26.472s. The aggregate production certificate has not yet been
+validated. See `checkpoint-layout-status.json`; further bounded runs continue
+from those cached objects.

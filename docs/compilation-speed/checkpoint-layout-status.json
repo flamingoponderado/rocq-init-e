@@ -1,0 +1,16 @@
+{
+  "production_compilation_source_files": 3386,
+  "generated_word_source_files": 3356,
+  "word_functions": 814,
+  "small_complete_function_proofs_passed": [
+    0,
+    1
+  ],
+  "large_function": 87,
+  "large_loop_chunks_completed": 9,
+  "steps_per_chunk": 100,
+  "next_chunk_timeout_seconds": 30,
+  "aggregate_certificate_checked": false,
+  "full_verifier_under_three_hours_established": false,
+  "challenge_and_rom_changed": false
+}

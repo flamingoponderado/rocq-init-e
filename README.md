@@ -60,11 +60,14 @@ rtk proxy git submodule update --init --recursive
 rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 scripts/audit_reference.py --self-test
 rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 scripts/import_baseline.py --check
 rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 scripts/import_baseline_metadata.py --check
-rtk proxy opam exec --switch=rocq-init-e -- dune build -j 1
+rtk proxy opam exec --switch=rocq-init-e -- python3 scripts/check_compilation_checkpoints.py --timeout 60 --budget 600 --keep-going
+timeout -k 5 10800 rtk proxy opam exec --switch=rocq-init-e -- dune build -j 1
 ```
 
 Use the documented opam switch for these commands. The exact compilation proof
-is expensive; a fresh build can recompute it. Do not restart an active build or
+uses separately compiled checkpoints; a fresh build can recompute them.
+The bounded checkpoint runner resumes completed files and reports slow phases.
+See [checkpoint layout and measurements](docs/compilation-speed/README.md). Do not restart an active build or
 run competing compiler/kernel/verifier jobs in a shared checkout.
 `galette-theories` is the relative symlink to the pinned theory sources, allowing
 a single Dune project without modifying Galette. Reference Lean projects are
