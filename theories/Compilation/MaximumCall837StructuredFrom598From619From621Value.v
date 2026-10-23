@@ -1,0 +1,76 @@
+From Galette Require Import Base.
+From Stdlib Require Import List Lia.
+From InitE.Compilation Require Import FastMaximum MaximumListChunks
+  MaximumCall837StructuredFrom598From619From621Context MaximumCall837StructuredFrom598From619From621Chunk00 MaximumCall837StructuredFrom598From619From621Chunk01 MaximumCall837StructuredFrom598From619From621Chunk02 MaximumCall837StructuredFrom598From619From621Chunk03 MaximumCall837StructuredFrom598From619From621Chunk04 MaximumCall837StructuredFrom598From619From621Chunk05 MaximumCall837StructuredFrom598From619From621Chunk06 MaximumCall837StructuredFrom598From619From621Chunk07 MaximumCall837StructuredFrom598From619From621Chunk08 MaximumCall837StructuredFrom598From619From621Chunk09 MaximumCall837StructuredFrom598From619From621Chunk10 MaximumCall837StructuredFrom598From619From621Chunk11 MaximumCall837StructuredFrom598From619From621Chunk12 MaximumCall837StructuredFrom598From619From621Chunk13 MaximumCall837StructuredFrom598From619From621Chunk14 MaximumCall837StructuredFrom598From619From621Chunk15 MaximumCall837StructuredFrom598From619From621Chunk16 MaximumCall837StructuredFrom598From619From621Chunk17 MaximumCall837StructuredFrom598From619From621Chunk18 MaximumCall837StructuredFrom598From619From621Chunk19 MaximumCall837StructuredFrom598From619From621Chunk20 MaximumCall837StructuredFrom598From619From621Chunk21 MaximumCall837StructuredFrom598From619From621Chunk22 MaximumCall837StructuredFrom598From619From621Chunk23 MaximumCall837StructuredFrom598From619From621Chunk24 MaximumCall837StructuredFrom598From619From621Chunk25 MaximumCall837StructuredFrom598From619From621Chunk26 MaximumCall837StructuredFrom598From619From621Chunk27.
+
+Definition values :=
+  MaximumCall837StructuredFrom598From619From621Chunk00.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk01.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk02.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk03.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk04.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk05.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk06.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk07.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk08.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk09.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk10.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk11.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk12.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk13.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk14.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk15.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk16.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk17.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk18.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk19.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk20.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk21.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk22.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk23.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk24.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk25.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk26.values ++
+  MaximumCall837StructuredFrom598From619From621Chunk27.values.
+
+Lemma values_eq :
+  List.map MaximumCall837StructuredFrom598From619From621Context.depth MaximumCall837StructuredFrom598From619From621Context.leaves = values.
+Proof.
+  rewrite <- (MaximumListChunks.gather_exact 28
+    MaximumCall837StructuredFrom598From619From621Context.depth MaximumCall837StructuredFrom598From619From621Context.leaves).
+  - unfold MaximumListChunks.gather.
+    cbn [List.seq List.map List.concat].
+    rewrite MaximumCall837StructuredFrom598From619From621Chunk00.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk01.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk02.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk03.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk04.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk05.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk06.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk07.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk08.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk09.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk10.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk11.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk12.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk13.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk14.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk15.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk16.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk17.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk18.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk19.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk20.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk21.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk22.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk23.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk24.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk25.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk26.values_eq,
+      MaximumCall837StructuredFrom598From619From621Chunk27.values_eq.
+    reflexivity.
+  - vm_compute. lia.
+Qed.
+
+Definition depth_value :=
+  fold_right FastMaximum.join_depth (Some 0) values.
