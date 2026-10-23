@@ -30,3 +30,41 @@ Proof.
   rewrite word_depthProof.max_depth_mk_Branch.
   reflexivity.
 Qed.
+
+Lemma max_depth_ret_handler_call {a} ss
+    (funs : num_map (N * wordLang.prog a)) n ns total d
+    (args ret_args : list N) cuts (ret_prog : wordLang.prog a)
+    ret_i ret_j h_idx (hprog : wordLang.prog a) h_i h_j argc body :
+  sptree.lookup d funs = Some (argc, body) ->
+  word_depth.max_depth ss
+    (word_depth.call_graph funs n ns total
+      (wordLang.Call
+        (Some (ret_args, (cuts, (ret_prog, (ret_i, ret_j)))))
+        (Some d) args (Some (h_idx, (hprog, (h_i, h_j)))))) =
+  OPTION_MAP2 MAX
+    (word_depth.max_depth ss
+      (word_depth.Call n
+        (word_depth.Const 3 (word_depth.Call d word_depth.Leaf))))
+    (OPTION_MAP2 MAX
+      (word_depth.max_depth ss
+        (word_depth.Call n
+          (word_depth.Const 3
+            (word_depth.call_graph (sptree.delete d funs) d [d] total body))))
+      (OPTION_MAP2 MAX
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total hprog))
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total ret_prog)))).
+Proof.
+  intro Hlookup.
+  destruct (@word_depth.call_graph_eqns a) as
+    (_ & _ & Ecall & _ & _ & _ & _ & _).
+  rewrite Ecall, Hlookup.
+  rewrite andb_false_r.
+  cbn [max_depth].
+  cbn [max_depth].
+  repeat rewrite word_depthProof.max_depth_mk_Branch.
+  cbn [max_depth].
+  rewrite word_depthProof.max_depth_mk_Branch.
+  reflexivity.
+Qed.
