@@ -68,3 +68,33 @@ Proof.
   rewrite word_depthProof.max_depth_mk_Branch.
   reflexivity.
 Qed.
+
+Lemma max_depth_ret_handler_call_pair {a} ss
+    (funs : num_map (N * wordLang.prog a)) n ns total d
+    (args : list N)
+    (ret : list N * (wordLang.cutsets * (wordLang.prog a * (N * N))))
+    (handler : N * (wordLang.prog a * (N * N))) argc body :
+  sptree.lookup d funs = Some (argc, body) ->
+  word_depth.max_depth ss
+    (word_depth.call_graph funs n ns total
+      (wordLang.Call (Some ret) (Some d) args (Some handler))) =
+  OPTION_MAP2 MAX
+    (word_depth.max_depth ss
+      (word_depth.Call n
+        (word_depth.Const 3 (word_depth.Call d word_depth.Leaf))))
+    (OPTION_MAP2 MAX
+      (word_depth.max_depth ss
+        (word_depth.Call n
+          (word_depth.Const 3
+            (word_depth.call_graph (sptree.delete d funs) d [d] total body))))
+      (OPTION_MAP2 MAX
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total (fst (snd handler))))
+        (word_depth.max_depth ss
+          (word_depth.call_graph funs n ns total (fst (snd (snd ret))))))).
+Proof.
+  destruct ret as [ret_args [cuts [ret_prog [ri rj]]]].
+  destruct handler as [hidx [hprog [hi hj]]].
+  cbn [fst snd].
+  apply max_depth_ret_handler_call.
+Qed.
