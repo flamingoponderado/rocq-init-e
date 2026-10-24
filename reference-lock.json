@@ -15,7 +15,7 @@
     },
     "vendor/galette": {
       "url": "https://github.com/flamingoponderado/galette.git",
-      "commit": "6eab85e03c934eae714ecf5eb02061b55f2843c1"
+      "commit": "52220d8e7efa464a0fa04c8511593c907652905f"
     }
   }
 }
