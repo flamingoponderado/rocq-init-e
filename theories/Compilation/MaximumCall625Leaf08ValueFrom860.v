@@ -1,0 +1,32 @@
+From Galette Require Import Base.
+From Galette.HOL.src.finite_maps Require Import sptree.
+From InitE.Compilation Require Import CallDepthLemma FastMaximum
+  MaximumContext MaximumCall625Via860Context MaximumCall625Leaf08SplitFrom860
+  MaximumCall78Via625ValueFrom860.
+
+Definition cached_depth :=
+  CallDepthLemma.ret_handler_result MaximumContext.frames
+    MaximumCall625Via860Context.funs MaximumCall625Via860Context.callee
+    [MaximumCall625Via860Context.callee] (sptree.size MaximumContext.funs)
+    78 MaximumCall625Leaf08SplitFrom860.ret_data
+    MaximumCall625Leaf08SplitFrom860.handler_data
+    MaximumCall78Via625ValueFrom860.depth_value.
+
+Lemma cached_depth_eq :
+  MaximumCall625Via860Context.depth MaximumCall625Leaf08SplitFrom860.leaf = cached_depth.
+Proof.
+  rewrite MaximumCall625Leaf08SplitFrom860.leaf_depth_compact.
+  unfold cached_depth, MaximumCall625Leaf08SplitFrom860.callee_body_depth,
+    MaximumCall78Via625ValueFrom860.depth_value.
+  apply f_equal.
+  apply f_equal.
+  exact MaximumCall78Via625ValueFrom860.values_eq.
+Qed.
+
+Definition value := Eval vm_compute in cached_depth.
+Lemma value_eq :
+  MaximumCall625Via860Context.depth MaximumCall625Leaf08SplitFrom860.leaf = value.
+Proof.
+  rewrite cached_depth_eq.
+  vm_cast_no_check (eq_refl value).
+Qed.

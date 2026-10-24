@@ -25,6 +25,10 @@ Theorem concrete_compilation : exists configuration : backend.config,
 Proof.
  exists checkedConfiguration. split.
  - rewrite Complete.staged_compilation_eq. exact checked_result.
- - split; vm_cast_no_check (eq_refl _).
+ - split.
+   + vm_cast_no_check (eq_refl
+       (lab_to_target.ffi_names (backend.lab_conf checkedConfiguration))).
+   + vm_cast_no_check (eq_refl
+       (lab_to_target.shmem_extra (backend.lab_conf checkedConfiguration))).
 Qed.
 Print Assumptions concrete_compilation.

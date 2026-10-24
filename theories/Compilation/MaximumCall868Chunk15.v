@@ -26,3 +26,9 @@ Proof.
   - exact leaf_lookup.
   - exact MaximumCall868Loop120OuterValue.value_eq.
 Qed.
+
+From InitE.Compilation Require Import MaximumCall868Context MaximumCall868Pieces.
+Lemma values_eq_old :
+  List.map MaximumCall868Context.depth
+    (MaximumListChunks.chunk_at 15 MaximumCall868Pieces.suffix) = values.
+Proof. exact values_eq. Qed.

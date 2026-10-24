@@ -1,0 +1,298 @@
+From Galette Require Import Base.
+From Stdlib Require Import List Lia.
+From InitE.Compilation Require Import FastMaximum MaximumListChunks
+  MaximumCall595StructuredContextFrom608From860 MaximumCall595StructuredChunk000From608From860 MaximumCall595StructuredChunk001From608From860 MaximumCall595StructuredChunk002From608From860 MaximumCall595StructuredChunk003From608From860 MaximumCall595StructuredChunk004From608From860 MaximumCall595StructuredChunk005From608From860 MaximumCall595StructuredChunk006From608From860 MaximumCall595StructuredChunk007From608From860 MaximumCall595StructuredChunk008From608From860 MaximumCall595StructuredChunk009From608From860 MaximumCall595StructuredChunk010From608From860 MaximumCall595StructuredChunk011From608From860 MaximumCall595StructuredChunk012From608From860 MaximumCall595StructuredChunk013From608From860 MaximumCall595StructuredChunk014From608From860 MaximumCall595StructuredChunk015From608From860 MaximumCall595StructuredChunk016From608From860 MaximumCall595StructuredChunk017From608From860 MaximumCall595StructuredChunk018From608From860 MaximumCall595StructuredChunk019From608From860 MaximumCall595StructuredChunk020From608From860 MaximumCall595StructuredChunk021From608From860 MaximumCall595StructuredChunk022From608From860 MaximumCall595StructuredChunk023From608From860 MaximumCall595StructuredChunk024From608From860 MaximumCall595StructuredChunk025From608From860 MaximumCall595StructuredChunk026From608From860 MaximumCall595StructuredChunk027From608From860 MaximumCall595StructuredChunk028From608From860 MaximumCall595StructuredChunk029From608From860 MaximumCall595StructuredChunk030From608From860 MaximumCall595StructuredChunk031From608From860 MaximumCall595StructuredChunk032From608From860 MaximumCall595StructuredChunk033From608From860 MaximumCall595StructuredChunk034From608From860 MaximumCall595StructuredChunk035From608From860 MaximumCall595StructuredChunk036From608From860 MaximumCall595StructuredChunk037From608From860 MaximumCall595StructuredChunk038From608From860 MaximumCall595StructuredChunk039From608From860 MaximumCall595StructuredChunk040From608From860 MaximumCall595StructuredChunk041From608From860 MaximumCall595StructuredChunk042From608From860 MaximumCall595StructuredChunk043From608From860 MaximumCall595StructuredChunk044From608From860 MaximumCall595StructuredChunk045From608From860 MaximumCall595StructuredChunk046From608From860 MaximumCall595StructuredChunk047From608From860 MaximumCall595StructuredChunk048From608From860 MaximumCall595StructuredChunk049From608From860 MaximumCall595StructuredChunk050From608From860 MaximumCall595StructuredChunk051From608From860 MaximumCall595StructuredChunk052From608From860 MaximumCall595StructuredChunk053From608From860 MaximumCall595StructuredChunk054From608From860 MaximumCall595StructuredChunk055From608From860 MaximumCall595StructuredChunk056From608From860 MaximumCall595StructuredChunk057From608From860 MaximumCall595StructuredChunk058From608From860 MaximumCall595StructuredChunk059From608From860 MaximumCall595StructuredChunk060From608From860 MaximumCall595StructuredChunk061From608From860 MaximumCall595StructuredChunk062From608From860 MaximumCall595StructuredChunk063From608From860 MaximumCall595StructuredChunk064From608From860 MaximumCall595StructuredChunk065From608From860 MaximumCall595StructuredChunk066From608From860 MaximumCall595StructuredChunk067From608From860 MaximumCall595StructuredChunk068From608From860 MaximumCall595StructuredChunk069From608From860 MaximumCall595StructuredChunk070From608From860 MaximumCall595StructuredChunk071From608From860 MaximumCall595StructuredChunk072From608From860 MaximumCall595StructuredChunk073From608From860 MaximumCall595StructuredChunk074From608From860 MaximumCall595StructuredChunk075From608From860 MaximumCall595StructuredChunk076From608From860 MaximumCall595StructuredChunk077From608From860 MaximumCall595StructuredChunk078From608From860 MaximumCall595StructuredChunk079From608From860 MaximumCall595StructuredChunk080From608From860 MaximumCall595StructuredChunk081From608From860 MaximumCall595StructuredChunk082From608From860 MaximumCall595StructuredChunk083From608From860 MaximumCall595StructuredChunk084From608From860 MaximumCall595StructuredChunk085From608From860 MaximumCall595StructuredChunk086From608From860 MaximumCall595StructuredChunk087From608From860 MaximumCall595StructuredChunk088From608From860 MaximumCall595StructuredChunk089From608From860 MaximumCall595StructuredChunk090From608From860 MaximumCall595StructuredChunk091From608From860 MaximumCall595StructuredChunk092From608From860 MaximumCall595StructuredChunk093From608From860 MaximumCall595StructuredChunk094From608From860 MaximumCall595StructuredChunk095From608From860 MaximumCall595StructuredChunk096From608From860 MaximumCall595StructuredChunk097From608From860 MaximumCall595StructuredChunk098From608From860 MaximumCall595StructuredChunk099From608From860 MaximumCall595StructuredChunk100From608From860 MaximumCall595StructuredChunk101From608From860 MaximumCall595StructuredChunk102From608From860 MaximumCall595StructuredChunk103From608From860 MaximumCall595StructuredChunk104From608From860 MaximumCall595StructuredChunk105From608From860 MaximumCall595StructuredChunk106From608From860 MaximumCall595StructuredChunk107From608From860 MaximumCall595StructuredChunk108From608From860 MaximumCall595StructuredChunk109From608From860 MaximumCall595StructuredChunk110From608From860 MaximumCall595StructuredChunk111From608From860 MaximumCall595StructuredChunk112From608From860 MaximumCall595StructuredChunk113From608From860 MaximumCall595StructuredChunk114From608From860 MaximumCall595StructuredChunk115From608From860 MaximumCall595StructuredChunk116From608From860 MaximumCall595StructuredChunk117From608From860 MaximumCall595StructuredChunk118From608From860 MaximumCall595StructuredChunk119From608From860 MaximumCall595StructuredChunk120From608From860 MaximumCall595StructuredChunk121From608From860 MaximumCall595StructuredChunk122From608From860 MaximumCall595StructuredChunk123From608From860 MaximumCall595StructuredChunk124From608From860 MaximumCall595StructuredChunk125From608From860 MaximumCall595StructuredChunk126From608From860 MaximumCall595StructuredChunk127From608From860 MaximumCall595StructuredChunk128From608From860 MaximumCall595StructuredChunk129From608From860 MaximumCall595StructuredChunk130From608From860 MaximumCall595StructuredChunk131From608From860 MaximumCall595StructuredChunk132From608From860 MaximumCall595StructuredChunk133From608From860 MaximumCall595StructuredChunk134From608From860 MaximumCall595StructuredChunk135From608From860 MaximumCall595StructuredChunk136From608From860 MaximumCall595StructuredChunk137From608From860 MaximumCall595StructuredChunk138From608From860.
+
+Definition values :=
+  MaximumCall595StructuredChunk000From608From860.values ++
+  MaximumCall595StructuredChunk001From608From860.values ++
+  MaximumCall595StructuredChunk002From608From860.values ++
+  MaximumCall595StructuredChunk003From608From860.values ++
+  MaximumCall595StructuredChunk004From608From860.values ++
+  MaximumCall595StructuredChunk005From608From860.values ++
+  MaximumCall595StructuredChunk006From608From860.values ++
+  MaximumCall595StructuredChunk007From608From860.values ++
+  MaximumCall595StructuredChunk008From608From860.values ++
+  MaximumCall595StructuredChunk009From608From860.values ++
+  MaximumCall595StructuredChunk010From608From860.values ++
+  MaximumCall595StructuredChunk011From608From860.values ++
+  MaximumCall595StructuredChunk012From608From860.values ++
+  MaximumCall595StructuredChunk013From608From860.values ++
+  MaximumCall595StructuredChunk014From608From860.values ++
+  MaximumCall595StructuredChunk015From608From860.values ++
+  MaximumCall595StructuredChunk016From608From860.values ++
+  MaximumCall595StructuredChunk017From608From860.values ++
+  MaximumCall595StructuredChunk018From608From860.values ++
+  MaximumCall595StructuredChunk019From608From860.values ++
+  MaximumCall595StructuredChunk020From608From860.values ++
+  MaximumCall595StructuredChunk021From608From860.values ++
+  MaximumCall595StructuredChunk022From608From860.values ++
+  MaximumCall595StructuredChunk023From608From860.values ++
+  MaximumCall595StructuredChunk024From608From860.values ++
+  MaximumCall595StructuredChunk025From608From860.values ++
+  MaximumCall595StructuredChunk026From608From860.values ++
+  MaximumCall595StructuredChunk027From608From860.values ++
+  MaximumCall595StructuredChunk028From608From860.values ++
+  MaximumCall595StructuredChunk029From608From860.values ++
+  MaximumCall595StructuredChunk030From608From860.values ++
+  MaximumCall595StructuredChunk031From608From860.values ++
+  MaximumCall595StructuredChunk032From608From860.values ++
+  MaximumCall595StructuredChunk033From608From860.values ++
+  MaximumCall595StructuredChunk034From608From860.values ++
+  MaximumCall595StructuredChunk035From608From860.values ++
+  MaximumCall595StructuredChunk036From608From860.values ++
+  MaximumCall595StructuredChunk037From608From860.values ++
+  MaximumCall595StructuredChunk038From608From860.values ++
+  MaximumCall595StructuredChunk039From608From860.values ++
+  MaximumCall595StructuredChunk040From608From860.values ++
+  MaximumCall595StructuredChunk041From608From860.values ++
+  MaximumCall595StructuredChunk042From608From860.values ++
+  MaximumCall595StructuredChunk043From608From860.values ++
+  MaximumCall595StructuredChunk044From608From860.values ++
+  MaximumCall595StructuredChunk045From608From860.values ++
+  MaximumCall595StructuredChunk046From608From860.values ++
+  MaximumCall595StructuredChunk047From608From860.values ++
+  MaximumCall595StructuredChunk048From608From860.values ++
+  MaximumCall595StructuredChunk049From608From860.values ++
+  MaximumCall595StructuredChunk050From608From860.values ++
+  MaximumCall595StructuredChunk051From608From860.values ++
+  MaximumCall595StructuredChunk052From608From860.values ++
+  MaximumCall595StructuredChunk053From608From860.values ++
+  MaximumCall595StructuredChunk054From608From860.values ++
+  MaximumCall595StructuredChunk055From608From860.values ++
+  MaximumCall595StructuredChunk056From608From860.values ++
+  MaximumCall595StructuredChunk057From608From860.values ++
+  MaximumCall595StructuredChunk058From608From860.values ++
+  MaximumCall595StructuredChunk059From608From860.values ++
+  MaximumCall595StructuredChunk060From608From860.values ++
+  MaximumCall595StructuredChunk061From608From860.values ++
+  MaximumCall595StructuredChunk062From608From860.values ++
+  MaximumCall595StructuredChunk063From608From860.values ++
+  MaximumCall595StructuredChunk064From608From860.values ++
+  MaximumCall595StructuredChunk065From608From860.values ++
+  MaximumCall595StructuredChunk066From608From860.values ++
+  MaximumCall595StructuredChunk067From608From860.values ++
+  MaximumCall595StructuredChunk068From608From860.values ++
+  MaximumCall595StructuredChunk069From608From860.values ++
+  MaximumCall595StructuredChunk070From608From860.values ++
+  MaximumCall595StructuredChunk071From608From860.values ++
+  MaximumCall595StructuredChunk072From608From860.values ++
+  MaximumCall595StructuredChunk073From608From860.values ++
+  MaximumCall595StructuredChunk074From608From860.values ++
+  MaximumCall595StructuredChunk075From608From860.values ++
+  MaximumCall595StructuredChunk076From608From860.values ++
+  MaximumCall595StructuredChunk077From608From860.values ++
+  MaximumCall595StructuredChunk078From608From860.values ++
+  MaximumCall595StructuredChunk079From608From860.values ++
+  MaximumCall595StructuredChunk080From608From860.values ++
+  MaximumCall595StructuredChunk081From608From860.values ++
+  MaximumCall595StructuredChunk082From608From860.values ++
+  MaximumCall595StructuredChunk083From608From860.values ++
+  MaximumCall595StructuredChunk084From608From860.values ++
+  MaximumCall595StructuredChunk085From608From860.values ++
+  MaximumCall595StructuredChunk086From608From860.values ++
+  MaximumCall595StructuredChunk087From608From860.values ++
+  MaximumCall595StructuredChunk088From608From860.values ++
+  MaximumCall595StructuredChunk089From608From860.values ++
+  MaximumCall595StructuredChunk090From608From860.values ++
+  MaximumCall595StructuredChunk091From608From860.values ++
+  MaximumCall595StructuredChunk092From608From860.values ++
+  MaximumCall595StructuredChunk093From608From860.values ++
+  MaximumCall595StructuredChunk094From608From860.values ++
+  MaximumCall595StructuredChunk095From608From860.values ++
+  MaximumCall595StructuredChunk096From608From860.values ++
+  MaximumCall595StructuredChunk097From608From860.values ++
+  MaximumCall595StructuredChunk098From608From860.values ++
+  MaximumCall595StructuredChunk099From608From860.values ++
+  MaximumCall595StructuredChunk100From608From860.values ++
+  MaximumCall595StructuredChunk101From608From860.values ++
+  MaximumCall595StructuredChunk102From608From860.values ++
+  MaximumCall595StructuredChunk103From608From860.values ++
+  MaximumCall595StructuredChunk104From608From860.values ++
+  MaximumCall595StructuredChunk105From608From860.values ++
+  MaximumCall595StructuredChunk106From608From860.values ++
+  MaximumCall595StructuredChunk107From608From860.values ++
+  MaximumCall595StructuredChunk108From608From860.values ++
+  MaximumCall595StructuredChunk109From608From860.values ++
+  MaximumCall595StructuredChunk110From608From860.values ++
+  MaximumCall595StructuredChunk111From608From860.values ++
+  MaximumCall595StructuredChunk112From608From860.values ++
+  MaximumCall595StructuredChunk113From608From860.values ++
+  MaximumCall595StructuredChunk114From608From860.values ++
+  MaximumCall595StructuredChunk115From608From860.values ++
+  MaximumCall595StructuredChunk116From608From860.values ++
+  MaximumCall595StructuredChunk117From608From860.values ++
+  MaximumCall595StructuredChunk118From608From860.values ++
+  MaximumCall595StructuredChunk119From608From860.values ++
+  MaximumCall595StructuredChunk120From608From860.values ++
+  MaximumCall595StructuredChunk121From608From860.values ++
+  MaximumCall595StructuredChunk122From608From860.values ++
+  MaximumCall595StructuredChunk123From608From860.values ++
+  MaximumCall595StructuredChunk124From608From860.values ++
+  MaximumCall595StructuredChunk125From608From860.values ++
+  MaximumCall595StructuredChunk126From608From860.values ++
+  MaximumCall595StructuredChunk127From608From860.values ++
+  MaximumCall595StructuredChunk128From608From860.values ++
+  MaximumCall595StructuredChunk129From608From860.values ++
+  MaximumCall595StructuredChunk130From608From860.values ++
+  MaximumCall595StructuredChunk131From608From860.values ++
+  MaximumCall595StructuredChunk132From608From860.values ++
+  MaximumCall595StructuredChunk133From608From860.values ++
+  MaximumCall595StructuredChunk134From608From860.values ++
+  MaximumCall595StructuredChunk135From608From860.values ++
+  MaximumCall595StructuredChunk136From608From860.values ++
+  MaximumCall595StructuredChunk137From608From860.values ++
+  MaximumCall595StructuredChunk138From608From860.values.
+
+Lemma values_eq :
+  List.map MaximumCall595StructuredContextFrom608From860.depth MaximumCall595StructuredContextFrom608From860.leaves = values.
+Proof.
+  rewrite <- (MaximumListChunks.gather_exact 139
+    MaximumCall595StructuredContextFrom608From860.depth MaximumCall595StructuredContextFrom608From860.leaves).
+  - unfold MaximumListChunks.gather.
+    cbn [List.seq List.map List.concat].
+    rewrite MaximumCall595StructuredChunk000From608From860.values_eq,
+      MaximumCall595StructuredChunk001From608From860.values_eq,
+      MaximumCall595StructuredChunk002From608From860.values_eq,
+      MaximumCall595StructuredChunk003From608From860.values_eq,
+      MaximumCall595StructuredChunk004From608From860.values_eq,
+      MaximumCall595StructuredChunk005From608From860.values_eq,
+      MaximumCall595StructuredChunk006From608From860.values_eq,
+      MaximumCall595StructuredChunk007From608From860.values_eq,
+      MaximumCall595StructuredChunk008From608From860.values_eq,
+      MaximumCall595StructuredChunk009From608From860.values_eq,
+      MaximumCall595StructuredChunk010From608From860.values_eq,
+      MaximumCall595StructuredChunk011From608From860.values_eq,
+      MaximumCall595StructuredChunk012From608From860.values_eq,
+      MaximumCall595StructuredChunk013From608From860.values_eq,
+      MaximumCall595StructuredChunk014From608From860.values_eq,
+      MaximumCall595StructuredChunk015From608From860.values_eq,
+      MaximumCall595StructuredChunk016From608From860.values_eq,
+      MaximumCall595StructuredChunk017From608From860.values_eq,
+      MaximumCall595StructuredChunk018From608From860.values_eq,
+      MaximumCall595StructuredChunk019From608From860.values_eq,
+      MaximumCall595StructuredChunk020From608From860.values_eq,
+      MaximumCall595StructuredChunk021From608From860.values_eq,
+      MaximumCall595StructuredChunk022From608From860.values_eq,
+      MaximumCall595StructuredChunk023From608From860.values_eq,
+      MaximumCall595StructuredChunk024From608From860.values_eq,
+      MaximumCall595StructuredChunk025From608From860.values_eq,
+      MaximumCall595StructuredChunk026From608From860.values_eq,
+      MaximumCall595StructuredChunk027From608From860.values_eq,
+      MaximumCall595StructuredChunk028From608From860.values_eq,
+      MaximumCall595StructuredChunk029From608From860.values_eq,
+      MaximumCall595StructuredChunk030From608From860.values_eq,
+      MaximumCall595StructuredChunk031From608From860.values_eq,
+      MaximumCall595StructuredChunk032From608From860.values_eq,
+      MaximumCall595StructuredChunk033From608From860.values_eq,
+      MaximumCall595StructuredChunk034From608From860.values_eq,
+      MaximumCall595StructuredChunk035From608From860.values_eq,
+      MaximumCall595StructuredChunk036From608From860.values_eq,
+      MaximumCall595StructuredChunk037From608From860.values_eq,
+      MaximumCall595StructuredChunk038From608From860.values_eq,
+      MaximumCall595StructuredChunk039From608From860.values_eq,
+      MaximumCall595StructuredChunk040From608From860.values_eq,
+      MaximumCall595StructuredChunk041From608From860.values_eq,
+      MaximumCall595StructuredChunk042From608From860.values_eq,
+      MaximumCall595StructuredChunk043From608From860.values_eq,
+      MaximumCall595StructuredChunk044From608From860.values_eq,
+      MaximumCall595StructuredChunk045From608From860.values_eq,
+      MaximumCall595StructuredChunk046From608From860.values_eq,
+      MaximumCall595StructuredChunk047From608From860.values_eq,
+      MaximumCall595StructuredChunk048From608From860.values_eq,
+      MaximumCall595StructuredChunk049From608From860.values_eq,
+      MaximumCall595StructuredChunk050From608From860.values_eq,
+      MaximumCall595StructuredChunk051From608From860.values_eq,
+      MaximumCall595StructuredChunk052From608From860.values_eq,
+      MaximumCall595StructuredChunk053From608From860.values_eq,
+      MaximumCall595StructuredChunk054From608From860.values_eq,
+      MaximumCall595StructuredChunk055From608From860.values_eq,
+      MaximumCall595StructuredChunk056From608From860.values_eq,
+      MaximumCall595StructuredChunk057From608From860.values_eq,
+      MaximumCall595StructuredChunk058From608From860.values_eq,
+      MaximumCall595StructuredChunk059From608From860.values_eq,
+      MaximumCall595StructuredChunk060From608From860.values_eq,
+      MaximumCall595StructuredChunk061From608From860.values_eq,
+      MaximumCall595StructuredChunk062From608From860.values_eq,
+      MaximumCall595StructuredChunk063From608From860.values_eq,
+      MaximumCall595StructuredChunk064From608From860.values_eq,
+      MaximumCall595StructuredChunk065From608From860.values_eq,
+      MaximumCall595StructuredChunk066From608From860.values_eq,
+      MaximumCall595StructuredChunk067From608From860.values_eq,
+      MaximumCall595StructuredChunk068From608From860.values_eq,
+      MaximumCall595StructuredChunk069From608From860.values_eq,
+      MaximumCall595StructuredChunk070From608From860.values_eq,
+      MaximumCall595StructuredChunk071From608From860.values_eq,
+      MaximumCall595StructuredChunk072From608From860.values_eq,
+      MaximumCall595StructuredChunk073From608From860.values_eq,
+      MaximumCall595StructuredChunk074From608From860.values_eq,
+      MaximumCall595StructuredChunk075From608From860.values_eq,
+      MaximumCall595StructuredChunk076From608From860.values_eq,
+      MaximumCall595StructuredChunk077From608From860.values_eq,
+      MaximumCall595StructuredChunk078From608From860.values_eq,
+      MaximumCall595StructuredChunk079From608From860.values_eq,
+      MaximumCall595StructuredChunk080From608From860.values_eq,
+      MaximumCall595StructuredChunk081From608From860.values_eq,
+      MaximumCall595StructuredChunk082From608From860.values_eq,
+      MaximumCall595StructuredChunk083From608From860.values_eq,
+      MaximumCall595StructuredChunk084From608From860.values_eq,
+      MaximumCall595StructuredChunk085From608From860.values_eq,
+      MaximumCall595StructuredChunk086From608From860.values_eq,
+      MaximumCall595StructuredChunk087From608From860.values_eq,
+      MaximumCall595StructuredChunk088From608From860.values_eq,
+      MaximumCall595StructuredChunk089From608From860.values_eq,
+      MaximumCall595StructuredChunk090From608From860.values_eq,
+      MaximumCall595StructuredChunk091From608From860.values_eq,
+      MaximumCall595StructuredChunk092From608From860.values_eq,
+      MaximumCall595StructuredChunk093From608From860.values_eq,
+      MaximumCall595StructuredChunk094From608From860.values_eq,
+      MaximumCall595StructuredChunk095From608From860.values_eq,
+      MaximumCall595StructuredChunk096From608From860.values_eq,
+      MaximumCall595StructuredChunk097From608From860.values_eq,
+      MaximumCall595StructuredChunk098From608From860.values_eq,
+      MaximumCall595StructuredChunk099From608From860.values_eq,
+      MaximumCall595StructuredChunk100From608From860.values_eq,
+      MaximumCall595StructuredChunk101From608From860.values_eq,
+      MaximumCall595StructuredChunk102From608From860.values_eq,
+      MaximumCall595StructuredChunk103From608From860.values_eq,
+      MaximumCall595StructuredChunk104From608From860.values_eq,
+      MaximumCall595StructuredChunk105From608From860.values_eq,
+      MaximumCall595StructuredChunk106From608From860.values_eq,
+      MaximumCall595StructuredChunk107From608From860.values_eq,
+      MaximumCall595StructuredChunk108From608From860.values_eq,
+      MaximumCall595StructuredChunk109From608From860.values_eq,
+      MaximumCall595StructuredChunk110From608From860.values_eq,
+      MaximumCall595StructuredChunk111From608From860.values_eq,
+      MaximumCall595StructuredChunk112From608From860.values_eq,
+      MaximumCall595StructuredChunk113From608From860.values_eq,
+      MaximumCall595StructuredChunk114From608From860.values_eq,
+      MaximumCall595StructuredChunk115From608From860.values_eq,
+      MaximumCall595StructuredChunk116From608From860.values_eq,
+      MaximumCall595StructuredChunk117From608From860.values_eq,
+      MaximumCall595StructuredChunk118From608From860.values_eq,
+      MaximumCall595StructuredChunk119From608From860.values_eq,
+      MaximumCall595StructuredChunk120From608From860.values_eq,
+      MaximumCall595StructuredChunk121From608From860.values_eq,
+      MaximumCall595StructuredChunk122From608From860.values_eq,
+      MaximumCall595StructuredChunk123From608From860.values_eq,
+      MaximumCall595StructuredChunk124From608From860.values_eq,
+      MaximumCall595StructuredChunk125From608From860.values_eq,
+      MaximumCall595StructuredChunk126From608From860.values_eq,
+      MaximumCall595StructuredChunk127From608From860.values_eq,
+      MaximumCall595StructuredChunk128From608From860.values_eq,
+      MaximumCall595StructuredChunk129From608From860.values_eq,
+      MaximumCall595StructuredChunk130From608From860.values_eq,
+      MaximumCall595StructuredChunk131From608From860.values_eq,
+      MaximumCall595StructuredChunk132From608From860.values_eq,
+      MaximumCall595StructuredChunk133From608From860.values_eq,
+      MaximumCall595StructuredChunk134From608From860.values_eq,
+      MaximumCall595StructuredChunk135From608From860.values_eq,
+      MaximumCall595StructuredChunk136From608From860.values_eq,
+      MaximumCall595StructuredChunk137From608From860.values_eq,
+      MaximumCall595StructuredChunk138From608From860.values_eq.
+    reflexivity.
+  - vm_compute. lia.
+Qed.
+
+Definition depth_value :=
+  fold_right FastMaximum.join_depth (Some 0) values.

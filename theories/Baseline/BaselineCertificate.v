@@ -6,4 +6,3 @@ Proof.
  destruct concrete_compilation as [configuration [Hcompile [Hnames Hmmio]]].
  exact (baseline_certificate_from_compilation configuration Hcompile Hnames Hmmio).
 Qed.
-Print Assumptions baseline_certificate.

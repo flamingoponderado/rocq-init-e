@@ -1,0 +1,107 @@
+From Galette Require Import Base.
+From Galette.HOL.src.finite_maps Require Import sptree.
+From Galette.HOL.src.list.src Require Import list.
+From Galette.HOL.src.coretypes Require Import option.
+From Galette.HOL.src.num.theories Require Import arithmetic.
+From Galette.cakeml.compiler.backend Require Import word_depth wordLang.
+From InitE.Compilation Require Import FastMaximum CallDepthLemma
+  MaximumContext MaximumCall861StructuredContext MaximumCall860Via861Context.
+Open Scope N_scope.
+
+Definition leaf := List.nth 25 MaximumCall861StructuredContext.leaves wordLang.Skip.
+Definition leaf_args :=
+  match leaf with wordLang.Call _ _ args _ => args | _ => [] end.
+Definition leaf_ret :=
+  match leaf with wordLang.Call ret _ _ _ => ret | _ => None end.
+Definition leaf_handler :=
+  match leaf with wordLang.Call _ _ _ handler => handler | _ => None end.
+Definition ret_data := THE leaf_ret.
+Definition handler_data := THE leaf_handler.
+Definition callee_argc :=
+  match sptree.lookup 860 MaximumCall861StructuredContext.funs with
+  | Some (argc, _) => argc
+  | None => 0
+  end.
+
+Lemma leaf_shape :
+  leaf = wordLang.Call (Some ret_data) (Some 860) leaf_args (Some handler_data).
+Proof. vm_cast_no_check (eq_refl leaf). Qed.
+
+Lemma body_lookup :
+  sptree.lookup 860 MaximumCall861StructuredContext.funs =
+  Some (callee_argc, MaximumCall860Via861Context.body).
+Proof. vm_cast_no_check (eq_refl (sptree.lookup 860 MaximumCall861StructuredContext.funs)). Qed.
+
+Definition callee_body_depth :=
+  fold_right FastMaximum.join_depth (Some 0)
+    (List.map MaximumCall860Via861Context.depth MaximumCall860Via861Context.leaves).
+
+Lemma callee_body_depth_eq :
+  word_depth.max_depth MaximumContext.frames
+    (word_depth.call_graph MaximumCall860Via861Context.funs 860 [860]
+      (sptree.size MaximumContext.funs) MaximumCall860Via861Context.body) =
+  callee_body_depth.
+Proof.
+  unfold callee_body_depth, MaximumCall860Via861Context.depth, MaximumCall860Via861Context.leaves.
+  transitivity
+    (FastMaximum.fast_depth MaximumContext.frames
+      MaximumCall860Via861Context.funs 860 [860]
+      (sptree.size MaximumContext.funs) MaximumCall860Via861Context.body).
+  - symmetry; apply FastMaximum.fast_depth_exact.
+  - apply FastMaximum.fast_depth_leaves.
+Qed.
+
+Lemma leaf_depth_split :
+  MaximumCall861StructuredContext.depth leaf =
+  OPTION_MAP2 MAX
+    (word_depth.max_depth MaximumContext.frames
+      (word_depth.Call MaximumCall861StructuredContext.callee
+        (word_depth.Const 3 (word_depth.Call 860 word_depth.Leaf))))
+    (OPTION_MAP2 MAX
+      (OPTION_MAP2 N.add
+        (sptree.lookup MaximumCall861StructuredContext.callee MaximumContext.frames)
+        (OPTION_MAP (N.add 3) callee_body_depth))
+      (OPTION_MAP2 MAX
+        (word_depth.max_depth MaximumContext.frames
+          (word_depth.call_graph MaximumCall861StructuredContext.funs
+            MaximumCall861StructuredContext.callee [MaximumCall861StructuredContext.callee]
+            (sptree.size MaximumContext.funs)
+            (fst (snd handler_data))))
+        (word_depth.max_depth MaximumContext.frames
+          (word_depth.call_graph MaximumCall861StructuredContext.funs
+            MaximumCall861StructuredContext.callee [MaximumCall861StructuredContext.callee]
+            (sptree.size MaximumContext.funs)
+            (fst (snd (snd ret_data))))))).
+Proof.
+  unfold MaximumCall861StructuredContext.depth.
+  rewrite leaf_shape.
+  apply (CallDepthLemma.max_depth_ret_handler_call_pair_subst
+    MaximumContext.frames MaximumCall861StructuredContext.funs MaximumCall861StructuredContext.callee
+    [MaximumCall861StructuredContext.callee] (sptree.size MaximumContext.funs)
+    860 leaf_args ret_data handler_data
+    callee_argc MaximumCall860Via861Context.body callee_body_depth).
+  - exact body_lookup.
+  - pose proof callee_body_depth_eq as Hbody.
+    unfold MaximumCall860Via861Context.funs, MaximumCall860Via861Context.callee in Hbody.
+    exact Hbody.
+Qed.
+
+Lemma leaf_depth_compact :
+  MaximumCall861StructuredContext.depth leaf =
+  CallDepthLemma.ret_handler_result MaximumContext.frames
+    MaximumCall861StructuredContext.funs MaximumCall861StructuredContext.callee
+    [MaximumCall861StructuredContext.callee] (sptree.size MaximumContext.funs)
+    860 ret_data handler_data callee_body_depth.
+Proof.
+  unfold MaximumCall861StructuredContext.depth.
+  rewrite leaf_shape.
+  apply (CallDepthLemma.max_depth_ret_handler_call_pair_compact
+    MaximumContext.frames MaximumCall861StructuredContext.funs
+    MaximumCall861StructuredContext.callee [MaximumCall861StructuredContext.callee]
+    (sptree.size MaximumContext.funs) 860 leaf_args ret_data handler_data
+    callee_argc MaximumCall860Via861Context.body callee_body_depth).
+  - exact body_lookup.
+  - pose proof callee_body_depth_eq as Hbody.
+    unfold MaximumCall860Via861Context.funs, MaximumCall860Via861Context.callee in Hbody.
+    exact Hbody.
+Qed.

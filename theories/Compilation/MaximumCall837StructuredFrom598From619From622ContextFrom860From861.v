@@ -1,0 +1,7 @@
+From Galette Require Import Base.
+From InitE.Compilation Require Import StructuredDepth MaximumCall837Via598From619From622ContextFrom860From861.
+
+Definition leaves := StructuredDepth.leaves MaximumCall837Via598From619From622ContextFrom860From861.body.
+Definition depth := MaximumCall837Via598From619From622ContextFrom860From861.depth.
+Definition funs := MaximumCall837Via598From619From622ContextFrom860From861.funs.
+Definition callee := MaximumCall837Via598From619From622ContextFrom860From861.callee.
