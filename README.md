@@ -5,12 +5,14 @@
 The challenge source now uses the software precompile guest from
 `flamingoponderado/stateless-pancaketh` commit
 `35569814e3fd569fd98cccdf2a9704683d42d2d9`. Its source and literal
-AST are pinned in `source/stateless-pancaketh/Guest/`. The guest performs
+AST are pinned in `source/stateless-pancaketh/Guest/`, with init-e's scratch
+arena moved to `[0xb0000000, 0xb0bee000)` so that it lies in the compiler's
+source-memory domain (`scratch_in_ordinaryDomain`). The guest performs
 precompiles in Pancake code; its only external calls are `halt` and `trap`.
 The source FFI therefore terminates on every external call, and the old
 accelerator implementation has been removed from the Rocq guest model.
 The updated initial ROM literals are pinned from init-e commit
-`e77282a23cb2d6c71f6add008ac504a32f57cb8f` in
+`89acaedaa70389a06503a16bdce7b4bdae0cf255` in
 `source/init-e-baseline/`. The importer checks each source file and the
 native, bitmap, and complete ROM hashes. The accepted certificate described
 below belongs to the previous guest; the Rocq compilation equality and

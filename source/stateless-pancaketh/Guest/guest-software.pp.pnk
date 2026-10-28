@@ -12,8 +12,8 @@ var 1 scratch_ptr = 0;
 var 1 frame_mem_ptr = 0;
 fun 1 mem_init() {
   heap_ptr = @base;
-  scratch_ptr = 2701127680;
-  frame_mem_ptr = 2688618496;
+  scratch_ptr = 2965299200;
+  frame_mem_ptr = 2952790016;
   return 0;
 }
 fun 1 alloc(1 n) {
