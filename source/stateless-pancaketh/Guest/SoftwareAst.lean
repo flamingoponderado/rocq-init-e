@@ -53,9 +53,9 @@ def guestFn_mem_init : Decl (BitVec 64) :=
         (Prog.seq
           (Prog.assign VarKind.global "heap_ptr" Exp.baseAddr)
           (Prog.seq
-          (Prog.assign VarKind.global "scratch_ptr" (Exp.const (BitVec.ofNat 64 2701127680)))
+          (Prog.assign VarKind.global "scratch_ptr" (Exp.const (BitVec.ofNat 64 2965299200)))
           (Prog.seq
-          (Prog.assign VarKind.global "frame_mem_ptr" (Exp.const (BitVec.ofNat 64 2688618496)))
+          (Prog.assign VarKind.global "frame_mem_ptr" (Exp.const (BitVec.ofNat 64 2952790016)))
           (Prog.return (Exp.const (BitVec.ofNat 64 0))))))
       returnShape := Shape.one }
 

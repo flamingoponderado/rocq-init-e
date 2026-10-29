@@ -29,3 +29,17 @@ Proof.
      rewrite !N.mod_small in E by lia; lia.
    + vm_compute; congruence.
 Qed.
+(** Every aligned cell of the guest's scratch arena is ordinary source memory. *)
+Theorem scratch_in_ordinaryDomain (address : word 64) :
+ w2n address mod 8 = 0 -> scratchStart <= w2n address < scratchEnd ->
+ ordinaryDomain address.
+Proof.
+ intros Haligned Hinside; unfold ordinaryDomain.
+ apply (proj2 (pan_globalsProof.in_addresses _ _ _)).
+ exists ((w2n address - sourceBase) / 8).
+ cbv [scratchStart scratchEnd sourceBase stackStart ramEnd ramStart ramSize stackSize globalsWords] in *.
+ split; [|lia].
+ change (address = n2w 2701131776 + n2w ((w2n address - 2701131776) / 8) * n2w 8)%w.
+ rewrite word_mul_n2w,word_add_n2w,<-(n2w_w2n address) at 1.
+ f_equal; lia.
+Qed.
