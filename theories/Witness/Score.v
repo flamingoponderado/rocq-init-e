@@ -18,13 +18,11 @@ From Galette.cakeml.pancake.semantics Require Import panSem.
 From InitE.Guest Require Import Ast GasLimit HostMemory.
 From InitE.InitE Require Import NatE Parameters SubmissionModel SourceSemantics Observations Challenge.
 From InitE.Witness Require Import Evaluator EvaluatorCorrect SourceDomains SourceRun Input
-  TargetLowerBound.
+  TargetLowerBound Runner.
 Open Scope N_scope.
 Open Scope hol_string_scope.
 
 Definition witnessClock : N := 32000.
-
-Definition emptyTrie : WordTrie.t (V := word_lab 64) := PositiveMap.empty _.
 
 (** The run's result is accepted: a final [halt] call with output byte 32 set. *)
 Definition acceptedRun (c : @cres 64 HostMemory) : bool :=
@@ -34,8 +32,6 @@ Definition acceptedRun (c : @cres 64 HostMemory) : bool :=
       (w2n (outputByte input (io_events (ffi s)) acceptanceOffset) =? 1)
   | _ => false
   end.
-
-Definition witnessCall : prog 64 := panLang.Call None (strlit "main") [].
 
 (** The only computation: about 200 s of [vm_compute].  It is stated over
     [decs_stcnames] and [c_evaluate_decls] themselves so that using it needs
@@ -49,33 +45,13 @@ Lemma witness_check :
       | None => false
       | Some s =>
           acceptedRun (c_evaluate_c sourceMemory ordinaryDecider sharedDecider
-                         (Datatypes.S (N.to_nat witnessClock)) witnessCall
+                         (Datatypes.S (N.to_nat witnessClock)) mainCall
                          (set_clock witnessClock s) emptyTrie)
       end
   end = true.
 Proof. vm_compute; reflexivity. Qed.
 
 Definition haltEvent : final_event := Final_event (ffi.ExtCall (strlit "halt")) [] [] FFI_failed.
-
-Lemma Rel_initial st :
-  Rel sourceMemory ordinaryDomain sharedDomain (set_structs st (sourceInitialState input)) emptyTrie.
-Proof.
-  split; [reflexivity|split; [reflexivity|]].
-  intros x; unfold WordTrie.get; rewrite PositiveMap.gempty; reflexivity.
-Qed.
-
-Lemma Rel_decls ds : forall (s s' : state 64 HostMemory),
-  Rel sourceMemory ordinaryDomain sharedDomain s emptyTrie ->
-  evaluate_decls s ds = Some s' -> Rel sourceMemory ordinaryDomain sharedDomain s' emptyTrie.
-Proof.
-  induction ds as [|[fi|sh v0 e|eid sh|nm fl] ds IH]; intros s s' HR E; cbn [evaluate_decls] in E.
-  - injection E as <-; exact HR.
-  - destruct (andb _ _); [|discriminate]. eapply IH; [apply Rel_set_code, HR|exact E].
-  - destruct (eval _ e); [|discriminate]. destruct (bool_decide _); [|discriminate].
-    eapply IH; [apply Rel_set_globals, HR|exact E].
-  - destruct (andb _ _); [|discriminate]. eapply IH; [apply Rel_set_eshapes, HR|exact E].
-  - exact (IH s s' HR E).
-Qed.
 
 Theorem witness_behaviour : exists events,
   sourceBehaviour input = Terminate (FFI_outcome haltEvent) events /\
@@ -86,7 +62,7 @@ Proof.
     (semantics_decls (sourceInitialState input) (strlit "main") guestAst).
   unfold semantics_decls.
   destruct (decs_stcnames [] guestAst) as [st|]; [|discriminate].
-  pose proof (Rel_initial st) as HR0.
+  pose proof (Rel_initial input st) as HR0.
   rewrite <- (c_evaluate_decls_correct sourceMemory ordinaryDecider
     ordinaryDomain sharedDomain ordinaryDecider_spec guestAst _ _ HR0).
   destruct (c_evaluate_decls _ _ _ _ guestAst) as [s|] eqn:Hdecls; [|discriminate].
@@ -96,7 +72,7 @@ Proof.
     (Rel_decls _ _ _ HR0 Hdecls)) as HR.
   pose proof (c_evaluate_correct sourceMemory ordinaryDecider sharedDecider
     ordinaryDomain sharedDomain ordinaryDecider_spec sharedDecider_spec
-    witnessCall _ _ HR) as run.
+    mainCall _ _ HR) as run.
   cbn [clock set_clock] in run.
   revert run.
   destruct (c_evaluate_c _ _ _ _ _ _ _) as [[r t] tt]; cbn [fst]; intros run.

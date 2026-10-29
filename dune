@@ -1,1 +1,7 @@
-(dirs theories galette-theories)
+(dirs theories galette-theories tools)
+
+; The default build is the proof; tools/ is built on request.
+(rule
+ (alias default)
+ (deps (alias_rec theories/all) (alias_rec galette-theories/all))
+ (action (progn)))
