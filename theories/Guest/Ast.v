@@ -1,5 +1,5 @@
 (* Generated from stateless-pancaketh Guest/SoftwareAst.lean; do not edit. *)
-(* SHA256: aa1963af1d48bf6b6d453cf1534b2b1be715638630106233a6b906e7fa663017 *)
+(* SHA256: bfc24faf6ee3e2f78bce2f05ab5addd91c4466536d2810dfa81a66f83b32a580 *)
 From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.src.string Require Import string.
@@ -52,9 +52,9 @@ Function
         (Seq
           (Assign Global (strlit "heap_ptr") BaseAddr)
           (Seq
-          (Assign Global (strlit "scratch_ptr") (panLang.Const (n2w 2701127680)))
+          (Assign Global (strlit "scratch_ptr") (panLang.Const (n2w 2965299200)))
           (Seq
-          (Assign Global (strlit "frame_mem_ptr") (panLang.Const (n2w 2688618496)))
+          (Assign Global (strlit "frame_mem_ptr") (panLang.Const (n2w 2952790016)))
           (Return (panLang.Const (n2w 0))))));
       fun_decl_return := One |}.
 

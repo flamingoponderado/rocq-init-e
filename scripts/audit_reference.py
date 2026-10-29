@@ -144,12 +144,24 @@ def audit(references):
 
     p = parameters((references / 'reference/init-e/InitE/Parameters.lean').read_text(), False)
     rocq_p = parameters((ROOT / 'theories/InitE/Parameters.v').read_text(), True)
-    source_layout = {'globalsWords', 'heapEnd'}
+    # The software guest fixes its globals; init-e 89acaedaa moves its scratch arena
+    # to the allocation ceiling, inside the source-memory domain.
+    source_layout = {'globalsWords', 'heapEnd', 'scratchStart', 'scratchEnd', 'heapStart'}
     require({k: v for k, v in p.items() if k not in source_layout} ==
             {k: v for k, v in rocq_p.items() if k not in source_layout},
             'parameter values differ')
     require(rocq_p['globalsWords'] == len(re.findall(r'^def guestGlobal_', lean, re.M)),
             'software guest globalsWords differs')
+    def mem_init(name):
+        found = re.findall(r'Prog\.assign VarKind\.global "' + name +
+                           r'" \(Exp\.const \(BitVec\.ofNat 64 ([0-9]+)\)\)', lean)
+        require(len(found) == 1, 'software guest ' + name + ' initialization differs')
+        return int(found[0])
+    require(rocq_p['scratchStart'] == mem_init('frame_mem_ptr') and
+            rocq_p['scratchEnd'] == mem_init('scratch_ptr') and
+            rocq_p['heapStart'] == rocq_p['sourceBase'] < rocq_p['scratchStart'] and
+            rocq_p['scratchEnd'] <= rocq_p['heapEnd'],
+            'software guest scratch layout differs')
     checks['parameter_values'] = p
     startup = number_list(list_body((ROOT / 'source/init-e-baseline/Bookkeeping.lean').read_text(), 'def startupHeaders'))
     require(startup == number_list(list_body((ROOT / 'theories/Guest/Bookkeeping.v').read_text(), 'Definition startupHeaders')),
@@ -207,6 +219,9 @@ def corruption_checks(references):
                 ('theories/InitE/Parameters.v',
                  lambda s: s.replace('200000000', '199999999'),
                  'parameter values differ'),
+                ('theories/InitE/Parameters.v',
+                 lambda s: s.replace('2965299200', '2965299208'),
+                 'software guest scratch layout differs'),
                 ('source/stateless-pancaketh/Guest/SoftwareAst.lean',
                  lambda s: s.replace('Prog.extCall "trap"', 'Prog.extCall "sha256f"'),
                  'import_guest regeneration differs')]

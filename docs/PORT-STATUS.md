@@ -9,9 +9,12 @@ acceptance by an isolated submission verifier.
 The challenge now pins stateless-pancaketh main commit
 `35569814e3fd569fd98cccdf2a9704683d42d2d9` and its software-precompile
 guest. The source has only `halt` and `trap` external calls; the RISC-V
-precompile accelerator is absent from the current semantics. The initial
+precompile accelerator is absent from the current semantics. As in init-e
+89acaedaa, the guest's scratch arena is `[0xb0000000, 0xb0bee000)`, inside the
+compiler's source-memory domain; it previously lay below `sourceBase`, so
+scratch stores failed in the source semantics. The initial
 submission uses a 1,028,080-byte ROM with SHA256
-`44b6a6b828293a54cf2e8698a6a0af6a0d08b4ea825f6504547996c31969d04b`.
+`2ce35ede086b882d8ab68c4b1a1486919a5f4e475cffeaf43b0a85c59f78ce6d`.
 The current exact compilation proof, coherent build, and positive sealed
 verifier replay are pending. The release checkpoint below is historical evidence
 for the previous guest and ROM.

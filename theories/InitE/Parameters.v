@@ -13,9 +13,11 @@ Definition ramStart : N := 2684354560.
 Definition ramSize : N := 29 * 1024 * 1024 * 1024.
 Definition ramEnd : N := ramStart + ramSize.
 Definition sourceBase : N := 2701131776.
-Definition scratchStart : N := sourceBase + 4096.
-Definition scratchEnd : N := 2713714688.
-Definition heapStart : N := scratchEnd.
+(** The guest's frame/scratch arena starts at its allocation ceiling
+    0xb0000000, inside the compiler's source-memory domain. *)
+Definition scratchStart : N := 2952790016.
+Definition scratchEnd : N := 2965299200.
+Definition heapStart : N := sourceBase.
 Definition stackSize : N := 16 * 1024 * 1024.
 Definition stackStart : N := ramEnd - stackSize.
 Definition globalsWords : N := 67.
@@ -23,8 +25,8 @@ Definition heapEnd : N := stackStart - globalsWords * 8.
 Definition gasLimit : N := 200000000.
 Theorem regions_disjoint :
  inputEnd <= initialPc /\ initialPc + codeSizeLimit <= ramStart /\
- ramStart <= outputStart /\ outputEnd <= sourceBase /\ sourceBase < scratchStart /\
- scratchStart < scratchEnd /\ scratchEnd <= heapStart /\ heapStart < heapEnd /\
+ ramStart <= outputStart /\ outputEnd <= heapStart /\ heapStart < scratchStart /\
+ scratchStart < scratchEnd /\ scratchEnd <= heapEnd /\
  heapEnd + globalsWords * 8 = stackStart /\ stackStart < ramEnd.
 Proof. repeat split; vm_compute; congruence. Qed.
 Theorem ramEnd_aligned : ramEnd mod 4096 = 0.
