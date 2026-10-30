@@ -249,6 +249,15 @@ Qed.
 Lemma Good_update m t w x : Good m t -> Good ((w =+ x) m) (WordTrie.set w x t).
 Proof. intros G y; rewrite WordTrie.get_set, !APPLY_UPDATE_THM, G; reflexivity. Qed.
 
+Lemma cset_rel m t m' w x : Good m t ->
+  SOME ((w =+ x) m) = SOME (fst (cset base w x (m', t))) /\
+  Good (fst (cset base w x (m', t))) (snd (cset base w x (m', t))).
+Proof.
+  intros G; unfold cset; cbn [fst snd]; split; [|intros y; reflexivity].
+  f_equal; apply functional_extensionality; intros y.
+  rewrite WordTrie.get_set, !APPLY_UPDATE_THM, G; reflexivity.
+Qed.
+
 Definition StoreRel (c : option cmem) (o : option (word a -> word_lab a)) : Prop :=
   match c with
   | SOME cm => o = SOME (fst cm) /\ Good (fst cm) (snd cm)
@@ -259,8 +268,8 @@ Lemma store_byte_rel m t be w b : Good m t ->
   StoreRel (c_mem_store_byte base md (m, t) be w b) (mem_store_byte m D be w b).
 Proof.
   intros G; unfold c_mem_store_byte, mem_store_byte, StoreRel; cbn [fst snd].
-  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); cbn; [|reflexivity].
-  split; [reflexivity|]. apply Good_update; intros y; rewrite G; reflexivity.
+  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); [|reflexivity].
+  apply cset_rel, G.
 Qed.
 
 Lemma write_bytearray_rel m t a0 bs be : Good m t ->
@@ -282,17 +291,18 @@ Lemma store_32_rel m t be w hw : Good m t ->
 Proof.
   intros G; unfold c_mem_store_32, mem_store_32, StoreRel; cbn [fst snd].
   destruct (aligned 2 w); [|reflexivity].
-  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); cbn; [|reflexivity].
-  split; [reflexivity|]. apply Good_update; intros y; rewrite G; reflexivity.
+  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); [|reflexivity].
+  apply cset_rel, G.
 Qed.
 
 Lemma stores_rel ws : forall m t a0, Good m t ->
-  StoreRel (c_mem_stores md a0 ws (m, t)) (mem_stores a0 ws D m).
+  StoreRel (c_mem_stores base md a0 ws (m, t)) (mem_stores a0 ws D m).
 Proof.
   induction ws as [|w ws IH]; intros m t a0 G; [split; [reflexivity|exact G]|].
   cbn [c_mem_stores mem_stores]; unfold c_mem_store, mem_store; cbn [fst snd].
   rewrite decide_md; destruct (md a0); [|reflexivity].
-  apply IH, Good_update, G.
+  destruct (cset_rel m t m a0 w G) as [E G']; injection E as ->.
+  unfold cset in G' |- *; cbn [fst snd] in G' |- *. apply IH, G'.
 Qed.
 
 (** *** Shared memory *)
@@ -391,9 +401,9 @@ Ltac finish := split; [reflexivity|cbn [fst snd]; rel_tac].
 
 Ltac mem_tac :=
   match goal with
-  | G : Good (memory ?s0) ?t0 |- context [c_mem_stores _ ?a0 ?ws (memory ?s0, ?t0)] =>
+  | G : Good (memory ?s0) ?t0 |- context [c_mem_stores _ _ ?a0 ?ws (memory ?s0, ?t0)] =>
       let H := fresh "H" in pose proof (stores_rel ws _ _ a0 G) as H; revert H;
-      destruct (c_mem_stores _ a0 ws (memory s0, t0)) as [[?m ?tm]|]; cbn [StoreRel fst snd];
+      destruct (c_mem_stores _ _ a0 ws (memory s0, t0)) as [[?m ?tm]|]; cbn [StoreRel fst snd];
       [intros [-> ?G]|intros ->]
   | G : Good (memory ?s0) ?t0 |- context [c_mem_store_32 _ _ (memory ?s0, ?t0) ?be ?w ?hw] =>
       let H := fresh "H" in pose proof (store_32_rel _ _ be w hw G) as H; revert H;

@@ -250,16 +250,19 @@ Fixpoint c_eval (s : state a ffi_t) (t : trie) (e : exp a) {struct e} : option (
   | BytesInWord => SOME (ValWord bytes_in_word)
   end.
 
-(** Memories are pairs: [panSem]'s function, which is only written, and the
-    trie that every read uses. *)
+(** Memories are pairs: [panSem]'s function and the trie that every read
+    uses.  A store sets the function to the new trie's lookup, so the old
+    memory is not kept alive. *)
 Definition cmem : Type := (word a -> word_lab a) * trie.
+
+Definition cset (w : word a) (v : word_lab a) (m : cmem) : cmem :=
+  let t := tset w v (snd m) in (tget t, t).
 
 Definition c_mem_store_byte (m : cmem) (be : bool) (w : word a) (b : word8) : option cmem :=
   match tget (snd m) (byte_align w) with
   | Word v =>
       if md (byte_align w)
-      then SOME ((byte_align w =+ Word (set_byte w b v be)) (fst m),
-                 tset (byte_align w) (Word (set_byte w b v be)) (snd m))
+      then SOME (cset (byte_align w) (Word (set_byte w b v be)) m)
       else NONE
   end.
 
@@ -282,13 +285,13 @@ Definition c_mem_store_32 (m : cmem) (be : bool) (w : word a) (hw : word32) : op
           let v1 := set_byte (w + n2w 1) (get_byte (n2w 1) hw be) v0 be in
           let v2 := set_byte (w + n2w 2) (get_byte (n2w 2) hw be) v1 be in
           let v3 := set_byte (w + n2w 3) (get_byte (n2w 3) hw be) v2 be in
-          SOME ((byte_align w =+ Word v3) (fst m), tset (byte_align w) (Word v3) (snd m))
+          SOME (cset (byte_align w) (Word v3) m)
         else NONE
     end
   else NONE.
 
 Definition c_mem_store (addr : word a) (w : word_lab a) (m : cmem) : option cmem :=
-  if md addr then SOME ((addr =+ w) (fst m), tset addr w (snd m)) else NONE.
+  if md addr then SOME (cset addr w m) else NONE.
 
 Fixpoint c_mem_stores (a0 : word a) (ws : list (word_lab a)) (m : cmem) : option cmem :=
   match ws with
