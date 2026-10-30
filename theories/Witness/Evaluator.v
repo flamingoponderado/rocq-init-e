@@ -82,6 +82,23 @@ Qed.
 End WordTrie.
 End WordTrie.
 
+(** [ffi.call_FFI], except that the new event goes to the front of
+    [io_events]: the evaluator keeps the event list reversed. *)
+Definition c_call_FFI {ffi} (st : ffi_state ffi) (s : ffiname) (conf bytes : list word8)
+    : ffi_result ffi :=
+  if negb (bool_decide (s = ffi.ExtCall (strlit []))) then
+    match ffi_state_oracle st s (ffi_state_ffi_state st) conf bytes with
+    | Oracle_return ffi' bytes' =>
+        if (LENGTH bytes' =? LENGTH bytes)%N then
+          FFI_return
+            (mk_ffi_state (ffi_state_oracle st) ffi'
+               (IO_event s conf (ZIP (bytes, bytes')) :: io_events st))
+            bytes'
+        else FFI_final (Final_event s conf bytes FFI_failed)
+    | Oracle_final outcome => FFI_final (Final_event s conf bytes outcome)
+    end
+  else FFI_return st bytes.
+
 Section Evaluator.
 Context {a : N} {ffi_t : Type}.
 Variables (base : word a -> word_lab a) (md smd : word a -> bool).
@@ -250,16 +267,19 @@ Fixpoint c_eval (s : state a ffi_t) (t : trie) (e : exp a) {struct e} : option (
   | BytesInWord => SOME (ValWord bytes_in_word)
   end.
 
-(** Memories are pairs: [panSem]'s function, which is only written, and the
-    trie that every read uses. *)
+(** Memories are pairs: [panSem]'s function and the trie that every read
+    uses.  A store sets the function to the new trie's lookup, so the old
+    memory is not kept alive. *)
 Definition cmem : Type := (word a -> word_lab a) * trie.
+
+Definition cset (w : word a) (v : word_lab a) (m : cmem) : cmem :=
+  let t := tset w v (snd m) in (tget t, t).
 
 Definition c_mem_store_byte (m : cmem) (be : bool) (w : word a) (b : word8) : option cmem :=
   match tget (snd m) (byte_align w) with
   | Word v =>
       if md (byte_align w)
-      then SOME ((byte_align w =+ Word (set_byte w b v be)) (fst m),
-                 tset (byte_align w) (Word (set_byte w b v be)) (snd m))
+      then SOME (cset (byte_align w) (Word (set_byte w b v be)) m)
       else NONE
   end.
 
@@ -282,13 +302,13 @@ Definition c_mem_store_32 (m : cmem) (be : bool) (w : word a) (hw : word32) : op
           let v1 := set_byte (w + n2w 1) (get_byte (n2w 1) hw be) v0 be in
           let v2 := set_byte (w + n2w 2) (get_byte (n2w 2) hw be) v1 be in
           let v3 := set_byte (w + n2w 3) (get_byte (n2w 3) hw be) v2 be in
-          SOME ((byte_align w =+ Word v3) (fst m), tset (byte_align w) (Word v3) (snd m))
+          SOME (cset (byte_align w) (Word v3) m)
         else NONE
     end
   else NONE.
 
 Definition c_mem_store (addr : word a) (w : word_lab a) (m : cmem) : option cmem :=
-  if md addr then SOME ((addr =+ w) (fst m), tset addr w (snd m)) else NONE.
+  if md addr then SOME (cset addr w m) else NONE.
 
 Fixpoint c_mem_stores (a0 : word a) (ws : list (word_lab a)) (m : cmem) : option cmem :=
   match ws with
@@ -323,7 +343,7 @@ Definition c_sh_mem_load (vk : varkind) (v0 : varname) (addr : word a) (nb : N) 
     : option (result a) * state a ffi_t :=
   if (nb =? 0)%N then
     (if smd addr then
-       match call_FFI (ffi s) (SharedMem MappedRead) [n2w nb] (word_to_bytes addr false) with
+       match c_call_FFI (ffi s) (SharedMem MappedRead) [n2w nb] (word_to_bytes addr false) with
        | FFI_final outcome => (SOME (FinalFFI outcome), empty_locals s)
        | FFI_return new_ffi new_bytes =>
            (NONE, set_ffi new_ffi (set_kvar vk v0 (ValWord (word_of_bytes false (n2w 0) new_bytes)) s))
@@ -331,7 +351,7 @@ Definition c_sh_mem_load (vk : varkind) (v0 : varname) (addr : word a) (nb : N) 
      else (SOME Error, s))
   else
     (if smd (byte_align addr) then
-       match call_FFI (ffi s) (SharedMem MappedRead) [n2w nb] (word_to_bytes addr false) with
+       match c_call_FFI (ffi s) (SharedMem MappedRead) [n2w nb] (word_to_bytes addr false) with
        | FFI_final outcome => (SOME (FinalFFI outcome), empty_locals s)
        | FFI_return new_ffi new_bytes =>
            (NONE, set_ffi new_ffi (set_kvar vk v0 (ValWord (word_of_bytes false (n2w 0) new_bytes)) s))
@@ -342,7 +362,7 @@ Definition c_sh_mem_store {b} (w : word b) (addr : word a) (nb : N) (s : state a
     : option (result a) * state a ffi_t :=
   if (nb =? 0)%N then
     (if smd addr then
-       match call_FFI (ffi s) (SharedMem MappedWrite) [n2w nb]
+       match c_call_FFI (ffi s) (SharedMem MappedWrite) [n2w nb]
                (word_to_bytes w false ++ word_to_bytes addr false) with
        | FFI_final outcome => (SOME (FinalFFI outcome), s)
        | FFI_return new_ffi new_bytes => (NONE, set_ffi new_ffi s)
@@ -350,7 +370,7 @@ Definition c_sh_mem_store {b} (w : word b) (addr : word a) (nb : N) (s : state a
      else (SOME Error, s))
   else
     (if smd (byte_align addr) then
-       match call_FFI (ffi s) (SharedMem MappedWrite) [n2w nb]
+       match c_call_FFI (ffi s) (SharedMem MappedWrite) [n2w nb]
                (TAKE nb (word_to_bytes w false) ++ word_to_bytes addr false) with
        | FFI_final outcome => (SOME (FinalFFI outcome), s)
        | FFI_return new_ffi new_bytes => (NONE, set_ffi new_ffi s)
@@ -562,7 +582,7 @@ Definition c_evaluate_body
           match read_bytearray sz1 (w2n ad1) (c_mem_load_byte t (be s)),
                 read_bytearray sz2 (w2n ad2) (c_mem_load_byte t (be s)) with
           | SOME bytes, SOME bytes2 =>
-              match call_FFI (ffi s) (ffi.ExtCall ffi_index) bytes bytes2 with
+              match c_call_FFI (ffi s) (ffi.ExtCall ffi_index) bytes bytes2 with
               | FFI_final outcome => (SOME (FinalFFI outcome), empty_locals s, t)
               | FFI_return new_ffi new_bytes =>
                   let nmem := c_write_bytearray sz2 new_bytes (memory s, t) (be s) in

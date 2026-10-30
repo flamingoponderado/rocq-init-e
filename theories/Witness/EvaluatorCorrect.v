@@ -1,9 +1,10 @@
 (** [Witness.Evaluator] computes [panSem]'s results.
 
     For states whose memory domains are decided by [md]/[smd] and whose
-    memory agrees with the trie, [c_evaluate_c] returns exactly
-    [panSem.evaluate_c]'s result and state, together with a trie that again
-    agrees with the returned memory. *)
+    memory agrees with the trie, [c_evaluate_c] returns [panSem.evaluate_c]'s
+    result, and its state is [panSem]'s with the FFI events reversed
+    ([norm]), together with a trie that again agrees with the returned
+    memory. *)
 From Stdlib Require Import FMapPositive.
 From Galette Require Import Base Classical.
 From Galette.HOL.src.num.theories Require Import arithmetic.
@@ -110,8 +111,14 @@ Definition Good (m : word a -> word_lab a) (t : WordTrie.t) : Prop := forall x, 
 Definition Rel (s : state a ffi_t) (t : WordTrie.t) : Prop :=
   memaddrs s = D /\ sh_memaddrs s = SD /\ Good (memory s) t.
 
+(** The evaluator keeps [io_events] reversed; [norm] gives [panSem]'s state. *)
+Definition revev (f : ffi_state ffi_t) : ffi_state ffi_t :=
+  mk_ffi_state (ffi_state_oracle f) (ffi_state_ffi_state f) (List.rev (io_events f)).
+
+Definition norm (s : state a ffi_t) : state a ffi_t := set_ffi (revev (ffi s)) s.
+
 Definition CR (c : cres) (x : option (result a) * state a ffi_t) : Prop :=
-  fst c = x /\ Rel (snd (fst c)) (snd c).
+  (fst (fst c), norm (snd (fst c))) = x /\ Rel (snd (fst c)) (snd c).
 
 Lemma decide_md {B} w (x y : B) : (if classical_dec (w IN D) then x else y) = (if md w then x else y).
 Proof.
@@ -249,6 +256,15 @@ Qed.
 Lemma Good_update m t w x : Good m t -> Good ((w =+ x) m) (WordTrie.set w x t).
 Proof. intros G y; rewrite WordTrie.get_set, !APPLY_UPDATE_THM, G; reflexivity. Qed.
 
+Lemma cset_rel m t m' w x : Good m t ->
+  SOME ((w =+ x) m) = SOME (fst (cset base w x (m', t))) /\
+  Good (fst (cset base w x (m', t))) (snd (cset base w x (m', t))).
+Proof.
+  intros G; unfold cset; cbn [fst snd]; split; [|intros y; reflexivity].
+  f_equal; apply functional_extensionality; intros y.
+  rewrite WordTrie.get_set, !APPLY_UPDATE_THM, G; reflexivity.
+Qed.
+
 Definition StoreRel (c : option cmem) (o : option (word a -> word_lab a)) : Prop :=
   match c with
   | SOME cm => o = SOME (fst cm) /\ Good (fst cm) (snd cm)
@@ -259,8 +275,8 @@ Lemma store_byte_rel m t be w b : Good m t ->
   StoreRel (c_mem_store_byte base md (m, t) be w b) (mem_store_byte m D be w b).
 Proof.
   intros G; unfold c_mem_store_byte, mem_store_byte, StoreRel; cbn [fst snd].
-  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); cbn; [|reflexivity].
-  split; [reflexivity|]. apply Good_update; intros y; rewrite G; reflexivity.
+  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); [|reflexivity].
+  apply cset_rel, G.
 Qed.
 
 Lemma write_bytearray_rel m t a0 bs be : Good m t ->
@@ -282,28 +298,19 @@ Lemma store_32_rel m t be w hw : Good m t ->
 Proof.
   intros G; unfold c_mem_store_32, mem_store_32, StoreRel; cbn [fst snd].
   destruct (aligned 2 w); [|reflexivity].
-  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); cbn; [|reflexivity].
-  split; [reflexivity|]. apply Good_update; intros y; rewrite G; reflexivity.
+  rewrite G; destruct (tget t _); rewrite decide_md; destruct (md _); [|reflexivity].
+  apply cset_rel, G.
 Qed.
 
 Lemma stores_rel ws : forall m t a0, Good m t ->
-  StoreRel (c_mem_stores md a0 ws (m, t)) (mem_stores a0 ws D m).
+  StoreRel (c_mem_stores base md a0 ws (m, t)) (mem_stores a0 ws D m).
 Proof.
   induction ws as [|w ws IH]; intros m t a0 G; [split; [reflexivity|exact G]|].
   cbn [c_mem_stores mem_stores]; unfold c_mem_store, mem_store; cbn [fst snd].
   rewrite decide_md; destruct (md a0); [|reflexivity].
-  apply IH, Good_update, G.
+  destruct (cset_rel m t m a0 w G) as [E G']; injection E as ->.
+  unfold cset in G' |- *; cbn [fst snd] in G' |- *. apply IH, G'.
 Qed.
-
-(** *** Shared memory *)
-
-Lemma sh_mem_load_eq vk v0 addr nb (s : state a ffi_t) : sh_memaddrs s = SD ->
-  c_sh_mem_load smd vk v0 addr nb s = sh_mem_load vk v0 addr nb s.
-Proof. intros HS; unfold c_sh_mem_load, sh_mem_load; rewrite HS, !decide_smd; reflexivity. Qed.
-
-Lemma sh_mem_store_eq {b} (w : word b) addr nb (s : state a ffi_t) : sh_memaddrs s = SD ->
-  c_sh_mem_store smd w addr nb s = sh_mem_store w addr nb s.
-Proof. intros HS; unfold c_sh_mem_store, sh_mem_store; rewrite HS, !decide_smd; reflexivity. Qed.
 
 (** *** States *)
 
@@ -334,17 +341,98 @@ Proof. intros H; apply (Rel_same _ _ _ H); destruct vk; reflexivity. Qed.
 Lemma Rel_set_memory m s t t' : Rel s t -> Good m t' -> Rel (set_memory m s) t'.
 Proof. intros (H1 & H2 & _) G; repeat split; assumption. Qed.
 
-Lemma Rel_sh_mem_load vk v0 addr nb s t : Rel s t -> Rel (snd (sh_mem_load vk v0 addr nb s)) t.
+(** *** Reversed events *)
+
+Lemma norm_locals s : locals (norm s) = locals s. Proof. reflexivity. Qed.
+Lemma norm_globals s : globals (norm s) = globals s. Proof. reflexivity. Qed.
+Lemma norm_structs s : structs (norm s) = structs s. Proof. reflexivity. Qed.
+Lemma norm_code s : code (norm s) = code s. Proof. reflexivity. Qed.
+Lemma norm_eshapes s : eshapes (norm s) = eshapes s. Proof. reflexivity. Qed.
+Lemma norm_memory s : memory (norm s) = memory s. Proof. reflexivity. Qed.
+Lemma norm_memaddrs s : memaddrs (norm s) = memaddrs s. Proof. reflexivity. Qed.
+Lemma norm_sh_memaddrs s : sh_memaddrs (norm s) = sh_memaddrs s. Proof. reflexivity. Qed.
+Lemma norm_clock s : clock (norm s) = clock s. Proof. reflexivity. Qed.
+Lemma norm_be s : be (norm s) = be s. Proof. reflexivity. Qed.
+Lemma norm_base_addr s : base_addr (norm s) = base_addr s. Proof. reflexivity. Qed.
+Lemma norm_top_addr s : top_addr (norm s) = top_addr s. Proof. reflexivity. Qed.
+Lemma norm_ffi s : ffi (norm s) = revev (ffi s). Proof. reflexivity. Qed.
+Lemma norm_set_locals x s : set_locals x (norm s) = norm (set_locals x s). Proof. reflexivity. Qed.
+Lemma norm_set_globals x s : set_globals x (norm s) = norm (set_globals x s). Proof. reflexivity. Qed.
+Lemma norm_set_code x s : set_code x (norm s) = norm (set_code x s). Proof. reflexivity. Qed.
+Lemma norm_set_eshapes x s : set_eshapes x (norm s) = norm (set_eshapes x s). Proof. reflexivity. Qed.
+Lemma norm_set_memory x s : set_memory x (norm s) = norm (set_memory x s). Proof. reflexivity. Qed.
+Lemma norm_set_clock x s : set_clock x (norm s) = norm (set_clock x s). Proof. reflexivity. Qed.
+Lemma norm_dec_clock s : dec_clock (norm s) = norm (dec_clock s). Proof. reflexivity. Qed.
+Lemma norm_empty_locals s : empty_locals (norm s) = norm (empty_locals s). Proof. reflexivity. Qed.
+Lemma norm_set_var v0 x s : set_var v0 x (norm s) = norm (set_var v0 x s). Proof. reflexivity. Qed.
+Lemma norm_set_kvar vk v0 x s : set_kvar vk v0 x (norm s) = norm (set_kvar vk v0 x s).
+Proof. destruct vk; reflexivity. Qed.
+Lemma norm_set_ffi f s : set_ffi (revev f) (norm s) = norm (set_ffi f s). Proof. reflexivity. Qed.
+Lemma norm_lookup_kvar vk v0 s : lookup_kvar vk v0 (norm s) = lookup_kvar vk v0 s.
+Proof. destruct vk; reflexivity. Qed.
+Lemma norm_is_valid_value s : is_valid_value (norm s) = is_valid_value s.
+Proof. reflexivity. Qed.
+
+Lemma norm_eval s : eval (norm s) = eval s.
 Proof.
-  intros H; unfold sh_mem_load.
-  repeat (destruct (classical_dec _) || destruct (_ =? _) || destruct (call_FFI _ _ _ _)); cbn [snd];
+  apply functional_extensionality; intros e.
+  induction e using exp_nested_ind; cbn [eval];
+    repeat match goal with H : Forall _ _ |- _ => rewrite (OPT_MMAP_ext _ _ _ H); clear H end;
+    repeat match goal with H : eval _ ?e = eval _ ?e |- _ => rewrite H; clear H end;
+    reflexivity.
+Qed.
+
+Create Rewrite HintDb norm.
+#[local] Hint Rewrite norm_locals norm_globals norm_structs norm_code norm_eshapes norm_memory
+  norm_memaddrs norm_sh_memaddrs norm_clock norm_be norm_base_addr norm_top_addr norm_ffi
+  norm_set_locals norm_set_globals norm_set_code norm_set_eshapes norm_set_memory norm_set_clock
+  norm_dec_clock norm_empty_locals norm_set_var norm_set_kvar norm_set_ffi norm_lookup_kvar
+  norm_is_valid_value norm_eval : norm.
+
+Definition res_map (r : ffi_result ffi_t) : ffi_result ffi_t :=
+  match r with FFI_return st bytes => FFI_return (revev st) bytes | FFI_final e => FFI_final e end.
+
+Lemma c_call_FFI_eq st n conf bytes :
+  call_FFI (revev st) n conf bytes = res_map (c_call_FFI st n conf bytes).
+Proof.
+  unfold call_FFI, c_call_FFI; cbn [ffi_state_oracle ffi_state_ffi_state revev].
+  destruct (negb _); [|reflexivity].
+  destruct (ffi_state_oracle st _ _ _ _); [|reflexivity].
+  destruct (_ =? _)%N; reflexivity.
+Qed.
+
+(** *** Shared memory *)
+
+Lemma sh_mem_load_eq vk v0 addr nb (s : state a ffi_t) : sh_memaddrs s = SD ->
+  sh_mem_load vk v0 addr nb (norm s) =
+  (fst (c_sh_mem_load smd vk v0 addr nb s), norm (snd (c_sh_mem_load smd vk v0 addr nb s))).
+Proof.
+  intros HS; unfold c_sh_mem_load, sh_mem_load; rewrite norm_sh_memaddrs, norm_ffi, HS, !decide_smd,
+    !c_call_FFI_eq.
+  destruct vk; repeat (destruct (smd _) || destruct (_ =? _)%N || destruct (c_call_FFI _ _ _ _)); reflexivity.
+Qed.
+
+Lemma sh_mem_store_eq {b} (w : word b) addr nb (s : state a ffi_t) : sh_memaddrs s = SD ->
+  sh_mem_store w addr nb (norm s) =
+  (fst (c_sh_mem_store smd w addr nb s), norm (snd (c_sh_mem_store smd w addr nb s))).
+Proof.
+  intros HS; unfold c_sh_mem_store, sh_mem_store; rewrite norm_sh_memaddrs, norm_ffi, HS, !decide_smd,
+    !c_call_FFI_eq.
+  repeat (destruct (smd _) || destruct (_ =? _)%N || destruct (c_call_FFI _ _ _ _)); reflexivity.
+Qed.
+
+Lemma Rel_sh_mem_load vk v0 addr nb s t : Rel s t -> Rel (snd (c_sh_mem_load smd vk v0 addr nb s)) t.
+Proof.
+  intros H; unfold c_sh_mem_load.
+  repeat (destruct (smd _) || destruct (_ =? _)%N || destruct (c_call_FFI _ _ _ _)); cbn [snd];
     eauto using Rel_set_ffi, Rel_set_kvar, Rel_empty_locals.
 Qed.
 
-Lemma Rel_sh_mem_store {b} (w : word b) addr nb s t : Rel s t -> Rel (snd (sh_mem_store w addr nb s)) t.
+Lemma Rel_sh_mem_store {b} (w : word b) addr nb s t : Rel s t ->
+  Rel (snd (c_sh_mem_store smd w addr nb s)) t.
 Proof.
-  intros H; unfold sh_mem_store.
-  repeat (destruct (classical_dec _) || destruct (_ =? _) || destruct (call_FFI _ _ _ _)); cbn [snd];
+  intros H; unfold c_sh_mem_store.
+  repeat (destruct (smd _) || destruct (_ =? _)%N || destruct (c_call_FFI _ _ _ _)); cbn [snd];
     eauto using Rel_set_ffi.
 Qed.
 
@@ -363,10 +451,10 @@ Lemma c_evaluate_c_unfold cf p s t :
 Proof. destruct cf, p; reflexivity. Qed.
 
 Definition Sound (cf : nat) (p : prog a) : Prop :=
-  forall s t, Rel s t -> CR (c_evaluate_c base md smd cf p s t) (evaluate_c cf p s).
+  forall s t, Rel s t -> CR (c_evaluate_c base md smd cf p s t) (evaluate_c cf p (norm s)).
 
 Definition LowerSound (cf : nat) : Prop :=
-  forall p s t, Rel s t -> CR (c_lowerF cf p s t) (lowerF cf p s).
+  forall p s t, Rel s t -> CR (c_lowerF cf p s t) (lowerF cf p (norm s)).
 
 (** Replace a recursive result by its [panSem] counterpart. *)
 Ltac use_cr H :=
@@ -391,9 +479,9 @@ Ltac finish := split; [reflexivity|cbn [fst snd]; rel_tac].
 
 Ltac mem_tac :=
   match goal with
-  | G : Good (memory ?s0) ?t0 |- context [c_mem_stores _ ?a0 ?ws (memory ?s0, ?t0)] =>
+  | G : Good (memory ?s0) ?t0 |- context [c_mem_stores _ _ ?a0 ?ws (memory ?s0, ?t0)] =>
       let H := fresh "H" in pose proof (stores_rel ws _ _ a0 G) as H; revert H;
-      destruct (c_mem_stores _ a0 ws (memory s0, t0)) as [[?m ?tm]|]; cbn [StoreRel fst snd];
+      destruct (c_mem_stores _ _ a0 ws (memory s0, t0)) as [[?m ?tm]|]; cbn [StoreRel fst snd];
       [intros [-> ?G]|intros ->]
   | G : Good (memory ?s0) ?t0 |- context [c_mem_store_32 _ _ (memory ?s0, ?t0) ?be ?w ?hw] =>
       let H := fresh "H" in pose proof (store_32_rel _ _ be w hw G) as H; revert H;
@@ -417,12 +505,18 @@ Ltac sh_tac :=
       rewrite (sh_mem_store_eq w ad nb s0 HS); split; [reflexivity|apply Rel_sh_mem_store, HR]
   end.
 
+Ltac ffi_tac :=
+  match goal with
+  | |- context [call_FFI (revev ?st) ?n ?c ?b] => rewrite (c_call_FFI_eq st n c b)
+  | |- context [c_call_FFI ?st ?n ?c ?b] => destruct (c_call_FFI st n c b); cbn [res_map]
+  end.
+
 Ltac destruct_match :=
   match goal with |- context [match ?x with _ => _ end] => destruct x eqn:? end.
 
 Ltac crush :=
   repeat (classical_decisions;
-          first [ finish | sh_tac | mem_tac | sub_cr
+          first [ progress autorewrite with norm | finish | sh_tac | mem_tac | sub_cr | ffi_tac
                 | progress cbn beta iota zeta delta [c_fix_clock fix_clock fst snd]
                 | destruct_match ]).
 
@@ -430,6 +524,7 @@ Lemma evaluate_c_sound cf : LowerSound cf -> forall p, Sound cf p.
 Proof.
   intros Hlow p; induction p; intros s0 t0 HR;
     rewrite c_evaluate_c_unfold, evaluate_c_unfold; cbn [c_evaluate_body evaluate_body];
+    autorewrite with norm;
     pose proof HR as (HD & HS & G);
     rewrite ?(c_eval_eq s0 t0 HR), ?c_is_valid_value_eq, ?c_lookup_code_eq, ?HD,
       ?(load_byte_eq _ _ _ G);
@@ -437,7 +532,7 @@ Proof.
 Qed.
 
 Theorem c_evaluate_c_correct cf p s t : Rel s t ->
-  CR (c_evaluate_c base md smd cf p s t) (evaluate_c cf p s).
+  CR (c_evaluate_c base md smd cf p s t) (evaluate_c cf p (norm s)).
 Proof.
   revert p s t; induction cf as [|cf IH]; intros p.
   - apply evaluate_c_sound; intros p0 s0 t0 H; split; [reflexivity|exact H].
@@ -446,8 +541,15 @@ Qed.
 
 (** [panSem.evaluate] runs with fuel one above the state's clock. *)
 Corollary c_evaluate_correct p s t : Rel s t ->
-  evaluate (p, s) = fst (c_evaluate_c base md smd (Datatypes.S (N.to_nat (clock s))) p s t).
+  evaluate (p, norm s) =
+  (fst (fst (c_evaluate_c base md smd (Datatypes.S (N.to_nat (clock s))) p s t)),
+   norm (snd (fst (c_evaluate_c base md smd (Datatypes.S (N.to_nat (clock s))) p s t)))).
 Proof. intros H; symmetry; apply (c_evaluate_c_correct _ p s t H). Qed.
+
+Lemma norm_id s : io_events (ffi s) = [] -> norm s = s.
+Proof.
+  destruct s as [? ? ? ? ? ? ? ? ? ? [o f ev] ? ?]; cbn; intros ->; reflexivity.
+Qed.
 
 Theorem c_evaluate_decls_correct ds : forall s t, Rel s t ->
   c_evaluate_decls base md s t ds = evaluate_decls s ds.

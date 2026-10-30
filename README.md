@@ -102,6 +102,25 @@ real negative CLI cases passed. The previous baseline passed positive replay; th
 See [submission protocol](docs/SUBMISSIONS.md) for package contents, operator
 sealing, negative tests and the positive command.
 
+## Score lower bound
+
+`InitE.Witness.Score` proves that every certificate's score is at least 3
+(`certificate_score_at_least_three`, `certificate_finite_score_at_least_three`,
+`submission_score_at_least_three`). The source semantics accepts the witness
+input, EEST block 00818 in `Witness/Input.v`. That is shown by running
+`Witness/Evaluator.v`, a computable copy of panSem proved equal to it in
+`Witness/EvaluatorCorrect.v`, under `vm_compute`: about 200 s at clock 32000.
+`Witness/TargetLowerBound.v` then shows that a matching target run needs an
+ordinary entry tick, a returning call and a halt.
+
+## EEST runner
+
+`Witness/Runner.v` runs the guest on any input with the computable evaluator.
+`runInput_halted` proves that a halted report is the source behaviour, with
+its output bytes. [tools/eest-runner](tools/eest-runner/README.md) extracts it to a native
+runner with `spike_run`'s command line. That runner is a testing aid with
+trusted extraction, and it is not in the default build.
+
 ## Fidelity and trust limits
 
 The allowed foundations are classical excluded middle, constructive indefinite

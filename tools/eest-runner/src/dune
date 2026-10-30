@@ -1,0 +1,14 @@
+; Not part of the default build: run
+;   dune build tools/eest-runner/src/eest_runner.exe
+; It needs Zarith (opam package zarith).
+(rocq.extraction
+ (prelude Extract)
+ (extracted_modules runner_extracted)
+ (theories Stdlib Galette InitE))
+
+(executable
+ (name eest_runner)
+ (modules fmap nth runner_extracted eest_runner)
+ (libraries zarith unix)
+ (ocamlopt_flags (:standard -unsafe -inline 200))
+ (flags (:standard -w -a)))
