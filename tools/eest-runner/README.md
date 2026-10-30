@@ -75,6 +75,20 @@ On the 309 cases of init-e's sampled baseline whose labels appear in the full
   recorded Spike run of the compiled guest.
 * The median case takes 2.7 s.
 
-The runner takes about 0.5–1 µs per RISC-V step that Spike counts for the same
-block. Cases with large inputs are slower, because panSem appends each FFI
-event to the end of the event list.
+### Full corpus
+
+The full `tests-zkevm@v21.0.1` corpus is 33,614 cases. It ran with
+`--jobs 24` on a 32-core, 125 GB machine. Wall clock: 10h36m (38,182 s).
+
+* 33,595 cases are `PASS(full)` and 9 are `PASS(malformed)`.
+* For all of them, the output bytes, debug bytes, trap and stage markers agree
+  with the recorded Spike run of guest commit 45e6117f.
+* All 32,444 cases that declare at most 200M gas pass. The slowest is a g2msm
+  block at 3h25m.
+* The 10 errors are the 8 MB RLP-limit blocks (`21566`–`21575`), which each
+  declare 555M gas. They were killed by the 8h timeout or by the system under
+  memory pressure (about 9.5 GB each).
+
+The median case takes 4.4 s. Most cases run at about 0.5–1 µs per RISC-V
+step that Spike counts for the same block. The BLS precompile cases run at
+about 3 µs per step.
