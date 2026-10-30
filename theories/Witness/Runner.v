@@ -67,7 +67,7 @@ Definition runInput (clock : N) (len : nat) (input : InputBlob) : report :=
       | Some s =>
           let '(r, t, _) := c_evaluate_c sourceMemory ordinaryDecider sharedDecider
                               (Datatypes.S (N.to_nat clock)) mainCall (set_clock clock s) emptyTrie in
-          let events := io_events (ffi t) in
+          let events := List.rev (io_events (ffi t)) in
           {| outcome := classify r; clockUsed := clock - panSem.clock t;
              eventCount := N.of_nat (List.length events);
              output := outputBytes input events len |}
@@ -92,6 +92,17 @@ Proof.
     eapply IH; [apply Rel_set_globals, HR|exact E].
   - destruct (andb _ _); [|discriminate]. eapply IH; [apply Rel_set_eshapes, HR|exact E].
   - exact (IH s s' HR E).
+Qed.
+
+Lemma evaluate_decls_ffi ds : forall (s s' : state 64 HostMemory),
+  evaluate_decls s ds = Some s' -> ffi s' = ffi s.
+Proof.
+  induction ds as [|[fi|sh v0 e|eid sh|nm fl] ds IH]; intros s s' E; cbn [evaluate_decls] in E.
+  - injection E as <-; reflexivity.
+  - destruct (andb _ _); [|discriminate]. exact (IH _ _ E).
+  - destruct (eval _ e); [|discriminate]. destruct (bool_decide _); [|discriminate]. exact (IH _ _ E).
+  - destruct (andb _ _); [|discriminate]. exact (IH _ _ E).
+  - exact (IH _ _ E).
 Qed.
 
 Lemma outputBytes_nth input events len offset :
@@ -131,6 +142,7 @@ Proof.
   pose proof (c_evaluate_correct sourceMemory ordinaryDecider sharedDecider
     ordinaryDomain sharedDomain ordinaryDecider_spec sharedDecider_spec
     mainCall _ _ HR) as run.
+  rewrite norm_id in run by (cbn [ffi set_clock]; rewrite (evaluate_decls_ffi _ _ _ Hdecls); reflexivity).
   cbn [panSem.clock set_clock] in run.
   revert run.
   destruct (c_evaluate_c _ _ _ _ _ _ _) as [[r t] tt]; cbn [fst outcome output]; intros run.
@@ -141,7 +153,8 @@ Proof.
     [|destruct (bool_decide (name = strlit "trap")); discriminate].
   apply bool_decide_spec in Eh; subst name.
   intros C; injection C as -> ->.
-  exists (io_events (ffi t)); split.
+  cbn [snd] in run.
+  exists (List.rev (io_events (ffi t))); split.
   - exact (semantics_of_final_run _ _ clock _ _ run).
   - intros offset H; apply outputBytes_nth, H.
 Qed.

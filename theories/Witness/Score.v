@@ -5,7 +5,7 @@
     [halt] with output byte 32 set, and [EvaluatorCorrect] and [SourceRun]
     turn that run into [sourceBehaviour input].  [TargetLowerBound] then
     shows that a target run matching it needs at least three ticks. *)
-From Stdlib Require Import FMapPositive.
+From Stdlib Require Import FMapPositive Lia.
 From Galette Require Import Base.
 From Galette.HOL.src.n_bit Require Import words.
 From Galette.HOL.src.list.src Require Import list.
@@ -24,30 +24,12 @@ Open Scope hol_string_scope.
 
 Definition witnessClock : N := 32000.
 
-(** The run's result is accepted: a final [halt] call with output byte 32 set. *)
-Definition acceptedRun (c : @cres 64 HostMemory) : bool :=
-  match c with
-  | (Some (FinalFFI (Final_event (ffi.ExtCall name) [] [] FFI_failed)), s, _) =>
-      bool_decide (name = strlit "halt") &&
-      (w2n (outputByte input (io_events (ffi s)) acceptanceOffset) =? 1)
-  | _ => false
-  end.
-
-(** The only computation: about 200 s of [vm_compute].  It is stated over
-    [decs_stcnames] and [c_evaluate_decls] themselves so that using it needs
-    no conversion through the run. *)
+(** The only computation: about 200 s of [vm_compute].  The run halts with no
+    configuration bytes, and output byte 32 is 1. *)
 Lemma witness_check :
-  match decs_stcnames [] guestAst with
-  | None => false
-  | Some st =>
-      match c_evaluate_decls sourceMemory ordinaryDecider
-              (set_structs st (sourceInitialState input)) emptyTrie guestAst with
-      | None => false
-      | Some s =>
-          acceptedRun (c_evaluate_c sourceMemory ordinaryDecider sharedDecider
-                         (Datatypes.S (N.to_nat witnessClock)) mainCall
-                         (set_clock witnessClock s) emptyTrie)
-      end
+  match runInput witnessClock 33 input with
+  | {| outcome := Halted [] []; output := out |} => w2n (List.nth 32 out (n2w 0)) =? 1
+  | _ => false
   end = true.
 Proof. vm_compute; reflexivity. Qed.
 
@@ -58,33 +40,14 @@ Theorem witness_behaviour : exists events,
   outputByte input events acceptanceOffset = n2w 1.
 Proof.
   pose proof witness_check as C; revert C.
-  change (sourceBehaviour input) with
-    (semantics_decls (sourceInitialState input) (strlit "main") guestAst).
-  unfold semantics_decls.
-  destruct (decs_stcnames [] guestAst) as [st|]; [|discriminate].
-  pose proof (Rel_initial input st) as HR0.
-  rewrite <- (c_evaluate_decls_correct sourceMemory ordinaryDecider
-    ordinaryDomain sharedDomain ordinaryDecider_spec guestAst _ _ HR0).
-  destruct (c_evaluate_decls _ _ _ _ guestAst) as [s|] eqn:Hdecls; [|discriminate].
-  rewrite (c_evaluate_decls_correct sourceMemory ordinaryDecider
-    ordinaryDomain sharedDomain ordinaryDecider_spec guestAst _ _ HR0) in Hdecls.
-  pose proof (Rel_set_clock sourceMemory ordinaryDomain sharedDomain witnessClock _ _
-    (Rel_decls _ _ _ HR0 Hdecls)) as HR.
-  pose proof (c_evaluate_correct sourceMemory ordinaryDecider sharedDecider
-    ordinaryDomain sharedDomain ordinaryDecider_spec sharedDecider_spec
-    mainCall _ _ HR) as run.
-  cbn [clock set_clock] in run.
-  revert run.
-  destruct (c_evaluate_c _ _ _ _ _ _ _) as [[r t] tt]; cbn [fst]; intros run.
-  unfold acceptedRun.
-  destruct r as [[| | | | | |[[name|] conf bytes outcome]]|]; try discriminate.
-  destruct conf; [|discriminate]. destruct bytes; [|discriminate].
-  destruct outcome; [|discriminate].
-  intros C; apply Bool.andb_true_iff in C as [Hname Hbyte].
-  apply bool_decide_spec in Hname; subst name.
-  exists (io_events (ffi t)); split.
-  - exact (semantics_of_final_run _ _ witnessClock _ _ run).
-  - apply N.eqb_eq in Hbyte. apply word_eq_w2n. rewrite Hbyte. reflexivity.
+  pose proof (runInput_halted witnessClock 33 input) as H; revert H.
+  destruct (runInput witnessClock 33 input) as [o cu ec out]; cbn [outcome output].
+  destruct o as [[|? ?] [|? ?]| | | |]; try discriminate.
+  intros H C; destruct (H [] [] eq_refl) as (events & source & bytes).
+  exists events; split; [exact source|].
+  rewrite (bytes acceptanceOffset) by (cbn; lia).
+  change (N.to_nat (offsetValue acceptanceOffset)) with 32%nat.
+  apply N.eqb_eq in C. apply word_eq_w2n. rewrite C. reflexivity.
 Qed.
 
 Lemma witness_gas : declaredGasLimit input <= 200000000.
